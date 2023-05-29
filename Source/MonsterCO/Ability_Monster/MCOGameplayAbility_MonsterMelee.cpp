@@ -1,0 +1,141 @@
+#include "MCOGameplayAbility_MonsterMelee.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Ability_Character/MCOAbilitySystemComponent.h"
+#include "Ability_Character/MCOCharacterTags.h"
+#include "AI/MCOAIKeys.h"
+#include "Monster/MCOMonsterAIController.h"
+#include "Monster/MCOMonsterCharacter.h"
+#include "MonsterAttachment/MCOMonsterAttachment.h"
+#include "MonsterAttachment/MCOMonsterModeComponent.h"
+
+
+UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
+{
+	AbilityInputID = EMCOAbilityID::NormalAttack;
+	AbilityTag = FMCOCharacterTags::Get().AttackTag;
+	AbilityTags.AddTag(AbilityTag);
+	ActivationOwnedTags.AddTag(AbilityTag);
+
+	static ConstructorHelpers::FObjectFinder<UMCOCommonMontageData> LeftRef(TEXT("/Game/Data/Dragon/DA_LeftClaw.DA_LeftClaw"));
+	if (true == LeftRef.Succeeded())
+	{
+		Data.Emplace(EMCOCharacterDirection::Left, LeftRef.Object);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMCOCommonMontageData> RightRef(TEXT("/Game/Data/Dragon/DA_RightClaw.DA_RightClaw"));
+	if (true == RightRef.Succeeded())
+	{
+		Data.Emplace(EMCOCharacterDirection::Right, RightRef.Object);
+	}
+
+	DirectionOption = EMCOCharacterDirectionOption::LeftRight;
+}
+
+bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
+{
+	bool bResult = Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+	if (false == bResult)
+	{
+		AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+		ensure(Monster);
+		Monster->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);
+	}
+	
+	return bResult;
+}
+
+void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+{
+	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	ensure(Monster);
+	
+	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
+	ensure(AIController);
+	
+	ACharacter* Target = Cast<ACharacter>(AIController->GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
+	ISTRUE(Target);
+	
+	const float AttackDegree = CalculateTargetDegree(
+		Monster->GetActorLocation(),
+		Monster->GetActorForwardVector(),
+		Target->GetActorLocation()
+	);
+	const EMCOCharacterDirection AttackingDirection = GetDirectionFromDegree(DirectionOption, AttackDegree);
+	ensure(Data.Contains(AttackingDirection));
+	
+	// Set Cooldown Effect
+	SetCooldownGameplayEffect(
+		Data[AttackingDirection]->AttributeValues.CooldownTime,
+		Data[AttackingDirection]->AttributeValues.CooldownTags
+	);
+	
+	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	
+	// MCOLOG(TEXT("Monster Attack %f : %s"),
+	// 	AttackDegree,
+	// 	*FHelper::GetEnumDisplayName(TEXT("EMCOCharacterDirection"), (int64)AttackingDirection)
+	// );
+	
+	StartActivation_CommonAttack(
+		Data[AttackingDirection]
+	);
+}
+
+void UMCOGameplayAbility_MonsterMelee::OnTaskCompleted()
+{
+	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	ensure(Monster);
+	Monster->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Succeeded);
+	
+	Super::OnTaskCompleted();
+}
+
+void UMCOGameplayAbility_MonsterMelee::OnTaskCancelled()
+{
+	MCOLOG(TEXT("Attack Cancelled"));
+	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	ensure(Monster);
+	Monster->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);
+	
+	Super::OnTaskCancelled();
+}
+
+void UMCOGameplayAbility_MonsterMelee::BeginDamaging_Collision()
+{
+	Super::BeginDamaging_Collision();
+
+	ISTRUE(nullptr != CurrentData);
+	
+	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	ensure(Monster);
+	
+	UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
+	ensure(Mode);
+	
+	AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
+	ensure(Attachment);
+	
+	Attachment->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+	Attachment->TurnOnCollision(CurrentData->CollisionData.SocketName);
+}
+
+void UMCOGameplayAbility_MonsterMelee::EndDamaging_Collision()
+{
+	Super::EndDamaging_Collision();
+	
+	ISTRUE(nullptr != CurrentData);
+	
+	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	ensure(Monster);
+	
+	UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
+	ensure(Mode);
+	
+	AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
+	ensure(Attachment);
+	
+	Attachment->OnAttachmentBeginOverlapDelegate.Clear();
+	Attachment->TurnOffCollision(CurrentData->CollisionData.SocketName);
+}
+

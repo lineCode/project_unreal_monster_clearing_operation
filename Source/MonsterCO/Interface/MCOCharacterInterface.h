@@ -1,0 +1,45 @@
+#pragma once
+
+#include "MonsterCO.h"
+#include "UObject/Interface.h"
+#include "MCOCharacterInterface.generated.h"
+
+
+USTRUCT()
+struct FMCODamagedData
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	float AttackedDegree = 0.0f;
+};
+
+
+DECLARE_DELEGATE(FOnDamagedDelegate);
+
+
+UINTERFACE(MinimalAPI)
+class UMCOCharacterInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class MONSTERCO_API IMCOCharacterInterface
+{
+	GENERATED_BODY()
+
+public:	
+// --- Action
+	virtual void OffAllCollision() = 0;
+	virtual bool CanAttack() const = 0;
+	virtual void ControlMoving(bool InToStop) = 0;
+
+// --- Damaged
+public:
+	FOnDamagedDelegate OnDamagedBegin;
+	FOnDamagedDelegate OnDamagedEnd;
+	
+	virtual const FMCODamagedData GetDamagedData() = 0;
+	virtual void SetDamagedData(const FMCODamagedData& InDegree) = 0;
+};

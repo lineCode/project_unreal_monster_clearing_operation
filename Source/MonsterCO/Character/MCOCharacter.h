@@ -1,0 +1,132 @@
+#pragma once
+
+#include "MonsterCO.h"
+#include "GameFramework/Character.h"
+#include "GameplayTagContainer.h"
+#include "Ability_Character/MCOAbilitySet.h"
+#include "AbilitySystemInterface.h"
+#include "Ability_Character/MCOAttributeSet.h"
+#include "Interface/MCOAttackedInterface.h"
+#include "Interface/MCOCharacterInterface.h"
+#include "MCOCharacter.generated.h"
+
+
+class FObjectInitializer;
+class UMCOAbilitySystemComponent;
+class UMCOAttributeSet;
+class UMCOCharacterData;
+class UMCOHpWidget;
+class UMCOAttributeWidget;
+
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedSignature, AMCOCharacter*, InCharacter);
+
+UCLASS()
+class MONSTERCO_API AMCOCharacter : public ACharacter, public IAbilitySystemInterface, public IMCOCharacterInterface, public IMCOAttackedInterface
+{
+	GENERATED_BODY()
+
+public:
+	AMCOCharacter(const FObjectInitializer& ObjectInitializer);
+
+protected:
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void BeginPlay() override;
+	
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Character")
+	FName CharacterName;
+
+	virtual void SetCharacterData();
+	
+// --- Ability
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;
+
+protected:
+	virtual void Initialize();
+
+protected:
+	UPROPERTY()
+	TWeakObjectPtr<UMCOAbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TWeakObjectPtr<const UMCOAttributeSet> AttributeSet;
+	
+	UPROPERTY()
+	FMCOAbilitySet_GrantedHandles AbilitySetHandles;
+	
+public:
+	virtual bool CanAttack() const override { return true; }
+	virtual FVector GetSocketLocation(const FName& InSocketName);
+
+	
+// --- Attribute
+public:
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character")
+	virtual int32 GetAbilityLevel(EMCOAbilityID InAbilityLevelID) const;
+
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character")
+	virtual bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetHealth() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetMaxHealth() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetStiffness() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetMaxStiffness() const;
+	
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Character|Attributes")
+	TObjectPtr<UMCOCharacterData> CharacterData;
+	
+// --- Tag
+public:
+	bool HasTag(const FGameplayTag& InTag) const;
+	int32 GetTagCount(const FGameplayTag& InTag) const;
+
+// --- Damage
+public:
+	UFUNCTION()
+	void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage);
+
+	virtual const FMCODamagedData GetDamagedData() override  { return CurrentDamagedData; }
+	virtual void SetDamagedData(const FMCODamagedData&  InDamagedData) override;
+
+	virtual void OffAllCollision() override {}
+
+	virtual ACharacter* GetAttackedCharacter() override { return this; }
+	float GetCapsuleRadius() const;
+	
+protected:
+	UPROPERTY()
+	FMCODamagedData CurrentDamagedData;
+	
+// --- Die
+public:
+	void Die();
+
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character")
+	void FinishDying();
+
+	FCharacterDiedSignature OnCharacterDied;
+
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Animation")
+	TObjectPtr<UAnimMontage> DeathMontage;
+
+// --- Stop
+public:
+	virtual void ControlMoving(bool bToStop) override;
+
+// --- Widget
+public:
+	void InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget);
+};
