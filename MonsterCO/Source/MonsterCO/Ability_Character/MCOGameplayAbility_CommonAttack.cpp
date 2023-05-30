@@ -9,6 +9,7 @@
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "Interface/MCOAttackedInterface.h"
+#include "Interface/MCOHUDInterface.h"
 
 
 UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
@@ -18,7 +19,6 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 
 	// Setting 
 	bIsUsingCollision = false;
-	bApplyCooldown = true;
 }
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UMCOCommonMontageData* InMontageData)
@@ -108,12 +108,11 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(const FMCOGranted
 	ISTRUE(nullptr != AttackedASC);
 
 	// Show Monster Widgets
-	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(InAttackedCharacter);
-	if (nullptr != PlayerInterface)
+	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->OwnerActor.Get());
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
+	if (nullptr != HUDInterface && nullptr != CharacterInterface)
 	{
-		IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
-		ISTRUE(CharacterInterface);
-		PlayerInterface->ShowMonsterInfo(CharacterInterface);
+		HUDInterface->ShowMonsterInfo(CharacterInterface);
 	}
 
 	// Give damage and stiffness 

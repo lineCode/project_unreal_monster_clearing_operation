@@ -10,6 +10,10 @@
 #include "DrawDebugHelpers.h"
 
 
+#define SKILLSLOT_MAX 3
+
+
+
 // --- Check
 #define ISTRUE(Expr)   { if(!(Expr)) return; }
 #define ISTRUE_F(Expr) { if(!(Expr)) return false; }

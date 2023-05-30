@@ -1,10 +1,10 @@
 #include "MCOGameplayAbility.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "MCOAbilityTask_PlayMontageAndWaitForEvent.h"
-#include "MCOAbilitySystemComponent.h"
 #include "MCOCharacterTags.h"
 #include "Character/MCOCharacter.h"
 #include "GameFramework/Character.h"
+#include "Interface/MCOHUDInterface.h"
 
 
 UMCOGameplayAbility::UMCOGameplayAbility()
@@ -16,7 +16,6 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	// Setting
 	bActivateAbilityOnGranted = false;
 	bCanBeCancelled = true;
-	bApplyCooldown = false;
 
 	ActivationPolicy = EMCOAbilityActivationPolicy::OnInputTriggered;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -107,18 +106,15 @@ UAbilitySystemComponent* UMCOGameplayAbility::GetAbilitySystemComponent() const
 	return ASCInterface->GetAbilitySystemComponent();
 }
 
-void UMCOGameplayAbility::SetCooldownGameplayEffect(const float& InDuration, const FGameplayTagContainer& InTags)
+void UMCOGameplayAbility::SetCooldownGameplayEffect(const FMCOCommonSkillData& InData)
 {
-	CooldownTimeMax = InDuration;
-	CooldownTags = InTags;
+	SkillData = InData;
 }
 
 void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
 	ISTRUE(nullptr != CooldownEffectClass);
-	ISTRUE(true == bApplyCooldown);
-	ISTRUE(0.0f != CooldownTimeMax);
-	ISTRUE(false == CooldownTags.IsEmpty());
+	ISTRUE(true == SkillData.CanApplyCooldown());
 
 	//MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *FHelper::GetEnumDisplayName(TEXT("EMCOAbilityID"), (int32)AbilityInputID), CooldownTimeMax);
 	
@@ -127,17 +123,30 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	
 	HandleForCooldown.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_CooldownTag,
-		CooldownTimeMax
+		SkillData.CooldownTime
 	);
 	
-	HandleForCooldown.Data->DynamicGrantedTags = CooldownTags;
+	HandleForCooldown.Data->DynamicGrantedTags = SkillData.CooldownTags;
 
 	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, HandleForCooldown);
+
+	StartCooldownWidget();
 }
 
 const FGameplayTagContainer* UMCOGameplayAbility::GetCooldownTags() const
 {
-	return &CooldownTags;	
+	return &SkillData.CooldownTags;	
+}
+
+void UMCOGameplayAbility::StartCooldownWidget() const
+{
+	ISTRUE(nullptr != CurrentActorInfo);
+	ISTRUE(true == SkillData.CanApplyCooldown());
+	ISTRUE(nullptr != SkillData.SkillImage);
+	
+	const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE(nullptr != HUDInterface);
+	HUDInterface->StartCooldownWidget(SkillData.SkillImage, SkillData.CooldownTime);
 }
 
 void UMCOGameplayAbility::CancelAllAbility()

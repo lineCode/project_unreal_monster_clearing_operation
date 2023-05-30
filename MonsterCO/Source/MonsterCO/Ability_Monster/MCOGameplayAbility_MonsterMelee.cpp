@@ -63,10 +63,7 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 	ensure(Data.Contains(AttackingDirection));
 	
 	// Set Cooldown Effect
-	SetCooldownGameplayEffect(
-		Data[AttackingDirection]->AttributeValues.CooldownTime,
-		Data[AttackingDirection]->AttributeValues.CooldownTags
-	);
+	SetCooldownGameplayEffect(Data[AttackingDirection]->CommonSkillData);
 	
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	

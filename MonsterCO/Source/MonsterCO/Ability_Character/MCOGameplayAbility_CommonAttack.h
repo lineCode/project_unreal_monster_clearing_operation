@@ -45,7 +45,7 @@ protected:
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, const FMCOCollisionData& InCollisionByChannelData, bool bHitDetected) const;
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = Effect)
+	UPROPERTY(EditAnywhere, Category = "MCO|Effect")
 	TSubclassOf<UGameplayEffect> AttributeEffect;
 	
 
@@ -61,7 +61,7 @@ private:
 	void StartDamageEndTimer();
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = AttackStyle)
+	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
 	uint8 bIsUsingCollision : 1;
 
 	UPROPERTY()

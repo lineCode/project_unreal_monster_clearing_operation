@@ -5,8 +5,7 @@
 #include "MCOHUDInterface.generated.h"
 
 class UMCOHUDWidget;
-
-
+class IMCOCharacterInterface;
 
 UINTERFACE(MinimalAPI)
 class UMCOHUDInterface : public UInterface
@@ -20,4 +19,6 @@ class MONSTERCO_API IMCOHUDInterface
 
 public:
 	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) = 0;
+	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) = 0;
+	virtual void StartCooldownWidget(UTexture2D* InImage, const float& InMax) const = 0;
 };

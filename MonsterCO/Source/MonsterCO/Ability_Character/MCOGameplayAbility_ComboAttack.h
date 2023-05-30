@@ -32,7 +32,7 @@ protected:
 	void SetComboTimer();
 	void DoNextCombo();
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|AttackData")
 	TObjectPtr<UMCOComboAttackData> Data;
 
 	int32 CurrentCombo;

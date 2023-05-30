@@ -5,9 +5,6 @@
 #include "MCOPlayerInterface.generated.h"
 
 
-class IMCOCharacterInterface;
-
-
 
 UINTERFACE(MinimalAPI)
 class UMCOPlayerInterface : public UInterface
@@ -38,7 +35,4 @@ public:
 	virtual void BeginAnimation_Equip() = 0;
 	virtual void EndAnimation_Equip() = 0;
 
-// --- Widget
-public:
-	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) = 0;
 };

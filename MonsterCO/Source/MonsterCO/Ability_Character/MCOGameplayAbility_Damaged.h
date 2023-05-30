@@ -20,9 +20,9 @@ protected:
 	
 protected:
 // --- Using Montage
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Montage)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Montage")
 	TMap<EMCOCharacterDirection, TObjectPtr<UAnimMontage>> Montages;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Montage)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Montage")
 	EMCOCharacterDirectionOption DirectionOption;
 };

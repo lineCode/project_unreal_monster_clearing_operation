@@ -2,8 +2,7 @@
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 
-UMCOHpWidget::UMCOHpWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UMCOHpWidget::UMCOHpWidget(const FObjectInitializer& ObjectInitializer)	: Super(ObjectInitializer)
 {
 	MaxHp = -1.0f;
 	CurrentHp = -1.0f;

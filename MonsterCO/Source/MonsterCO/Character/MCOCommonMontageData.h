@@ -5,6 +5,25 @@
 #include "GameplayTagContainer.h"
 #include "MCOCommonMontageData.generated.h"
 
+
+USTRUCT(BlueprintType)
+struct FMCOCommonSkillData
+{
+	GENERATED_BODY()
+
+public:
+	bool CanApplyCooldown() const { return (CooldownTime != 0.0f && CooldownTags.IsEmpty() == false); }
+	
+	UPROPERTY(EditAnywhere)
+	float CooldownTime = 0.0f;
+	
+	UPROPERTY(EditAnywhere)
+	FGameplayTagContainer CooldownTags = FGameplayTagContainer();
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UTexture2D> SkillImage = nullptr;
+};
+
 USTRUCT(BlueprintType)
 struct FMCOGrantedAttributeValues
 {
@@ -16,12 +35,6 @@ public:
 		
 	UPROPERTY(EditAnywhere)
 	float DamageValue = 0.0f;
-	
-	UPROPERTY(EditAnywhere)
-	float CooldownTime = 0.0f;
-	
-	UPROPERTY(EditAnywhere)
-	FGameplayTagContainer CooldownTags = FGameplayTagContainer();
 };
 
 USTRUCT(BlueprintType)
@@ -83,6 +96,9 @@ public:
 		
 	UPROPERTY(EditAnywhere, Category = Montage)
 	FName MontageSectionName;
+	
+	UPROPERTY(EditAnywhere, Category = SkillData)
+	FMCOCommonSkillData CommonSkillData;
 	
 	UPROPERTY(EditAnywhere, Category = Attribute)
 	FMCOGrantedAttributeValues AttributeValues;

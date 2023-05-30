@@ -2,6 +2,7 @@
 
 #include "MonsterCO.h"
 #include "Abilities/GameplayAbility.h"
+#include "Character/MCOCommonMontageData.h"
 #include "MCOGameplayAbility.generated.h"
 
 class AMCOCharacter;
@@ -30,26 +31,22 @@ protected:
 
 // --- Effect
 protected:
-	UPROPERTY(EditAnywhere, Category = Effect)
+	UPROPERTY(EditAnywhere, Category = "MCO|Effect")
 	TSubclassOf<UGameplayEffect> TagEffectClass;
 	
 // --- Cooldown
 protected:
-	void SetCooldownGameplayEffect(const float& InDuration, const FGameplayTagContainer& InTags);
+	void SetCooldownGameplayEffect(const FMCOCommonSkillData& InData);
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
+	void StartCooldownWidget() const;
 	
-	UPROPERTY(EditAnywhere, Category = Cooldown)
+	UPROPERTY(EditAnywhere, Category = "MCO|Cooldown")
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
 	
-	UPROPERTY(EditAnywhere, Category = Cooldown)
-	float CooldownTimeMax;
-	
-	UPROPERTY(EditAnywhere, Category = Cooldown)
-	FGameplayTagContainer CooldownTags;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability")
-	uint8 bApplyCooldown : 1;
+	UPROPERTY(EditAnywhere, Category = "MCO|SkillData")
+	FMCOCommonSkillData SkillData;
+
 	
 // --- Setting
 public:

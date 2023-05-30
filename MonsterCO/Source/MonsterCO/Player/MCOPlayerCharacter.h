@@ -104,6 +104,7 @@ public:
 	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) override;
 	void InitializeHUD();
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;
+	virtual void StartCooldownWidget(UTexture2D* InImage, const float& InMax) const override;
 
 	UPROPERTY()
 	uint8 bIsMonsterInfoShowed : 1;

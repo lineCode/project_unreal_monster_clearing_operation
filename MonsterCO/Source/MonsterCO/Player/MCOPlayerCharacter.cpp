@@ -354,3 +354,9 @@ void AMCOPlayerCharacter::ShowMonsterInfo(IMCOCharacterInterface* InCharacter)
 	HUDWidget->ShowWidget(false, true);
 }
 
+void AMCOPlayerCharacter::StartCooldownWidget(UTexture2D* InImage, const float& InMax) const
+{
+	ISTRUE(nullptr != HUDWidget);
+	HUDWidget->StartSkillWidget(InImage, InMax);
+}
+

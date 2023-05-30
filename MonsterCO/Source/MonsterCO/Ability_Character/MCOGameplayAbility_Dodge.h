@@ -22,10 +22,10 @@ protected:
 	void OnTaskFinished();
 
 protected:
-	UPROPERTY(EditAnywhere, Category = RootMotion)
+	UPROPERTY(EditAnywhere, Category = "MCO|RootMotion")
 	float Strength;
 	
-	UPROPERTY(EditAnywhere, Category = RootMotion)
+	UPROPERTY(EditAnywhere, Category = "MCO|RootMotion")
 	float Duration;
 
 private:

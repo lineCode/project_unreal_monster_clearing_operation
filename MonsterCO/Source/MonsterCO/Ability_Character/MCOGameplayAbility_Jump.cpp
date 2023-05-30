@@ -19,8 +19,7 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
 	
-	bApplyCooldown = true;
-	CooldownTimeMax = 2.0f;
+	SkillData.CooldownTime = 2.0f;
 }
 
 bool UMCOGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const

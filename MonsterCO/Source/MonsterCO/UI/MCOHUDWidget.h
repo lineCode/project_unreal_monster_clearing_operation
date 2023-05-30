@@ -6,6 +6,7 @@
 
 class UMCOHpWidget;
 class UMCOAttributeWidget;
+class UMCOSkillWidget;
 
 
 UCLASS()
@@ -25,6 +26,7 @@ public:
 	
 	UMCOHpWidget* GetHpWidget(bool bIsPlayer);
 	UMCOAttributeWidget* GetAttributeWidget(bool bIsPlayer);
+	void StartSkillWidget(UTexture2D* InImage, const float& InMax);
 
 protected:
 	const FName GetName(bool bIsPlayer) const;
@@ -35,4 +37,7 @@ protected:
 	
 	UPROPERTY()
 	TMap<FName, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
+
+	UPROPERTY()
+	TArray<TObjectPtr<UMCOSkillWidget>> SkillWidgets;
 };

@@ -44,8 +44,7 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	
 	// Set Cooldown Effect
 	SetCooldownGameplayEffect(
-		Data->GetMontageData(CurrentCombo)->AttributeValues.CooldownTime,
-		Data->GetMontageData(CurrentCombo)->AttributeValues.CooldownTags
+		Data->GetMontageData(CurrentCombo)->CommonSkillData
 	);
 	
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
