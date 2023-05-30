@@ -6,6 +6,8 @@
 #include "Interface/MCOHUDInterface.h"
 #include "MCOPlayerCharacter.generated.h"
 
+class UMCOPlayerModeComponent;
+class AMCOWeapon;
 class UMCOPlayerControlData;
 class UMCOInputConfig;
 class USpringArmComponent;
@@ -75,8 +77,8 @@ protected:
 // --- Mode & Weapon 
 public:
 	EMCOModeType GetModeType() const;
-	class UMCOPlayerModeComponent* GetModeComponent() const { return ModeComponent; }
-	class AMCOWeapon* GetWeapon();
+	UMCOPlayerModeComponent* GetModeComponent() const { return ModeComponent; }
+	AMCOWeapon* GetWeapon();
 
 	UPROPERTY(VisibleAnywhere, Category = "MCO|Weapon")
 	TObjectPtr<UMCOPlayerModeComponent> ModeComponent;

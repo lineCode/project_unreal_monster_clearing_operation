@@ -4,6 +4,12 @@
 #include "Engine/DataAsset.h"
 #include "MCOComboAttackData.generated.h"
 
+
+
+class UMCOCommonMontageData;
+
+
+
 USTRUCT(BlueprintType)
 struct FMCOMontageComboData
 {
@@ -11,13 +17,11 @@ struct FMCOMontageComboData
 	
 public:
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UMCOCommonMontageData> Data = nullptr;
+	TObjectPtr<UMCOCommonMontageData> Data = nullptr;
 	
 	UPROPERTY(EditAnywhere)
 	float NextComboFrameCount = 0.0f;
 };
-
-
 
 UCLASS(BlueprintType)
 class MONSTERCO_API UMCOComboAttackData : public UPrimaryDataAsset
@@ -29,8 +33,8 @@ public:
 	uint8 GetMaxCombo() const { return MontageData.Num(); }
 	float GetComboCheckTime(uint8 CurrentCombo, float AttackSpeedRate = 1.0f);
 	
-	class UMCOCommonMontageData* GetMontageData(uint8 CurrentCombo);
-	class UAnimMontage* GetMontage(uint8 CurrentCombo);
+	UMCOCommonMontageData* GetMontageData(uint8 CurrentCombo);
+	UAnimMontage* GetMontage(uint8 CurrentCombo);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = MontageData)	

@@ -53,50 +53,41 @@ if (__##OutResult.Succeeded())\
 else {OutResult = nullptr;}\
 ensure(OutResult);
 
-#define SETASSET(ClassType, Path) [this]()-> ClassType* {\
-static ConstructorHelpers::FObjectFinder<ClassType> __##ClassType(Path);\
-MCOCHECK(__##ClassType);\
-if (__##ClassType.Succeeded())\
-{return __##ClassType.Object;}\
-else {return nullptr;}\
-}();
-
 
 // --- Enum
-
 UENUM(BlueprintType)
 enum class EMCOAbilityID : uint8
 {
-	None         UMETA(DisplayName = "None"),
-	Confirm      UMETA(DisplayName = "Confirm"),
-	Cancel       UMETA(DisplayName = "Cancel"),
-    
-	Jump         UMETA(DisplayName = "Jump"),
-	Dodge        UMETA(DisplayName = "Roll"),
-	Dash         UMETA(DisplayName = "Dash"),
-	Equip        UMETA(DisplayName = "Equip"),
-	NormalAttack UMETA(DisplayName = "NormalAttack"),
-	Damaged      UMETA(DisplayName = "Damaged"),
-	Dead         UMETA(DisplayName = "Dead"),
-
-	// TO DO
-	SkillA       UMETA(DisplayName = "SkillA"),
-	SkillB       UMETA(DisplayName = "SkillB")
+	None           UMETA(DisplayName = "None"),
+	Confirm        UMETA(DisplayName = "Confirm"),
+	Cancel         UMETA(DisplayName = "Cancel"),
+      
+	Jump           UMETA(DisplayName = "Jump"),
+	Dodge          UMETA(DisplayName = "Roll"),
+	Dash           UMETA(DisplayName = "Dash"),
+	Equip          UMETA(DisplayName = "Equip"),
+	NormalAttack   UMETA(DisplayName = "NormalAttack"),
+	Damaged        UMETA(DisplayName = "Damaged"),
+	Dead           UMETA(DisplayName = "Dead"),
+  
+	// TO DO  
+	SkillA         UMETA(DisplayName = "SkillA"),
+	SkillB         UMETA(DisplayName = "SkillB")
 };
 
 UENUM(BlueprintType)
 enum class EMCOModeType : uint8
 {
-	TwoHand      UMETA(DisplayName = "TwoHand"),
-	Max          UMETA(DisplayName = "Max")
+	TwoHand        UMETA(DisplayName = "TwoHand"),
+	Max            UMETA(DisplayName = "Max")
 };
 
 UENUM(BlueprintType)
 enum class EMCOCharacterSpeed : uint8
 {
-	Slow         UMETA(DisplayName = "Slow"),
-	Normal       UMETA(DisplayName = "Normal"),
-	Fast         UMETA(DisplayName = "Fast")
+	Slow           UMETA(DisplayName = "Slow"),
+	Normal         UMETA(DisplayName = "Normal"),
+	Fast           UMETA(DisplayName = "Fast")
 };
 
 UENUM(BlueprintType)
