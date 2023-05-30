@@ -4,7 +4,8 @@
 #include "MCOAbilitySystemComponent.h"
 #include "MCOCharacterTags.h"
 #include "MCOGameplayAbility_Dash.h"
-#include "Player/MCOPlayerCharacter.h"
+#include "Interface/MCOPlayerInterface.h"
+
 
 UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& ObjectInitializer)
 {
@@ -29,9 +30,9 @@ bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHan
 {
 	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 
-	const AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(Player);
-	ISTRUE_F(Player->CanDodgeAction());
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE_F(PlayerInterface);
+	ISTRUE_F(PlayerInterface->CanDodgeAction());
 
 	return true;
 }
@@ -40,10 +41,10 @@ void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle
 {
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	const AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ensure(nullptr != Player);
-	const FVector WorldDirection = Player->GetInputDirection();	
-	bIsDodgeForward = Player->IsDashForward();
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ensure(nullptr != PlayerInterface);
+	const FVector WorldDirection = PlayerInterface->GetInputDirection();	
+	bIsDodgeForward = PlayerInterface->IsDashForward();
 
 	UAbilityTask_ApplyRootMotionConstantForce* Task = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce
 	(

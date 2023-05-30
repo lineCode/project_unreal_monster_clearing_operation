@@ -3,8 +3,8 @@
 #include "MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "MCOAbilitySystemComponent.h"
 #include "MCOCharacterTags.h"
+#include "Character/MCOCharacter.h"
 #include "GameFramework/Character.h"
-#include "Player/MCOPlayerCharacter.h"
 
 
 UMCOGameplayAbility::UMCOGameplayAbility()
@@ -86,31 +86,25 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const FGameplayAbilitySpecHandle H
 
 ACharacter* UMCOGameplayAbility::GetCharacter() const
 {
+	ISTRUE_N(CurrentActorInfo);
+	
 	return Cast<ACharacter>(CurrentActorInfo->AvatarActor.Get());
-}
-
-AMCOCharacter* UMCOGameplayAbility::GetMCOCharacter() const
-{
-	return Cast<AMCOCharacter>(CurrentActorInfo->AvatarActor.Get());
 }
 
 AController* UMCOGameplayAbility::GetController() const
 {
-	AMCOCharacter* Character = GetMCOCharacter();
+	const ACharacter* Character = GetCharacter();
 	ISTRUE_N(Character);
-
 	return Cast<AController>(Character->GetController());
 }
 
-UMCOAbilitySystemComponent* UMCOGameplayAbility::GetMCOAbilitySystemComponent() const
+UAbilitySystemComponent* UMCOGameplayAbility::GetAbilitySystemComponent() const
 {
-	AMCOCharacter* Character = GetMCOCharacter();
+	ACharacter* Character = GetCharacter();
 	ISTRUE_N(Character);
-
-	UAbilitySystemComponent* ASC = Character->GetAbilitySystemComponent();
-	ISTRUE_N(ASC);
-
-	return Cast<UMCOAbilitySystemComponent>(ASC);
+	const IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Character);
+	ISTRUE_N(ASCInterface);
+	return ASCInterface->GetAbilitySystemComponent();
 }
 
 void UMCOGameplayAbility::SetCooldownGameplayEffect(const float& InDuration, const FGameplayTagContainer& InTags)
@@ -126,9 +120,6 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	ISTRUE(0.0f != CooldownTimeMax);
 	ISTRUE(false == CooldownTags.IsEmpty());
 
-	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
-	ISTRUE(nullptr != ASC);
-	
 	//MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *FHelper::GetEnumDisplayName(TEXT("EMCOAbilityID"), (int32)AbilityInputID), CooldownTimeMax);
 	
 	FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
@@ -151,7 +142,7 @@ const FGameplayTagContainer* UMCOGameplayAbility::GetCooldownTags() const
 
 void UMCOGameplayAbility::CancelAllAbility()
 {
-	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 
 	FGameplayTagContainer AbilityTypesToIgnore;
@@ -208,8 +199,9 @@ void UMCOGameplayAbility::StartActivationWithMontageAndEventTag(UAnimMontage* In
 
 void UMCOGameplayAbility::JumpToMontageSection(const UAnimMontage* InMontage, const FName& SectionName) const
 {
-	const ACharacter* Character = GetMCOCharacter();
+	const ACharacter* Character = GetCharacter();
 	ISTRUE(Character != nullptr);
+	ISTRUE(Character->GetMesh() != nullptr);
 	UAnimInstance* AnimInstance = Character->GetMesh()->GetAnimInstance();
 	ISTRUE(AnimInstance != nullptr);
 

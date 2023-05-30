@@ -1,6 +1,5 @@
 #include "AnimNotifyState_Equip.h"
-#include "Player/MCOPlayerCharacter.h"
-#include "PlayerWeapon/MCOWeapon.h"
+#include "Interface/MCOPlayerInterface.h"
 
 
 FString UAnimNotifyState_Equip::GetNotifyName_Implementation() const
@@ -14,12 +13,10 @@ void UAnimNotifyState_Equip::NotifyBegin(USkeletalMeshComponent* MeshComp, UAnim
 
 	ISTRUE(MeshComp);
 	ISTRUE(MeshComp->GetOwner());
-	AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(MeshComp->GetOwner());
-	ISTRUE(Player);
-	AMCOWeapon* Weapon = Player->GetWeapon();
-	ISTRUE(Weapon);
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(MeshComp->GetOwner());
+	ISTRUE(PlayerInterface);
 
-	Weapon->BeginAnimation_Equip();
+	PlayerInterface->BeginAnimation_Equip();
 }
 
 void UAnimNotifyState_Equip::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
@@ -28,10 +25,8 @@ void UAnimNotifyState_Equip::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSe
 
 	ISTRUE(MeshComp);
 	ISTRUE(MeshComp->GetOwner());
-	AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(MeshComp->GetOwner());
-	ISTRUE(Player);
-	AMCOWeapon* Weapon = Player->GetWeapon();
-	ISTRUE(Weapon);
-
-	Weapon->EndAnimation_Equip();
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(MeshComp->GetOwner());
+	ISTRUE(PlayerInterface);
+	
+	PlayerInterface->EndAnimation_Equip();
 }

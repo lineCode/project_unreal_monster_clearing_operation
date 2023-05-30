@@ -25,9 +25,8 @@ public:
 // --- Getter
 protected:
 	ACharacter* GetCharacter() const;
-	AMCOCharacter* GetMCOCharacter() const;
 	AController* GetController() const;
-	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;
+	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 
 // --- Effect
 protected:

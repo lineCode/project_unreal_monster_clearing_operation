@@ -9,6 +9,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "IAutomationControllerManager.h"
 #include "Input/MCOInputComponent.h"
 #include "Input/MCOInputConfig.h"
 #include "UI/MCOHUDWidget.h"
@@ -17,7 +18,7 @@
 #include "PlayerWeapon/MCOPlayerModeComponent.h"
 #include "Ability_Character/MCOCharacterTags.h"
 #include "Ability_Character/MCOAbilitySystemComponent.h"
-
+#include "PlayerWeapon/MCOWeapon.h"
 
 
 AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -138,17 +139,46 @@ EMCOModeType AMCOPlayerCharacter::GetModeType() const
 	return ModeComponent->GetModeType();
 }
 
-AMCOWeapon* AMCOPlayerCharacter::GetWeapon()
-{
-	return ModeComponent->GetWeapon();
-}
-
 void AMCOPlayerCharacter::OffAllCollision()
 {
 	Super::OffAllCollision();
 
 	
 }
+
+bool AMCOPlayerCharacter::IsEquipped()
+{
+	ISTRUE_F(nullptr != ModeComponent);
+	
+	return ModeComponent->IsEquipped();
+}
+
+void AMCOPlayerCharacter::SetEquippedWithoutAnimation()
+{
+	ISTRUE(nullptr != ModeComponent);
+	ModeComponent->SetEquip();
+}
+
+void AMCOPlayerCharacter::SwitchEquipUnequip()
+{
+	ISTRUE(nullptr != ModeComponent);
+	ModeComponent->SwitchEquipUnequip();
+}
+
+void AMCOPlayerCharacter::BeginAnimation_Equip()
+{
+	ISTRUE(nullptr != ModeComponent);
+	ISTRUE(nullptr != ModeComponent->GetWeapon());
+	ModeComponent->GetWeapon()->BeginAnimation_Equip();
+}
+
+void AMCOPlayerCharacter::EndAnimation_Equip()
+{
+	ISTRUE(nullptr != ModeComponent);
+	ISTRUE(nullptr != ModeComponent->GetWeapon());
+	ModeComponent->GetWeapon()->EndAnimation_Equip();
+}
+
 
 bool AMCOPlayerCharacter::CheckCanMoveWithTags() const
 {
@@ -313,7 +343,7 @@ void AMCOPlayerCharacter::InitializeHUD()
 	HUDWidget->ShowWidget(true, true);
 }
 
-void AMCOPlayerCharacter::ShowMonsterInfo(AMCOCharacter* InCharacter)
+void AMCOPlayerCharacter::ShowMonsterInfo(IMCOCharacterInterface* InCharacter)
 {
 	ISTRUE(false == bIsMonsterInfoShowed);
 	ISTRUE(nullptr != HUDWidget);

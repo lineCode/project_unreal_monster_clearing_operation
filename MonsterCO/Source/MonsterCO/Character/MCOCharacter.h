@@ -103,7 +103,7 @@ public:
 	virtual void OffAllCollision() override {}
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
-	float GetCapsuleRadius() const;
+	virtual float GetCapsuleRadius() const override;
 	
 protected:
 	UPROPERTY()
@@ -111,10 +111,10 @@ protected:
 	
 // --- Die
 public:
-	void Die();
+	virtual void Die() override;
 
 	UFUNCTION(BlueprintCallable, Category = "MCO|Character")
-	void FinishDying();
+	virtual void FinishDying() override;
 
 	FCharacterDiedSignature OnCharacterDied;
 
@@ -128,5 +128,5 @@ public:
 
 // --- Widget
 public:
-	void InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget);
+	virtual void InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget) override;
 };

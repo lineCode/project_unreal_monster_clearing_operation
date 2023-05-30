@@ -76,6 +76,14 @@ enum class EMCOAbilityID : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMCOMonsterAttack : uint8
+{
+	NormalAttack   UMETA(DisplayName = "NormalAttack"),
+	SkillA         UMETA(DisplayName = "SkillA"),
+	SkillB         UMETA(DisplayName = "SkillB")
+};
+
+UENUM(BlueprintType)
 enum class EMCOModeType : uint8
 {
 	TwoHand        UMETA(DisplayName = "TwoHand"),

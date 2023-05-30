@@ -1,6 +1,7 @@
 #include "MCOGameplayAbility_Jump.h"
 #include "MCOCharacterTags.h"
-#include "Player/MCOPlayerCharacter.h"
+#include "Interface/MCOPlayerInterface.h"
+#include "GameFramework/Character.h"
 
 
 
@@ -26,9 +27,9 @@ bool UMCOGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHand
 {
 	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 
-	const AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(Player);
-	ISTRUE_F(Player->CanJumpAction());
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE_F(PlayerInterface);
+	ISTRUE_F(PlayerInterface->CanJumpAction());
 
 	return true;
 }

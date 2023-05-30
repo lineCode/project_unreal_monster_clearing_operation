@@ -4,6 +4,7 @@
 #include "Character/MCOCharacter.h"
 #include "InputActionValue.h"
 #include "Interface/MCOHUDInterface.h"
+#include "Interface/MCOPlayerInterface.h"
 #include "MCOPlayerCharacter.generated.h"
 
 class UMCOPlayerModeComponent;
@@ -15,7 +16,7 @@ class UCameraComponent;
 class UMCOHUDWidget;
 
 UCLASS()
-class MONSTERCO_API AMCOPlayerCharacter : public AMCOCharacter, public IMCOHUDInterface
+class MONSTERCO_API AMCOPlayerCharacter : public AMCOCharacter, public IMCOHUDInterface, public IMCOPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -53,37 +54,42 @@ public:
 	bool CheckCanMoveWithTags() const;
 	bool CanMoveCamera() const;
 	bool CanMoveCharacter() const;
-	bool CanJumpAction() const;
-	bool CanEquipAction() const;
-	bool CanDodgeAction() const;
-	bool CanDashAction() const;
+	virtual bool CanJumpAction() const override;
+	virtual bool CanEquipAction() const override;
+	virtual bool CanDodgeAction() const override;
+	virtual bool CanDashAction() const override;
 	virtual bool CanAttack() const override;
 	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	
-	void SetSpeed(EMCOCharacterSpeed CharacterSpeed) const;
+	virtual void SetSpeed(EMCOCharacterSpeed CharacterSpeed) const override; 
 	virtual void ControlMoving(bool bToStop) override;
 	
-	FVector GetInputDirection() const;
-	bool IsDashForward() const;
+	virtual FVector GetInputDirection() const override;
+	virtual bool IsDashForward() const override;
 	
 	bool bGetInput;
 	
 protected:
 	UPROPERTY()
 	FVector2D MovementVector;
+
 	
 // --- Mode & Weapon 
 public:
 	EMCOModeType GetModeType() const;
-	UMCOPlayerModeComponent* GetModeComponent() const { return ModeComponent; }
-	AMCOWeapon* GetWeapon();
-
-	UPROPERTY(VisibleAnywhere, Category = "MCO|Weapon")
-	TObjectPtr<UMCOPlayerModeComponent> ModeComponent;
 	
 	virtual void OffAllCollision() override;
+	virtual bool IsEquipped() override;
+	virtual void SetEquippedWithoutAnimation() override;
+	virtual void SwitchEquipUnequip() override;
+	virtual void BeginAnimation_Equip() override;
+	virtual void EndAnimation_Equip() override;
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "MCO|Weapon")
+	TObjectPtr<UMCOPlayerModeComponent> ModeComponent;
 
 // --- Components
 protected:
@@ -97,7 +103,7 @@ protected:
 public:
 	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) override;
 	void InitializeHUD();
-	virtual void ShowMonsterInfo(AMCOCharacter* InCharacter);
+	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;
 
 	UPROPERTY()
 	uint8 bIsMonsterInfoShowed : 1;

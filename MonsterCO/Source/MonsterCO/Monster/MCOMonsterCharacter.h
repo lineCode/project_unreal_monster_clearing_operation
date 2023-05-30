@@ -24,18 +24,17 @@ protected:
 	virtual void SetCharacterData() override;
 	
 // --- AI
-public:
-	FAICharacterAITaskFinishedDelegate OnAttackFinished;
-	FAICharacterAITaskFinishedDelegate OnTurnFinished;
-
 protected:
+	virtual UObject* GetTarget() override;
+	
 	virtual float GetAIPatrolRadius() override;
 	virtual float GetAIDetectRange() override;
 	virtual float GetAIMeleeRange() override;
 	virtual float GetAITurnSpeed() override;
 	virtual FVector GetAITurnVector() override;
 	
-	virtual void SetTurnVector(const FVector& InTurnVector) override;
+	virtual bool IsTurning() override;
+	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) override;
 	virtual void SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished) override;
 
 	virtual bool CanAttack() override;
@@ -47,7 +46,9 @@ protected:
 	
 protected:
 	UPROPERTY()
-	FVector TurnVector; 
+	FVector TurnVector;
+
+	bool bIsTurning;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = MCO)

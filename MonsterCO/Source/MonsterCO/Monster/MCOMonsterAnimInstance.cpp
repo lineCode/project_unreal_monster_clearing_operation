@@ -44,7 +44,13 @@ void UMCOMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// Turn in place
 	IMCOMonsterAIInterface* AIPawn = Cast<IMCOMonsterAIInterface>(Owner);
 	ISTRUE(nullptr != AIPawn);
-	const FVector TurnVector = AIPawn->GetAITurnVector();
-	ISTRUE(false == FMath::IsNearlyZero(TurnVector.Size2D()));
-	CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(TurnVector, Owner->GetActorRotation());
+	if (false == AIPawn->IsTurning())
+	{
+		CurrentPawnDirection = 0.0f;
+	}
+	else
+	{
+		const FVector TurnVector = AIPawn->GetAITurnVector();
+		CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(TurnVector, Owner->GetActorRotation());
+	}
 }

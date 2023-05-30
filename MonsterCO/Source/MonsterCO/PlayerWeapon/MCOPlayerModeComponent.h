@@ -23,6 +23,7 @@ public:
 	
 	void SpawnWeapon(ACharacter* InOwner);
 	void SetMode(const EMCOModeType InModeType);
+	void SetEquip();
 	void SwitchEquipUnequip();
 
 protected:

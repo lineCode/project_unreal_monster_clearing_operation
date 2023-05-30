@@ -1,7 +1,7 @@
 #include "MCOGameplayAbility_Death.h"
 #include "MCOAbilitySystemComponent.h"
 #include "MCOCharacterTags.h"
-#include "Character/MCOCharacter.h"
+#include "Interface/MCOCharacterInterface.h"
 
 
 UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
@@ -24,9 +24,9 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 {
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	AMCOCharacter* MCOCharacter = Cast<AMCOCharacter>(GetMCOCharacter());
-	ISTRUE(nullptr != MCOCharacter);
-	MCOCharacter->Die();
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE(nullptr != CharacterInterface);
+	CharacterInterface->Die();
 	
 	CancelAllAbility();
 	StartActivationWithMontage(MontageToPlay);	
@@ -34,9 +34,9 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 
 void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {	
-	AMCOCharacter* MCOCharacter = Cast<AMCOCharacter>(GetMCOCharacter());
-	ISTRUE(nullptr != MCOCharacter);
-	MCOCharacter->FinishDying();
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE(nullptr != CharacterInterface);
+	CharacterInterface->FinishDying();
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

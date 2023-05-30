@@ -52,3 +52,11 @@ void AMCOMonsterAIController::ContinueAI()
 	BTComponent->RestartTree();
 }
 
+UObject* AMCOMonsterAIController::GetTarget()
+{
+	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
+	ensure(true == UseBlackboard(BBAsset, BlackboardPtr));
+	
+	return BlackboardPtr->GetValueAsObject(BBKEY_TARGET);
+}
+

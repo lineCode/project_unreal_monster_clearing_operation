@@ -1,11 +1,7 @@
 #include "MCOGameplayAbility_MonsterMelee.h"
-#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
-#include "BehaviorTree/BlackboardComponent.h"
-#include "Ability_Character/MCOAbilitySystemComponent.h"
+#include "AbilitySystemComponent.h"
 #include "Ability_Character/MCOCharacterTags.h"
-#include "AI/MCOAIKeys.h"
-#include "Monster/MCOMonsterAIController.h"
-#include "Monster/MCOMonsterCharacter.h"
+#include "Interface/MCOMonsterAIInterface.h"
 #include "MonsterAttachment/MCOMonsterAttachment.h"
 #include "MonsterAttachment/MCOMonsterModeComponent.h"
 
@@ -37,9 +33,9 @@ bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbility
 	bool bResult = Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 	if (false == bResult)
 	{
-		AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
-		ensure(Monster);
-		Monster->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);
+		const IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(ActorInfo->AvatarActor.Get());
+		ensure(MonsterInterface);
+		MonsterInterface->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);
 	}
 	
 	return bResult;
@@ -47,13 +43,15 @@ bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbility
 
 void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	ISTRUE(nullptr != ActorInfo);
+	
+	AActor* Monster = ActorInfo->AvatarActor.Get();
 	ensure(Monster);
+
+	IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(Monster);
+	ensure(MonsterInterface);
 	
-	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
-	ensure(AIController);
-	
-	ACharacter* Target = Cast<ACharacter>(AIController->GetBlackboardComponent()->GetValueAsObject(BBKEY_TARGET));
+	AActor* Target = Cast<AActor>(MonsterInterface->GetTarget());
 	ISTRUE(Target);
 	
 	const float AttackDegree = CalculateTargetDegree(
@@ -84,9 +82,9 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 
 void UMCOGameplayAbility_MonsterMelee::OnTaskCompleted()
 {
-	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
-	ensure(Monster);
-	Monster->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Succeeded);
+	IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
+	ensure(MonsterInterface);
+	MonsterInterface->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Succeeded);
 	
 	Super::OnTaskCompleted();
 }
@@ -94,9 +92,9 @@ void UMCOGameplayAbility_MonsterMelee::OnTaskCompleted()
 void UMCOGameplayAbility_MonsterMelee::OnTaskCancelled()
 {
 	MCOLOG(TEXT("Attack Cancelled"));
-	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
-	ensure(Monster);
-	Monster->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);
+	IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
+	ensure(MonsterInterface);
+	MonsterInterface->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);
 	
 	Super::OnTaskCancelled();
 }
@@ -107,17 +105,17 @@ void UMCOGameplayAbility_MonsterMelee::BeginDamaging_Collision()
 
 	ISTRUE(nullptr != CurrentData);
 	
-	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	IMCOMonsterAIInterface* Monster = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(Monster);
 	
-	UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
-	ensure(Mode);
-	
-	AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
-	ensure(Attachment);
-	
-	Attachment->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-	Attachment->TurnOnCollision(CurrentData->CollisionData.SocketName);
+	// UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
+	// ensure(Mode);
+	//
+	// AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
+	// ensure(Attachment);
+	//
+	// Attachment->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+	// Attachment->TurnOnCollision(CurrentData->CollisionData.SocketName);
 }
 
 void UMCOGameplayAbility_MonsterMelee::EndDamaging_Collision()
@@ -126,16 +124,16 @@ void UMCOGameplayAbility_MonsterMelee::EndDamaging_Collision()
 	
 	ISTRUE(nullptr != CurrentData);
 	
-	AMCOMonsterCharacter* Monster = Cast<AMCOMonsterCharacter>(GetMCOCharacter());
+	IMCOMonsterAIInterface* Monster = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(Monster);
 	
-	UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
-	ensure(Mode);
-	
-	AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
-	ensure(Attachment);
-	
-	Attachment->OnAttachmentBeginOverlapDelegate.Clear();
-	Attachment->TurnOffCollision(CurrentData->CollisionData.SocketName);
+	// UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
+	// ensure(Mode);
+	//
+	// AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
+	// ensure(Attachment);
+	//
+	// Attachment->OnAttachmentBeginOverlapDelegate.Clear();
+	// Attachment->TurnOffCollision(CurrentData->CollisionData.SocketName);
 }
 

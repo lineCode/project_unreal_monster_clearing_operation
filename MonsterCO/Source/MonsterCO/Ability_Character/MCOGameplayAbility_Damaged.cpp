@@ -2,7 +2,10 @@
 #include "MCOAbilitySystemComponent.h"
 #include "MCOAttributeSet.h"
 #include "MCOCharacterTags.h"
-#include "Player/MCOPlayerCharacter.h"
+#include "Interface/MCOCharacterInterface.h"
+#include "Interface/MCOPlayerInterface.h"
+
+
 
 UMCOGameplayAbility_Damaged::UMCOGameplayAbility_Damaged()
 {
@@ -34,6 +37,12 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 		CharacterInterface->GetDamagedData().AttackedDegree,
 		*FHelper::GetEnumDisplayName(TEXT("EMCOCharacterDirection"), (int64)DamagedDirection)
 	);
+
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	if (nullptr != PlayerInterface)
+	{
+		PlayerInterface->SetEquippedWithoutAnimation();
+	}
 	
 	CancelAllAbility();
 	// CharacterInterface->OffAllCollision();
@@ -43,7 +52,7 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 
 void UMCOGameplayAbility_Damaged::OnTaskCompleted()
 {
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(GetCharacter());
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(CharacterInterface);
 	CharacterInterface->OnDamagedEnd.ExecuteIfBound();
 	
@@ -52,7 +61,7 @@ void UMCOGameplayAbility_Damaged::OnTaskCompleted()
 
 void UMCOGameplayAbility_Damaged::OnTaskCancelled()
 {
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(GetCharacter());
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(CharacterInterface);
 	CharacterInterface->OnDamagedEnd.ExecuteIfBound();
 	

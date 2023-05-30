@@ -30,6 +30,15 @@ void UMCOPlayerModeComponent::SetMode(const EMCOModeType InModeType)
 	// MCOLOG(TEXT("Mode is changed to %s"), *FHelper::GetEnumDisplayName(TEXT("EMCOModeType"), (int32)CurrentModeType));
 }
 
+void UMCOPlayerModeComponent::SetEquip()
+{
+	ISTRUE(false == bIsEquipped);
+
+	bIsEquipped = true;
+	CurrentWeaponActor->SwitchEquipUnequip(true);
+	CurrentWeaponActor->BeginAnimation_Equip();
+}
+
 void UMCOPlayerModeComponent::SwitchEquipUnequip()
 {
 	ISTRUE(CurrentWeaponActor);

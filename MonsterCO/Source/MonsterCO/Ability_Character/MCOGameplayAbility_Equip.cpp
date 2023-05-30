@@ -1,8 +1,8 @@
 #include "MCOGameplayAbility_Equip.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "MCOCharacterTags.h"
-#include "Player/MCOPlayerCharacter.h"
-#include "PlayerWeapon/MCOPlayerModeComponent.h"
+#include "Interface/MCOCharacterInterface.h"
+#include "Interface/MCOPlayerInterface.h"
 
 
 UMCOGameplayAbility_Equip::UMCOGameplayAbility_Equip()
@@ -28,9 +28,9 @@ bool UMCOGameplayAbility_Equip::CanActivateAbility(const FGameplayAbilitySpecHan
 {
 	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 
-	const AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(Player);
-	ISTRUE_F(Player->CanEquipAction());
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE_F(PlayerInterface);
+	ISTRUE_F(PlayerInterface->CanEquipAction());
 
 	return true;
 }
@@ -39,20 +39,21 @@ void UMCOGameplayAbility_Equip::ActivateAbility(const FGameplayAbilitySpecHandle
 {
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ensure(Player);
-	UMCOPlayerModeComponent* ModeComponent = Player->GetModeComponent();
-	ensure(ModeComponent);
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
+	ensure(CharacterInterface);
 
-	StartActivationWithMontage(ModeComponent->IsEquipped() ? MontageOnUnequip : MontageOnEquip);
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ensure(PlayerInterface);
+
+	StartActivationWithMontage(PlayerInterface->IsEquipped() ? MontageOnUnequip : MontageOnEquip);
 	
-	Player->ControlMoving(true);
-	ModeComponent->SwitchEquipUnequip();
+	CharacterInterface->ControlMoving(true);
+	PlayerInterface->SwitchEquipUnequip();
 }
 
 void UMCOGameplayAbility_Equip::OnTaskCompleted()
 {
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(GetMCOCharacter());
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(CharacterInterface);
 	CharacterInterface->ControlMoving(false);
 	
@@ -61,7 +62,7 @@ void UMCOGameplayAbility_Equip::OnTaskCompleted()
 
 void UMCOGameplayAbility_Equip::OnTaskCancelled()
 {
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(GetMCOCharacter());
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(CharacterInterface);
 	CharacterInterface->ControlMoving(false);
 	

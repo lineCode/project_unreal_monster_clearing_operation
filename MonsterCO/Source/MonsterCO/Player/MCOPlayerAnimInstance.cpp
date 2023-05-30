@@ -45,7 +45,7 @@ void UMCOPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
     
     ModeType = Owner->GetModeType();
-    bIsEquipped = Owner->GetModeComponent()->IsEquipped();
+    bIsEquipped = Owner->IsEquipped();
 
     // --- Ability
     ISTRUE(Owner->GetAbilitySystemComponent() != nullptr);

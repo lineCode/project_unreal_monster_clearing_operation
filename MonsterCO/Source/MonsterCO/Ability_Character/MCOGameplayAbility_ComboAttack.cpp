@@ -1,9 +1,8 @@
 #include "MCOGameplayAbility_ComboAttack.h"
 #include "MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "MCOCharacterTags.h"
-#include "Player/MCOPlayerCharacter.h"
+#include "Interface/MCOCharacterInterface.h"
 #include "Character/MCOComboAttackData.h"
-#include "PlayerWeapon/MCOWeapon.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -26,9 +25,9 @@ bool UMCOGameplayAbility_ComboAttack::CanActivateAbility(const FGameplayAbilityS
 {
 	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 
-	const AMCOCharacter* MCOCharacter = Cast<AMCOCharacter>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(MCOCharacter);
-	ISTRUE_F(MCOCharacter->CanAttack());
+	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE_F(CharacterInterface);
+	ISTRUE_F(CharacterInterface->CanAttack());
 
 	return true;
 }
@@ -94,28 +93,28 @@ void UMCOGameplayAbility_ComboAttack::BeginDamaging_Collision()
 {
 	Super::BeginDamaging_Collision();
 
-	AMCOPlayerCharacter* Owner = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
-	ensure(Owner);
+	//AMCOPlayerCharacter* Owner = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
+	//ensure(Owner);
 	
-	AMCOWeapon* Weapon = Owner->GetWeapon();
-	ensure(Weapon);
+	//AMCOWeapon* Weapon = Owner->GetWeapon();
+	//ensure(Weapon);
 	
-	Weapon->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-	Weapon->TurnOnAllCollision();
+	//Weapon->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+	//Weapon->TurnOnAllCollision();
 }
 
 void UMCOGameplayAbility_ComboAttack::EndDamaging_Collision()
 {
 	Super::EndDamaging_Collision();
 
-	AMCOPlayerCharacter* Owner = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
-	ensure(Owner);
+	//AMCOPlayerCharacter* Owner = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
+	//ensure(Owner);
 	
-	AMCOWeapon* Weapon = Owner->GetWeapon();
-	ensure(Weapon);
+	//AMCOWeapon* Weapon = Owner->GetWeapon();
+	//ensure(Weapon);
 	
-	Weapon->OnAttachmentBeginOverlapDelegate.Clear();
-	Weapon->TurnOffAllCollision();
+	//Weapon->OnAttachmentBeginOverlapDelegate.Clear();
+	//Weapon->TurnOffAllCollision();
 }
 
 void UMCOGameplayAbility_ComboAttack::SetComboTimer()

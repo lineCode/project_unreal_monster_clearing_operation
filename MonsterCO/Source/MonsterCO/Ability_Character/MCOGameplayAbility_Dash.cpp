@@ -1,6 +1,6 @@
 #include "MCOGameplayAbility_Dash.h"
 #include "MCOCharacterTags.h"
-#include "Player/MCOPlayerCharacter.h"
+#include "Interface/MCOPlayerInterface.h"
 
 
 UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
@@ -21,9 +21,9 @@ bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHand
 {
 	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == true);
 
-	AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(nullptr != Player);
-	ISTRUE_F(true == Player->CanDashAction());
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE_F(nullptr != PlayerInterface);
+	ISTRUE_F(true == PlayerInterface->CanDashAction());
 
 	return true;
 }
@@ -32,9 +32,9 @@ void UMCOGameplayAbility_Dash::ActivateAbility(const FGameplayAbilitySpecHandle 
 {
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ensure(Player);
-	Player->SetSpeed(EMCOCharacterSpeed::Fast);
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ensure(PlayerInterface);
+	PlayerInterface->SetSpeed(EMCOCharacterSpeed::Fast);
 }
 
 void UMCOGameplayAbility_Dash::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
@@ -49,7 +49,7 @@ void UMCOGameplayAbility_Dash::EndAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
-	AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(ActorInfo->AvatarActor.Get());
-	ISTRUE(Player);
-	Player->SetSpeed(EMCOCharacterSpeed::Normal);
+	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE(PlayerInterface);
+	PlayerInterface->SetSpeed(EMCOCharacterSpeed::Normal);
 }

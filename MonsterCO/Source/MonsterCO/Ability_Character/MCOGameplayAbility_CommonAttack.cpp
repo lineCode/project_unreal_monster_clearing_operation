@@ -1,9 +1,14 @@
 #include "MCOGameplayAbility_CommonAttack.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
+#include "GameFramework/Character.h"
 #include "MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "MCOCharacterTags.h"
 #include "Character/MCOCommonMontageData.h"
 #include "Physics/MCOPhysics.h"
-#include "Player/MCOPlayerCharacter.h"
+#include "Interface/MCOCharacterInterface.h"
+#include "Interface/MCOPlayerInterface.h"
+#include "Interface/MCOAttackedInterface.h"
 
 
 UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
@@ -103,13 +108,12 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(const FMCOGranted
 	ISTRUE(nullptr != AttackedASC);
 
 	// Show Monster Widgets
-	if (true == GetMCOCharacter()->IsA<AMCOPlayerCharacter>())
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(InAttackedCharacter);
+	if (nullptr != PlayerInterface)
 	{
-		AMCOPlayerCharacter* Player = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
-		ISTRUE(Player);
-		AMCOCharacter* Monster = Cast<AMCOCharacter>(InAttackedCharacter);
-		ISTRUE(Monster);
-		Player->ShowMonsterInfo(Monster);
+		IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
+		ISTRUE(CharacterInterface);
+		PlayerInterface->ShowMonsterInfo(CharacterInterface);
 	}
 
 	// Give damage and stiffness 
@@ -290,7 +294,9 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 	ISTRUE(nullptr != InAttackedCharacter);
 	
 	ISTRUE(false == DamagedCharacters.Contains(InAttackedCharacter));
-	ISTRUE(true == InAttackedCharacter->IsA<AMCOCharacter>());  // need to add attachments.....
+
+	IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(InAttackedCharacter);
+	ISTRUE(nullptr != AttackedInterface);  // need to add attachments.....
 	
 	DamagedCharacters.Emplace(InAttackedCharacter);
 			
@@ -320,7 +326,7 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 
 void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisionData& InCollisionData, const FMCOGrantedAttributeValues& InAttributeValues)
 {
-	AMCOCharacter* Attacker = Cast<AMCOCharacter>(GetMCOCharacter());
+	ACharacter* Attacker = Cast<ACharacter>(CurrentActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != Attacker);
 
 	TArray<FHitResult> OutHitResults;
@@ -329,11 +335,15 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisi
 		false,
 		Attacker
 	);
+	
+	IMCOCharacterInterface* AttackerInterface = Cast<IMCOCharacterInterface>(Attacker);
+	ISTRUE(nullptr != AttackerInterface);
+	const float Radius = AttackerInterface->GetCapsuleRadius();
 
 	const FVector AttackDirection = GetDirectionVector(InCollisionData.AttackDirection, Attacker);
 	
 	const FVector Start = Attacker->GetActorLocation() +
-		(Attacker->GetActorForwardVector() * Attacker->GetCapsuleRadius()) +
+		(Attacker->GetActorForwardVector() * Radius) +
 		(AttackDirection * InCollisionData.AdditiveLocationFromFront);
 	
 	const FVector End = Start + AttackDirection * InCollisionData.AttackLength;
@@ -359,7 +369,7 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisi
 		{
 			continue;
 		}
-		AMCOCharacter* AttackedCharacter = Cast<AMCOCharacter>(AttackedInterface->GetAttackedCharacter());
+		ACharacter* AttackedCharacter = AttackedInterface->GetAttackedCharacter();
 		if (nullptr == AttackedCharacter)
 		{
 			continue;

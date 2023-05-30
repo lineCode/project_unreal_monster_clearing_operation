@@ -17,9 +17,13 @@ public:
 	AMCOMonsterAIController(const FObjectInitializer& ObjectInitializer);
 	virtual void PostInitializeComponents() override;
 
+public:
 	void RunAI();
 	void StopAI();
 	void ContinueAI();
+
+public:
+	UObject* GetTarget();
 	
 protected:
 	virtual void OnPossess(APawn* InPawn) override;
