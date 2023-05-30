@@ -4,6 +4,9 @@
 #include "Character/MCOAttachment.h"
 #include "MCOWeapon.generated.h"
 
+class UStaticMeshComponent;
+
+
 UCLASS()
 class MONSTERCO_API AMCOWeapon : public AMCOAttachment
 {
@@ -15,6 +18,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+protected:	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MCO, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> WeaponMesh;
+	
 //--- Equip
 public:
 	void SwitchEquipUnequip(bool bInToEquip);
@@ -24,7 +31,7 @@ public:
 protected:
 	UPROPERTY()
 	uint8 bIsToEquip:1;
-
+	
 //--- Socket
 protected:
 	UPROPERTY()

@@ -6,6 +6,9 @@ AMCOWeapon::AMCOWeapon()
 {
 	HolsterSocketName = FName(TEXT("Holster_GreatSword"));
 	HandSocketName = FName(TEXT("Hand_GreatSword"));
+	
+	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
+	WeaponMesh->SetupAttachment(Scene);
 }
 
 void AMCOWeapon::BeginPlay()

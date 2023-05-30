@@ -28,5 +28,5 @@ protected:
 	TObjectPtr<UMCOMonstersData> MonstersData;
 
 	UPROPERTY()
-	TSoftObjectPtr<AMCOMonsterCharacter> SpawnedMonster;
+	TWeakObjectPtr<AMCOMonsterCharacter> SpawnedMonster;
 };

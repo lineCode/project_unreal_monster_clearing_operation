@@ -103,5 +103,5 @@ public:
 	uint8 bIsMonsterInfoShowed : 1;
 
 	UPROPERTY()
-	TSoftObjectPtr<UMCOHUDWidget> HUDWidget;
+	TWeakObjectPtr<UMCOHUDWidget> HUDWidget;
 };

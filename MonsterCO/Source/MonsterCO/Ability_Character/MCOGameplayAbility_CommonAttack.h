@@ -69,7 +69,7 @@ protected:
 	
 private:
 	UPROPERTY()
-	TSet<TSoftObjectPtr<ACharacter>> DamagedCharacters;
+	TSet<TWeakObjectPtr<ACharacter>> DamagedCharacters;
 	
 	int32 CurrentDamageTimingIdx = 0;
 	FTimerHandle DamageTimerHandle;
