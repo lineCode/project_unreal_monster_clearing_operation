@@ -40,7 +40,7 @@ void UMCOSkillWidget::StartSkillCooldown(const float& InCooldownTime)
 		CooldownTimerHandle,
 		this,
 		&ThisClass::UpdateCooldownProgressBar,
-		0.1f,
+		0.05f,
 		true,
 		0.0f
 	);
@@ -65,6 +65,7 @@ void UMCOSkillWidget::UpdateCooldownProgressBar()
 
 void UMCOSkillWidget::ResetCooldownTimer()
 {
+	SetImagePercent(0.0f);
 	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
 	GetWorld()->GetTimerManager().ClearTimer(CooldownTimerHandle);
 }

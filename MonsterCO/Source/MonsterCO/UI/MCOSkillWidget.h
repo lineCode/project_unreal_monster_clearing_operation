@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "MonsterCO.h"
 #include "Blueprint/UserWidget.h"
 #include "MCOSkillWidget.generated.h"
 
