@@ -10,7 +10,7 @@
 #include "DrawDebugHelpers.h"
 
 
-#define SKILLSLOT_MAX 3
+const int SLOT_MAX = 5;
 
 
 

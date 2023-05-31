@@ -1,5 +1,5 @@
 #include "Game/MCOGameSingleton.h"
-#include "Monster/MCOMonsterCharacter.h"
+#include "Character/Monster/MCOMonsterCharacter.h"
 
 
 UMCOGameSingleton::UMCOGameSingleton()

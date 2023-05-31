@@ -1,5 +1,8 @@
 #include "Input/MCOInputConfig.h"
 
+#include "EnhancedActionKeyMapping.h"
+#include "InputMappingContext.h"
+
 const UInputAction* UMCOInputConfig::FindNativeInputActionForTag(const FGameplayTag& InputTag) const
 {
 	for (const FMCOInputAction& Action : NativeInputActions)
@@ -22,4 +25,21 @@ const UInputAction* UMCOInputConfig::FindAbilityInputActionForTag(const FGamepla
 		}
 	}
 	return nullptr;
+}
+
+FText UMCOInputConfig::GetActionKeyName(const FGameplayTag& InTag) const
+{
+	const UInputAction* Action = FindAbilityInputActionForTag(InTag);
+	
+	for (const FEnhancedActionKeyMapping& Mapping : InputMappingContext->GetMappings())
+	{
+		if (Mapping.Action != Action)
+		{
+			continue;
+		}
+
+		return Mapping.Key.GetDisplayName();
+	}
+
+	return FText();
 }

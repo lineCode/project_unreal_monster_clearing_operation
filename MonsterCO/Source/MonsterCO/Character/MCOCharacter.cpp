@@ -2,14 +2,12 @@
 #include "MCOCharacterData.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Ability_Character/MCOAbilitySystemComponent.h"
-#include "Ability_Character/MCOCharacterTags.h"
-#include "Ability_Character/MCOAbilitySet.h"
-#include "Ability_Character/MCOAttributeSet.h"
-#include "Physics/MCOPhysics.h"
+#include "AbilitySystem/MCOAbilitySystemComponent.h"
+#include "AbilitySystem/MCOCharacterTags.h"
+#include "AbilitySystem/MCOAttributeSet.h"
 #include "UI/MCOHpWidget.h"
 #include "UI/MCOAttributeWidget.h"
-#include "Player/MCOPlayerState.h"
+#include "MCOPlayerState.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) 

@@ -31,6 +31,7 @@ class MONSTERCO_API UMCOInputConfig : public UPrimaryDataAsset
 public:
 	const UInputAction* FindNativeInputActionForTag(const FGameplayTag& InputTag) const;
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag) const;
+	FText GetActionKeyName(const FGameplayTag& InTag) const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputMappingContext> InputMappingContext;

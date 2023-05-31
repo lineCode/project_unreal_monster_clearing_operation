@@ -2,11 +2,12 @@
 #include "MCOHpWidget.h"
 #include "MCOAttributeWidget.h"
 #include "MCOSkillWidget.h"
+#include "MCOSkillWidgetData.h"
 #include "Interface/MCOHUDInterface.h"
 
-UMCOHUDWidget::UMCOHUDWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UMCOHUDWidget::UMCOHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	GETASSET(SkillWidgetData, UMCOSkillWidgetData, TEXT("/Game/Data/Player/DA_SkillWidgetData.DA_SkillWidgetData"));
 }
 
 void UMCOHUDWidget::NativeConstruct()
@@ -34,11 +35,27 @@ UMCOAttributeWidget* UMCOHUDWidget::GetAttributeWidget(bool bIsPlayer)
 	return AttributeWidgets[CurName];
 }
 
-void UMCOHUDWidget::StartSkillWidget(UTexture2D* InImage, const float& InMax)
+void UMCOHUDWidget::InitializeSkillWidget(const FGameplayTag& InTag, const FText& InKeyText)
 {
-	// select idx...
-	
-	SkillWidgets[0]->StartSkillCooldown(InImage, InMax);
+	// get an empty slot then apply
+	for (uint8 i = 0; i < SkillWidgets.Num(); i++)
+	{
+		if (false == SkillWidgets[i]->IsActive())
+		{
+			SkillWidgetData->SetData(InTag, i, InKeyText);
+			SkillWidgets[i]->SetSkillWidget(SkillWidgetData->GetTexture(InTag), InKeyText);
+			return;
+		}
+	}
+
+	MCOLOG(TEXT("not enough slot"));
+}
+
+void UMCOHUDWidget::StartSkillWidget(const FGameplayTag& InTag, const float& InCooldownTime)
+{
+	uint8 idx = SkillWidgetData->GetIndex(InTag);
+	ensure(idx < SkillWidgets.Num());
+	SkillWidgets[idx]->StartSkillCooldown(InCooldownTime);
 }
 
 const FName UMCOHUDWidget::GetName(bool bIsPlayer) const
@@ -57,7 +74,7 @@ void UMCOHUDWidget::InitializeHUDWidget(bool bIsPlayer)
 		*FString::Printf(TEXT("WBP_%sAttribute"), *CurName.ToString())
 	)));
 
-	for (int32 i = 0; i < SKILLSLOT_MAX; i++)
+	for (int32 i = 0; i < SLOT_MAX; i++)
 	{
 		SkillWidgets.Emplace(Cast<UMCOSkillWidget>(GetWidgetFromName(
 			*FString::Printf(TEXT("WBP_PlayerSkill_%d"), i + 1)

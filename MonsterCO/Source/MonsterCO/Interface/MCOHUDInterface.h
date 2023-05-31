@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "AbilitySystem/CharacterAbility/MCOCommonMontageData.h"
 #include "MCOHUDInterface.generated.h"
 
 class UMCOHUDWidget;
@@ -20,5 +21,5 @@ class MONSTERCO_API IMCOHUDInterface
 public:
 	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) = 0;
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) = 0;
-	virtual void StartCooldownWidget(UTexture2D* InImage, const float& InMax) const = 0;
+	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const = 0;
 };

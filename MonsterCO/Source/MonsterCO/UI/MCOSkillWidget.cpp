@@ -10,14 +10,30 @@ void UMCOSkillWidget::NativeConstruct()
 
 	ensure(Image);
 	ensure(SkillRadialProgressBar);
+	
+	UnSetSkillWidget();
 }
 
-void UMCOSkillWidget::StartSkillCooldown(UTexture2D* InImage, const float& InMax)
+void UMCOSkillWidget::SetSkillWidget(UTexture2D* InTexture, const FText& InKeyText)
 {
-	MaxCooldownTime = InMax;
+	Image->SetBrushFromTexture(InTexture);
+	Image->SetVisibility(ESlateVisibility::Visible);
+	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
+	bIsActive = true;
+}
+
+void UMCOSkillWidget::UnSetSkillWidget()
+{
+	Image->SetVisibility(ESlateVisibility::Hidden);
+	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
+	bIsActive = false;
+}
+
+void UMCOSkillWidget::StartSkillCooldown(const float& InCooldownTime)
+{
+	MaxCooldownTime = InCooldownTime;
 
 	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Visible);
-	Image->SetBrushFromTexture(InImage);
 
 	CooldownTimerHandle.Invalidate();
 	GetWorld()->GetTimerManager().SetTimer(
