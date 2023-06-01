@@ -53,7 +53,8 @@ void UMCOHUDWidget::InitializeSkillWidget(const FGameplayTag& InTag, const FText
 
 void UMCOHUDWidget::StartSkillWidget(const FGameplayTag& InTag, const float& InCooldownTime)
 {
-	uint8 idx = SkillWidgetData->GetIndex(InTag);
+	int8 idx = SkillWidgetData->GetIndex(InTag);
+	ISTRUE(0 <= idx);
 	ensure(idx < SkillWidgets.Num());
 	SkillWidgets[idx]->StartSkillCooldown(InCooldownTime);
 }

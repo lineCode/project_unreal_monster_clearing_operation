@@ -4,8 +4,7 @@
 #include "MCOGameplayAbility_CommonAttack.h"
 #include "MCOGameplayAbility_ComboAttack.generated.h"
 
-class UMCOComboAttackData;
-
+class UMCOMontageDataCombo;
 
 UCLASS()
 class MONSTERCO_API UMCOGameplayAbility_ComboAttack : public UMCOGameplayAbility_CommonAttack
@@ -32,8 +31,8 @@ protected:
 	void SetComboTimer();
 	void DoNextCombo();
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|AttackData")
-	TObjectPtr<UMCOComboAttackData> Data;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
+	TObjectPtr<UMCOMontageDataCombo> Data;
 
 	int32 CurrentCombo;
 	bool bIsComboCommandPressed;

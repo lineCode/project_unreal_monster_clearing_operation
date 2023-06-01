@@ -2,7 +2,9 @@
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
-#include "MCOComboAttackData.h"
+#include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
+#include "AbilitySystem/ActionData/MCOMontageDataUnit.h"
+#include "AbilitySystem/ActionData/MCOAttackFragment_Timer.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -40,17 +42,20 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	ComboTimerHandle.Invalidate();
 	
 	ensure(nullptr != Data);
-	ensure(nullptr != Data->GetMontage(CurrentCombo));
+	UMCOMontageDataUnit* DataUnit = Data->GetMontageData(CurrentCombo - 1);
+	ensure(DataUnit);
 	
 	// Set Cooldown Effect
-	SetCooldownGameplayEffect(
-		Data->GetMontageData(CurrentCombo)->CommonSkillData
-	);
+	SetCooldownFragment(DataUnit->CooldownFragment);
 	
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
-		Data->GetMontageData(CurrentCombo)
+		DataUnit->GetMontage(),
+		Data->MontageSectionName,
+		DataUnit->TimerFragment,
+		DataUnit->DamageFragment,
+		DataUnit->CollisionFragment
 	);
 
 	SetComboTimer();
@@ -120,34 +125,43 @@ void UMCOGameplayAbility_ComboAttack::SetComboTimer()
 {
 	ComboTimerHandle.Invalidate();
 	
-	float FrameCount = Data->GetComboCheckTime(CurrentCombo);
-	ISTRUE(FrameCount > 0.0f);
+	float ComboCheckTime = TimerFragment->GetComboCheckTime();
+	ISTRUE(ComboCheckTime > 0.0f);
+	
+	// MCOLOG(TEXT("[Combo] SetComboTimer: %f"), ComboCheckTime);
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		ComboTimerHandle,
 		this,
 		&ThisClass::DoNextCombo,
-		FrameCount,
+		ComboCheckTime,
 		false
 	);
 }
 
 void UMCOGameplayAbility_ComboAttack::DoNextCombo()
-{
+{	
 	ISTRUE(bIsComboCommandPressed == true);
 
 	CurrentCombo++;
 	bIsComboCommandPressed = false;
 
 	int32 MaxCombo = Data->GetMaxCombo();
-	// MCOLOG(TEXT("Combo Number : %d / %d"), CurrentCombo, MaxCombo);
+	// MCOLOG(TEXT("[Combo] %d / %d"), CurrentCombo, MaxCombo);
 	ISTRUE(CurrentCombo <= MaxCombo);
 
 	bIsDoingCombo = true;
 	
+	UMCOMontageDataUnit* DataUnit = Data->GetMontageData(CurrentCombo - 1);
+	ensure(DataUnit);
+	
 	// Play next Montage
 	StartActivation_CommonAttack(
-		Data->GetMontageData(CurrentCombo)
+		DataUnit->GetMontage(),
+		Data->MontageSectionName,
+		DataUnit->TimerFragment,
+		DataUnit->DamageFragment,
+		DataUnit->CollisionFragment
 	);
 		
 	SetComboTimer();

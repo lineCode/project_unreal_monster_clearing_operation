@@ -4,6 +4,9 @@
 #include "MCOGameplayAbility_CommonAttack.h"
 #include "MCOGameplayAbility_MonsterMelee.generated.h"
 
+class UMCOMontageDataDirectional;
+
+
 UCLASS()
 class MONSTERCO_API UMCOGameplayAbility_MonsterMelee : public UMCOGameplayAbility_CommonAttack
 {
@@ -24,9 +27,6 @@ protected:
 	
 protected:	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Montage)
-	TMap<EMCOCharacterDirection, TObjectPtr<UMCOCommonMontageData>> Data;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Direction)
-	EMCOCharacterDirectionOption DirectionOption;
+	TObjectPtr<UMCOMontageDataDirectional> Data;
 	
 };

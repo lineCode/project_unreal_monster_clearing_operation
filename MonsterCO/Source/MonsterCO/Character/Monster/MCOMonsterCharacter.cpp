@@ -14,8 +14,8 @@
 
 AMCOMonsterCharacter::AMCOMonsterCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	GETASSET(CharacterData, UMCOCharacterData, TEXT("/Game/Data/Dragon/DA_Dragon.DA_Dragon"));
-	GETASSET(MonsterAIData, UMCOMonsterAIData, TEXT("/Game/Data/Dragon/DA_DragonAIData.DA_DragonAIData"));
+	GETASSET(CharacterData, UMCOCharacterData, TEXT("/Game/Data/Monster/Dragon/DA_Dragon.DA_Dragon"));
+	GETASSET(MonsterAIData, UMCOMonsterAIData, TEXT("/Game/Data/Monster/Dragon/DA_DragonAIData.DA_DragonAIData"));
 
 	GetMesh()->SetGenerateOverlapEvents(true);
 	

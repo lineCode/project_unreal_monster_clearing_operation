@@ -29,5 +29,5 @@ protected:
 	float Duration;
 
 private:
-	bool bIsDodgeForward;	
+	bool bIsDodgeForward;
 };

@@ -18,6 +18,7 @@ const int SLOT_MAX = 5;
 #define ISTRUE(Expr)   { if(!(Expr)) return; }
 #define ISTRUE_F(Expr) { if(!(Expr)) return false; }
 #define ISTRUE_N(Expr) { if(!(Expr)) return nullptr; }
+#define ISTRUE_Z(Expr) { if(!(Expr)) return 0; }
 
 
 // --- Log

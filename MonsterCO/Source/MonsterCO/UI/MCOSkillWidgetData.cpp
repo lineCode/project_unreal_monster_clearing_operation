@@ -14,8 +14,11 @@ UTexture2D* UMCOSkillWidgetData::GetTexture(const FGameplayTag& InTag)
 	return SkillUIDatas[InTag].SkillImage;
 }
 
-uint8 UMCOSkillWidgetData::GetIndex(const FGameplayTag& InTag)
+int8 UMCOSkillWidgetData::GetIndex(const FGameplayTag& InTag)
 {
-	ensure(true == SkillUIDatas.Contains(InTag));
-	return SkillUIDatas[InTag].SlotLocation;
+	if (true == SkillUIDatas.Contains(InTag))
+	{
+		return SkillUIDatas[InTag].SlotLocation;
+	}
+	return -1;
 }

@@ -8,6 +8,7 @@
 class AMCOCharacter;
 class AController;
 class UMCOAbilitySystemComponent;
+class UMCOAttackFragment_Cooldown;
 
 
 UCLASS()
@@ -36,17 +37,17 @@ protected:
 	
 // --- Cooldown
 protected:
-	void SetCooldownGameplayEffect(const FMCOCommonSkillData& InData);
+	void SetCooldownFragment(UMCOAttackFragment_Cooldown* InCooldownFragment);
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 	void StartCooldownWidget() const;
 	
 	UPROPERTY(EditAnywhere, Category = "MCO|Cooldown")
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
-	
-	UPROPERTY(EditAnywhere, Category = "MCO|SkillData")
-	FMCOCommonSkillData SkillData;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "MCO|Cooldown")
+	TObjectPtr<UMCOAttackFragment_Cooldown> CooldownFragment;
 	
 // --- Setting
 public:
@@ -93,8 +94,4 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnGrantedEventTag(FGameplayTag EventTag, FGameplayEventData EventData);
-	
-// --- Direction
-protected:
-	EMCOCharacterDirection GetDirectionFromDegree(const EMCOCharacterDirectionOption InDirectionOption, const float InDegree);
 };

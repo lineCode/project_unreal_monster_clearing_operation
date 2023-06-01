@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "MCOGameplayAbility_Dash.h"
+#include "AbilitySystem/ActionData/MCOAttackFragment_Cooldown.h"
 #include "Interface/MCOPlayerInterface.h"
 
 
@@ -22,7 +23,8 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 
 	Strength = 500.0f;
 	Duration = 0.5f;
-	SkillData.CooldownTime = 3.0f;
+	
+	CooldownFragment->CooldownTime = 3.0f;
 }
 
 bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const

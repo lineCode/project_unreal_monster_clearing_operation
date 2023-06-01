@@ -2,11 +2,15 @@
 
 #include "MonsterCO.h"
 #include "MCOGameplayAbility.h"
-#include "MCOCommonMontageData.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "MCOGameplayAbility_CommonAttack.generated.h"
 
 class UGameplayEffect;
+class UMCOMontageData;
+class UMCOAttackFragment_Timer;
+class UMCOAttackFragment_Damage;
+class UMCOAttackFragment_Collision;
+
 
 UCLASS()
 class MONSTERCO_API UMCOGameplayAbility_CommonAttack : public UMCOGameplayAbility
@@ -18,7 +22,11 @@ public:
 
 // --- Ability
 protected:
-	void StartActivation_CommonAttack(UMCOCommonMontageData* InMontageData);
+	void StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
+		UMCOAttackFragment_Timer* InTimerFragment,
+		UMCOAttackFragment_Damage* InDamageFragment,
+		UMCOAttackFragment_Collision* InCollisionFragment
+	);
 
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
@@ -32,7 +40,7 @@ protected:
 
 // --- Attack
 protected:
-	void ApplyDamageAndStiffness(const FMCOGrantedAttributeValues& InAttributeValues, ACharacter* InAttackedCharacter);
+	void ApplyDamageAndStiffness(ACharacter* InAttackedCharacter);
 	float CalculateTargetDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& DestLocation, bool bLog = false) const;
 	float CalculateDamagedDegree(const FVector& TargetLocation, const FVector& TargetForward, const FVector& AttackDirection, bool bLog = false) const;
 	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const;
@@ -41,8 +49,8 @@ protected:
 	UFUNCTION()
 	void OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter);
 
-	void AttackHitCheckByChannel(const FMCOCollisionData& InCollisionData, const FMCOGrantedAttributeValues& InAttributeValues);
-	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, const FMCOCollisionData& InCollisionByChannelData, bool bHitDetected) const;
+	void AttackHitCheckByChannel();
+	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|Effect")
@@ -63,9 +71,16 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
 	uint8 bIsUsingCollision : 1;
+	
+	UPROPERTY()
+	TObjectPtr<UMCOAttackFragment_Damage> DamageFragment;
 
 	UPROPERTY()
-	TObjectPtr<UMCOCommonMontageData> CurrentData;
+	TObjectPtr<UMCOAttackFragment_Collision> CollisionFragment;
+	
+	UPROPERTY()
+	TObjectPtr<UMCOAttackFragment_Timer> TimerFragment;
+	
 	
 private:
 	UPROPERTY()

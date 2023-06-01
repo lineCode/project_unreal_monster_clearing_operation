@@ -4,6 +4,8 @@
 #include "MCOGameplayAbility.h"
 #include "MCOGameplayAbility_Damaged.generated.h"
 
+class UMCOMontageDataDirectional;
+
 UCLASS()
 class MONSTERCO_API UMCOGameplayAbility_Damaged : public UMCOGameplayAbility
 {
@@ -18,11 +20,7 @@ protected:
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
 	
-protected:
-// --- Using Montage
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Montage")
-	TMap<EMCOCharacterDirection, TObjectPtr<UAnimMontage>> Montages;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Montage")
-	EMCOCharacterDirectionOption DirectionOption;
+protected:	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Montage)
+	TObjectPtr<UMCOMontageDataDirectional> Data;
 };

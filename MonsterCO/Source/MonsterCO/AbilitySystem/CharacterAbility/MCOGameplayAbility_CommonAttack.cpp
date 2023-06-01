@@ -4,7 +4,9 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
-#include "MCOCommonMontageData.h"
+#include "AbilitySystem/ActionData/MCOAttackFragment_Timer.h"
+#include "AbilitySystem/ActionData/MCOAttackFragment_Damage.h"
+#include "AbilitySystem/ActionData/MCOAttackFragment_Collision.h"
 #include "Physics/MCOPhysics.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOAttackedInterface.h"
@@ -20,16 +22,19 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 	bIsUsingCollision = false;
 }
 
-void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UMCOCommonMontageData* InMontageData)
+void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
+	UMCOAttackFragment_Timer* InTimerFragment,
+	UMCOAttackFragment_Damage* InDamageFragment,
+	UMCOAttackFragment_Collision* InCollisionFragment)
 {
-	ensure(nullptr != InMontageData);
-
-	// Init data
-	CurrentData = InMontageData;
+	TimerFragment = InTimerFragment;
+	DamageFragment = InDamageFragment;
+	CollisionFragment = InCollisionFragment;
+	
 	DamagedCharacters.Reset();
 
 	// Play Montage
-	StartActivationWithMontage(CurrentData->MontageToPlay, CurrentData->MontageSectionName);
+	StartActivationWithMontage(InMontage, InSectionName);
 
 	// Damage Timer
 	SetDamageTimer();
@@ -80,10 +85,7 @@ void UMCOGameplayAbility_CommonAttack::EndDamaging()
 
 void UMCOGameplayAbility_CommonAttack::BeginDamaging_Channel()
 {	
-	AttackHitCheckByChannel(
-		CurrentData->CollisionData,
-		CurrentData->AttributeValues
-	);
+	AttackHitCheckByChannel();
 }
 
 void UMCOGameplayAbility_CommonAttack::BeginDamaging_Collision()
@@ -98,7 +100,7 @@ void UMCOGameplayAbility_CommonAttack::EndDamaging_Collision()
 {
 }
 
-void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(const FMCOGrantedAttributeValues& InAttributeValues, ACharacter* InAttackedCharacter)
+void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter)
 {
 	// Get ASC from AttackedCharacter
 	IAbilitySystemInterface* AttackedCharacter = Cast<IAbilitySystemInterface>(InAttackedCharacter);
@@ -120,11 +122,11 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(const FMCOGranted
 	
 	HandleForAttributes.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_DamageTag,
-		InAttributeValues.DamageValue
+		DamageFragment->Damage
 	);
 	HandleForAttributes.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_StiffnessTag,
-		InAttributeValues.StiffnessValue
+		DamageFragment->Stiffness
 	);
 	
 	AttackedASC->ApplyGameplayEffectSpecToSelf(
@@ -301,7 +303,7 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 	CurrentDamagedData.AttackedDegree = CalculateDamagedDegree(
 		InAttackedCharacter->GetActorLocation(),
 		InAttackedCharacter->GetActorForwardVector(),
-		-GetDirectionVector(CurrentData->CollisionData.AttackDirection, InAttacker)
+		-GetDirectionVector(CollisionFragment->AttackDirection, InAttacker)
 	);
 	
 	// CurrentDamagedData.AttackedDegree = CalculateTargetDegree(
@@ -315,14 +317,10 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 	// );
 	
 	SendDamagedDataToTarget(InAttackedCharacter);
-
-	ApplyDamageAndStiffness(
-		CurrentData->AttributeValues,
-		InAttackedCharacter
-	);
+	ApplyDamageAndStiffness(InAttackedCharacter);
 }
 
-void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisionData& InCollisionData, const FMCOGrantedAttributeValues& InAttributeValues)
+void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 {
 	ACharacter* Attacker = Cast<ACharacter>(CurrentActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != Attacker);
@@ -338,15 +336,15 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisi
 	ISTRUE(nullptr != AttackerInterface);
 	const float Radius = AttackerInterface->GetCapsuleRadius();
 
-	const FVector AttackDirection = GetDirectionVector(InCollisionData.AttackDirection, Attacker);
+	const FVector AttackDirection = GetDirectionVector(CollisionFragment->AttackDirection, Attacker);
 	
 	const FVector Start = Attacker->GetActorLocation() +
 		(Attacker->GetActorForwardVector() * Radius) +
-		(AttackDirection * InCollisionData.AdditiveLocationFromFront);
+		(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);
 	
-	const FVector End = Start + AttackDirection * InCollisionData.AttackLength;
+	const FVector End = Start + AttackDirection * CollisionFragment->AttackLength;
 	
-	const FCollisionShape Shape = FCollisionShape::MakeSphere(InCollisionData.AttackRadius);
+	const FCollisionShape Shape = FCollisionShape::MakeSphere(CollisionFragment->AttackRadius);
 	
 	const bool HitDetected = GetWorld()->SweepMultiByChannel(
 		OutHitResults,
@@ -383,7 +381,7 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisi
 		
 		
 #if ENABLE_DRAW_DEBUG
-		DrawDebug(AttackDirection, Start, End, InCollisionData, HitDetected);
+		DrawDebug(AttackDirection, Start, End, HitDetected);
 #endif
 		
 		DamagedCharacters.Emplace(AttackedCharacter);
@@ -406,7 +404,7 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisi
 		// );
 			
 		SendDamagedDataToTarget(AttackedCharacter);
-		ApplyDamageAndStiffness(InAttributeValues, AttackedCharacter);
+		ApplyDamageAndStiffness(AttackedCharacter);
 	}
 
 	// FGameplayAbilityTargetDataHandle TargetDataHandle;
@@ -431,17 +429,17 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel(const FMCOCollisi
 	// );
 }
 
-void UMCOGameplayAbility_CommonAttack::DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, const FMCOCollisionData& InCollisionByChannelData, bool bHitDetected) const
+void UMCOGameplayAbility_CommonAttack::DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const
 {
 	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	const float CapsuleHalfHeight = InCollisionByChannelData.AttackLength * 0.5f;
+	const float CapsuleHalfHeight = CollisionFragment->AttackLength * 0.5f;
 	const FColor DrawColor = bHitDetected == true ? FColor::Green : FColor::Red;
 
 	DrawDebugCapsule(
 		GetWorld(), 
 		CapsuleOrigin,
 		CapsuleHalfHeight,
-		InCollisionByChannelData.AttackRadius,
+		CollisionFragment->AttackRadius,
 		FRotationMatrix::MakeFromZ(AttackForward).ToQuat(), 
 		DrawColor,
 		false, 
@@ -462,19 +460,19 @@ void UMCOGameplayAbility_CommonAttack::ResetTimer()
 
 float UMCOGameplayAbility_CommonAttack::GetCurrentDamageBeginFrameCount()
 {
-	return CurrentData->GetDamageBeginFrameCountAfterEndTime(CurrentDamageTimingIdx);
+	return TimerFragment->GetDamageBeginTimeAfterPrevEndTime(CurrentDamageTimingIdx);
 }
 
 float UMCOGameplayAbility_CommonAttack::GetCurrentDamageEndFrameCount()
 {
-	return CurrentData->GetDamageExistFrameCount(CurrentDamageTimingIdx);
+	return TimerFragment->GetDamageExistTime(CurrentDamageTimingIdx);
 }
 
 void UMCOGameplayAbility_CommonAttack::StartDamageBeginTimer()
 {
 	ResetTimer();
 	
-	ISTRUE(CurrentDamageTimingIdx < CurrentData->DamageTimings.Num());
+	ISTRUE(CurrentDamageTimingIdx < TimerFragment->DamageTimings.Num());
 
 	const float FrameCount = GetCurrentDamageBeginFrameCount();
 	ISTRUE(FrameCount > 0.0f);
@@ -492,7 +490,7 @@ void UMCOGameplayAbility_CommonAttack::StartDamageEndTimer()
 {
 	ResetTimer();
 	
-	ISTRUE(CurrentDamageTimingIdx < CurrentData->DamageTimings.Num());
+	ISTRUE(CurrentDamageTimingIdx < TimerFragment->DamageTimings.Num());
 	
 	const float FrameCount = GetCurrentDamageEndFrameCount();
 	ISTRUE(FrameCount > 0.0f);

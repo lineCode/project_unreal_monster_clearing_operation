@@ -1,6 +1,7 @@
 #include "MCOGameplayAbility_MonsterMelee.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
+#include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "Interface/MCOMonsterAIInterface.h"
 
 
@@ -10,20 +11,6 @@ UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 	AbilityTag = FMCOCharacterTags::Get().AttackTag;
 	AbilityTags.AddTag(AbilityTag);
 	ActivationOwnedTags.AddTag(AbilityTag);
-
-	static ConstructorHelpers::FObjectFinder<UMCOCommonMontageData> LeftRef(TEXT("/Game/Data/Dragon/DA_LeftClaw.DA_LeftClaw"));
-	if (true == LeftRef.Succeeded())
-	{
-		Data.Emplace(EMCOCharacterDirection::Left, LeftRef.Object);
-	}
-
-	static ConstructorHelpers::FObjectFinder<UMCOCommonMontageData> RightRef(TEXT("/Game/Data/Dragon/DA_RightClaw.DA_RightClaw"));
-	if (true == RightRef.Succeeded())
-	{
-		Data.Emplace(EMCOCharacterDirection::Right, RightRef.Object);
-	}
-
-	DirectionOption = EMCOCharacterDirectionOption::LeftRight;
 }
 
 bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -51,27 +38,27 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 	
 	AActor* Target = Cast<AActor>(MonsterInterface->GetTarget());
 	ISTRUE(Target);
-	
+
+	ensure(nullptr != Data);
+	ensure(nullptr != Data->CooldownFragment);
+
 	const float AttackDegree = CalculateTargetDegree(
 		Monster->GetActorLocation(),
 		Monster->GetActorForwardVector(),
 		Target->GetActorLocation()
 	);
-	const EMCOCharacterDirection AttackingDirection = GetDirectionFromDegree(DirectionOption, AttackDegree);
-	ensure(Data.Contains(AttackingDirection));
 	
 	// Set Cooldown Effect
-	SetCooldownGameplayEffect(Data[AttackingDirection]->CommonSkillData);
+	SetCooldownFragment(Data->CooldownFragment);
 	
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
-	// MCOLOG(TEXT("Monster Attack %f : %s"),
-	// 	AttackDegree,
-	// 	*FHelper::GetEnumDisplayName(TEXT("EMCOCharacterDirection"), (int64)AttackingDirection)
-	// );
-	
 	StartActivation_CommonAttack(
-		Data[AttackingDirection]
+		Data->GetMontage(AttackDegree),
+		Data->MontageSectionName,
+		Data->TimerFragment, 
+		Data->DamageFragment,
+		Data->GetCollisionFragment(AttackDegree)
 	);
 }
 
@@ -98,7 +85,7 @@ void UMCOGameplayAbility_MonsterMelee::BeginDamaging_Collision()
 {
 	Super::BeginDamaging_Collision();
 
-	ISTRUE(nullptr != CurrentData);
+	ISTRUE(nullptr != Data);
 	
 	IMCOMonsterAIInterface* Monster = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(Monster);
@@ -117,7 +104,7 @@ void UMCOGameplayAbility_MonsterMelee::EndDamaging_Collision()
 {
 	Super::EndDamaging_Collision();
 	
-	ISTRUE(nullptr != CurrentData);
+	ISTRUE(nullptr != Data);
 	
 	IMCOMonsterAIInterface* Monster = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(Monster);

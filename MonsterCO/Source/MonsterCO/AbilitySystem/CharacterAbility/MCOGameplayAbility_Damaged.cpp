@@ -2,6 +2,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOAttributeSet.h"
 #include "AbilitySystem/MCOCharacterTags.h"
+#include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOPlayerInterface.h"
 
@@ -26,28 +27,19 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 {
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
-	
-	// Using Montage
-	const EMCOCharacterDirection DamagedDirection = GetDirectionFromDegree(DirectionOption, CharacterInterface->GetDamagedData().AttackedDegree);
-	ensure(Montages.Contains(DamagedDirection));
-	
-	MCOLOG(TEXT("Damaged %f : %s"),
-		CharacterInterface->GetDamagedData().AttackedDegree,
-		*FHelper::GetEnumDisplayName(TEXT("EMCOCharacterDirection"), (int64)DamagedDirection)
-	);
-
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	if (nullptr != PlayerInterface)
 	{
 		PlayerInterface->SetEquippedWithoutAnimation();
 	}
 	
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
+	ensure(CharacterInterface);
+	
 	CancelAllAbility();
 	// CharacterInterface->OffAllCollision();
 	CharacterInterface->OnDamagedBegin.ExecuteIfBound();
-	StartActivationWithMontage(Montages[DamagedDirection]);
+	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().AttackedDegree));
 }
 
 void UMCOGameplayAbility_Damaged::OnTaskCompleted()

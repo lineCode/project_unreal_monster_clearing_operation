@@ -341,15 +341,15 @@ void AMCOPlayerCharacter::InitializeHUD()
 	InitializeWidget(HUDWidget->GetHpWidget(true), HUDWidget->GetAttributeWidget(true));
 	HUDWidget->ShowWidget(true, true);
 
-	// temp 
-	HUDWidget->InitializeSkillWidget(
-		FMCOCharacterTags::Get().AttackTag,
-		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().AttackTag)
-	);
-
+	// temp
 	HUDWidget->InitializeSkillWidget(
 		FMCOCharacterTags::Get().DodgeTag,
 		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().DodgeTag)
+	);
+	
+	HUDWidget->InitializeSkillWidget(
+		FMCOCharacterTags::Get().AttackTag,
+		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().AttackTag)
 	);
 }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "MonsterCO.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "MCOSkillWidgetData.generated.h"
@@ -32,7 +32,7 @@ class MONSTERCO_API UMCOSkillWidgetData : public UPrimaryDataAsset
 public:
 	void SetData(const FGameplayTag& InTag, const uint8 InSlotLocation, const FText& InKeyText);
 	UTexture2D* GetTexture(const FGameplayTag& InTag);
-	uint8 GetIndex(const FGameplayTag& InTag);
+	int8 GetIndex(const FGameplayTag& InTag);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget)
 	TMap<FGameplayTag, FSkillUIData> SkillUIDatas;

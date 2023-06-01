@@ -3,6 +3,7 @@
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
+#include "AbilitySystem/ActionData/MCOAttackFragment_Cooldown.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOHUDInterface.h"
@@ -13,6 +14,7 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	// Effect 
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
 	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_AbilityTags.GE_AbilityTags_C"));
+	CooldownFragment = CreateDefaultSubobject<UMCOAttackFragment_Cooldown>(TEXT("NAME_CooldownFragment"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -107,16 +109,17 @@ UAbilitySystemComponent* UMCOGameplayAbility::GetAbilitySystemComponent() const
 	return ASCInterface->GetAbilitySystemComponent();
 }
 
-void UMCOGameplayAbility::SetCooldownGameplayEffect(const FMCOCommonSkillData& InData)
+void UMCOGameplayAbility::SetCooldownFragment(UMCOAttackFragment_Cooldown* InCooldownFragment)
 {
-	SkillData = InData;
+	CooldownFragment = InCooldownFragment;
 }
 
 void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
+	ISTRUE(nullptr != CooldownFragment);
 	ISTRUE(nullptr != CooldownEffectClass);
-	ISTRUE(true == SkillData.CanApplyCooldown());
-
+	ISTRUE(true == CooldownFragment->CanApplyCooldown());
+	
 	//MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *FHelper::GetEnumDisplayName(TEXT("EMCOAbilityID"), (int32)AbilityInputID), CooldownTimeMax);
 	
 	FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
@@ -124,10 +127,10 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	
 	HandleForCooldown.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_CooldownTag,
-		SkillData.CooldownTime
+		CooldownFragment->CooldownTime
 	);
 	
-	HandleForCooldown.Data->DynamicGrantedTags = SkillData.CooldownTags;
+	HandleForCooldown.Data->DynamicGrantedTags = CooldownFragment->CooldownTags;
 
 	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, HandleForCooldown);
 
@@ -136,17 +139,21 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 
 const FGameplayTagContainer* UMCOGameplayAbility::GetCooldownTags() const
 {
-	return &SkillData.CooldownTags;	
+	ISTRUE_N(nullptr != CooldownFragment);
+	ISTRUE_N(nullptr != CooldownEffectClass);
+	ISTRUE_N(true == CooldownFragment->CanApplyCooldown());
+	
+	return &CooldownFragment->CooldownTags;	
 }
 
 void UMCOGameplayAbility::StartCooldownWidget() const
 {
 	ISTRUE(nullptr != CurrentActorInfo);
-	ISTRUE(true == SkillData.CanApplyCooldown());
+	ISTRUE(true == CooldownFragment->CanApplyCooldown());
 	
 	const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != HUDInterface);
-	HUDInterface->StartCooldownWidget(AbilityTag, SkillData.CooldownTime);
+	HUDInterface->StartCooldownWidget(AbilityTag, CooldownFragment->CooldownTime);
 }
 
 void UMCOGameplayAbility::CancelAllAbility()
@@ -245,93 +252,3 @@ void UMCOGameplayAbility::OnGrantedEventTag(FGameplayTag EventTag, FGameplayEven
 	// 	//...
 	// }
 }
-
-EMCOCharacterDirection UMCOGameplayAbility::GetDirectionFromDegree(const EMCOCharacterDirectionOption InDirectionOption, const float InDegree)
-{
-	switch(InDirectionOption)
-	{
-	case EMCOCharacterDirectionOption::FrontBack:
-	{
-		if (-90.0f < InDegree && InDegree < 90.0f)
-		{
-			return EMCOCharacterDirection::Front; 
-		}
-		else
-		{
-			return EMCOCharacterDirection::Back; 
-		}
-	}
-	break;
-	case EMCOCharacterDirectionOption::LeftRight:
-	{
-		if (InDegree < 0.0f)
-		{
-			return EMCOCharacterDirection::Left; 
-		}
-		else
-		{
-			return EMCOCharacterDirection::Right; 
-		}
-	}
-	break;
-	case EMCOCharacterDirectionOption::FourSide:
-	{
-		if (InDegree < 0.0f)
-		{
-			if (InDegree > -45.0f)       return EMCOCharacterDirection::Front;
-			else if (InDegree > -135.0f)  return EMCOCharacterDirection::Left; 
-			else                         return EMCOCharacterDirection::Back;
-		}
-		else
-		{
-			if (InDegree < 45.0f)        return EMCOCharacterDirection::Front;
-			else if (InDegree < 135.0f)   return EMCOCharacterDirection::Right; 
-			else                         return EMCOCharacterDirection::Back;
-		}
-	}
-	break;
-	case EMCOCharacterDirectionOption::SixSide:
-	{
-		// Left
-		if (InDegree < 0.0f)
-		{
-			if (InDegree > -60.0f)         return EMCOCharacterDirection::Front_Left;
-			else if (InDegree > -120.0f)   return EMCOCharacterDirection::Left; 
-			else                           return EMCOCharacterDirection::Back_Left;
-		}
-		// Right
-		else
-		{
-			if (InDegree < 60.0f)          return EMCOCharacterDirection::Front_Right;
-			else if (InDegree < 120.0f)    return EMCOCharacterDirection::Right; 
-			else                           return EMCOCharacterDirection::Back_Right;
-		}
-	}
-	break;
-	case EMCOCharacterDirectionOption::EightSide:
-	{
-		// Left
-		if (InDegree < 0.0f)
-		{
-			if (InDegree > -30.0f)       return EMCOCharacterDirection::Front;
-			else if (InDegree > -60.0f)  return EMCOCharacterDirection::Front_Left;
-			else if (InDegree > -90.0f)  return EMCOCharacterDirection::Left; 
-			else if (InDegree > -120.0f) return EMCOCharacterDirection::Back_Left;
-			else                         return EMCOCharacterDirection::Back;
-		}
-		// Right
-		else
-		{
-			if (InDegree < 30.0f)        return EMCOCharacterDirection::Front;
-			else if (InDegree < 60.0f)   return EMCOCharacterDirection::Front_Right;
-			else if (InDegree < 90.0f)   return EMCOCharacterDirection::Right; 
-			else if (InDegree < 120.0f)  return EMCOCharacterDirection::Back_Right;
-			else                         return EMCOCharacterDirection::Back;
-		}
-	}
-	break;
-	}
-	
-	return EMCOCharacterDirection::Front;
-}
-
