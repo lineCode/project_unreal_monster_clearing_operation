@@ -1,10 +1,11 @@
-#include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
+#include "MCOMontageDataDirectional.h"
+#include "MCOActionFragment_Montage.h"
 
 
 UAnimMontage* UMCOMontageDataDirectional::GetMontage(const float InDegree, bool bIsLog)
 {
 	const EMCOCharacterDirection Direction = GetDirectionFromDegree(InDegree);
-	ensure(Montages.Contains(Direction));
+	ensure(MontageFragments.Contains(Direction));
 
 	if (true == bIsLog)
 	{
@@ -13,13 +14,14 @@ UAnimMontage* UMCOMontageDataDirectional::GetMontage(const float InDegree, bool 
 		);
 	}
 	
-	return Montages[Direction].Montage;
+	return MontageFragments[Direction]->GetMontage();
 }
 
-UMCOAttackFragment_Collision* UMCOMontageDataDirectional::GetCollisionFragment(const float InDegree, bool bIsLog)
+const UMCOActionFragment_Collision* UMCOMontageDataDirectional::GetCollisionFragment(const float InDegree, bool bIsLog)
 {
 	const EMCOCharacterDirection Direction = GetDirectionFromDegree(InDegree);
-	ensure(Montages.Contains(Direction));
+	ensure(MontageFragments.Contains(Direction));
+	ensure(ActionDefinition);
 	
 	if (true == bIsLog)
 	{
@@ -28,7 +30,7 @@ UMCOAttackFragment_Collision* UMCOMontageDataDirectional::GetCollisionFragment(c
 		);
 	}
 	
-	return Montages[Direction].CollisionFragment;
+	return MontageFragments[Direction]->ActionDefinition->GetCollisionFragment();
 }
 
 EMCOCharacterDirection UMCOMontageDataDirectional::GetDirectionFromDegree(const float InDegree) const

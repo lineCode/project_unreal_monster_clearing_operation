@@ -8,7 +8,7 @@
 class AMCOCharacter;
 class AController;
 class UMCOAbilitySystemComponent;
-class UMCOAttackFragment_Cooldown;
+class UMCOActionFragment_Cooldown;
 
 
 UCLASS()
@@ -32,22 +32,21 @@ protected:
 
 // --- Effect
 protected:
-	UPROPERTY(EditAnywhere, Category = "MCO|Effect")
+	UPROPERTY()
 	TSubclassOf<UGameplayEffect> TagEffectClass;
 	
 // --- Cooldown
 protected:
-	void SetCooldownFragment(UMCOAttackFragment_Cooldown* InCooldownFragment);
+	void UpdateCooldownFragment(const UMCOActionFragment_Cooldown* InCooldownFragment);
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 	void StartCooldownWidget() const;
 	
-	UPROPERTY(EditAnywhere, Category = "MCO|Cooldown")
+	UPROPERTY()
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
 
-protected:
-	UPROPERTY(EditAnywhere, Category = "MCO|Cooldown")
-	TObjectPtr<UMCOAttackFragment_Cooldown> CooldownFragment;
+	UPROPERTY()
+	TObjectPtr<const UMCOActionFragment_Cooldown> CooldownFragment;
 	
 // --- Setting
 public:

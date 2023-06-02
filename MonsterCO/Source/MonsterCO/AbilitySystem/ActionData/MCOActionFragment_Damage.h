@@ -1,12 +1,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MCOAttackDefinition.h"
-#include "MCOAttackFragment_Damage.generated.h"
+#include "MCOActionDefinition.h"
+#include "MCOActionFragment_Damage.generated.h"
 
 
 UCLASS()
-class MONSTERCO_API UMCOAttackFragment_Damage : public UMCOAttackFragment
+class MONSTERCO_API UMCOActionFragment_Damage : public UMCOActionFragment
 {
 	GENERATED_BODY()
 	

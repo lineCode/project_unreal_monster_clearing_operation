@@ -1,19 +1,19 @@
 #include "MCOMontageDataCombo.h"
-#include "MCOMontageDataUnit.h"
+#include "MCOActionFragment_Montage.h"
 
-UMCOMontageDataUnit* UMCOMontageDataCombo::GetMontageData(const uint8 InComboIdx)
+const UMCOActionFragment_Montage* UMCOMontageDataCombo::GetMontageFragment(const uint8 InComboIdx)
 {
-	ensure(ComboMontageData.IsValidIndex(InComboIdx));
-	return ComboMontageData[InComboIdx];
+	ensure(MontageFragments.IsValidIndex(InComboIdx));
+	return MontageFragments[InComboIdx];
 }
 
 UAnimMontage* UMCOMontageDataCombo::GetMontage(const uint8 InComboIdx)
 {
-	ensure(ComboMontageData.IsValidIndex(InComboIdx));
-	return ComboMontageData[InComboIdx]->GetMontage();
+	ensure(MontageFragments.IsValidIndex(InComboIdx));
+	return MontageFragments[InComboIdx]->GetMontage();;
 }
 
 uint8 UMCOMontageDataCombo::GetMaxCombo() const
 {
-	return ComboMontageData.Num();
+	return MontageFragments.Num();
 }

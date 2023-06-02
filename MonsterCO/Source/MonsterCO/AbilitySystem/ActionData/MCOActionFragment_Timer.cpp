@@ -1,6 +1,6 @@
-#include "AbilitySystem/ActionData/MCOAttackFragment_Timer.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
 
-float UMCOAttackFragment_Timer::GetDamageBeginTimeAfterPrevEndTime(uint8 InDamageIdx, float SpeedRate)
+float UMCOActionFragment_Timer::GetDamageBeginTimeAfterPrevEndTime(uint8 InDamageIdx, float SpeedRate) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
 	float BeginTime = CalculateTime(DamageTimings[InDamageIdx].Begin, SpeedRate);
@@ -13,7 +13,7 @@ float UMCOAttackFragment_Timer::GetDamageBeginTimeAfterPrevEndTime(uint8 InDamag
 	return BeginTime;
 }
 
-float UMCOAttackFragment_Timer::GetDamageExistTime(uint8 InDamageIdx, float SpeedRate)
+float UMCOActionFragment_Timer::GetDamageExistTime(uint8 InDamageIdx, float SpeedRate) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
 
@@ -23,12 +23,12 @@ float UMCOAttackFragment_Timer::GetDamageExistTime(uint8 InDamageIdx, float Spee
 	return End - Begin;
 }
 
-float UMCOAttackFragment_Timer::GetComboCheckTime(float SpeedRate)
+float UMCOActionFragment_Timer::GetComboCheckTime(float SpeedRate) const
 {
 	return CalculateTime(NextComboFrameCount, SpeedRate);
 }
 
-float UMCOAttackFragment_Timer::CalculateTime(float FrameCount, float SpeedRate)
+float UMCOActionFragment_Timer::CalculateTime(float FrameCount, float SpeedRate) const
 {
 	return (FrameCount / MontageFrameRate) / SpeedRate;
 }

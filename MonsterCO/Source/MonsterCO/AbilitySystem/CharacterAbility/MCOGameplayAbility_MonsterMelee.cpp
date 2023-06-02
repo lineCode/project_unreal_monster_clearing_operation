@@ -1,8 +1,9 @@
 #include "MCOGameplayAbility_MonsterMelee.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
-#include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "Interface/MCOMonsterAIInterface.h"
+#include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
 
 
 UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
@@ -11,6 +12,18 @@ UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 	AbilityTag = FMCOCharacterTags::Get().AttackTag;
 	AbilityTags.AddTag(AbilityTag);
 	ActivationOwnedTags.AddTag(AbilityTag);
+	
+}
+
+void UMCOGameplayAbility_MonsterMelee::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+	
+	ensure(nullptr != Data);
+	ensure(nullptr != Data->ActionDefinition);
+	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
+	ensure(nullptr != Fragment);
+	CooldownFragment = Fragment;
 }
 
 bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -39,25 +52,22 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 	AActor* Target = Cast<AActor>(MonsterInterface->GetTarget());
 	ISTRUE(Target);
 
-	ensure(nullptr != Data);
-	ensure(nullptr != Data->CooldownFragment);
-
 	const float AttackDegree = CalculateTargetDegree(
 		Monster->GetActorLocation(),
 		Monster->GetActorForwardVector(),
 		Target->GetActorLocation()
 	);
 	
-	// Set Cooldown Effect
-	SetCooldownFragment(Data->CooldownFragment);
+	ensure(nullptr != Data);
+	ensure(nullptr != Data->ActionDefinition);
 	
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
 		Data->GetMontage(AttackDegree),
 		Data->MontageSectionName,
-		Data->TimerFragment, 
-		Data->DamageFragment,
+		Data->ActionDefinition->GetTimerFragment(), 
+		Data->ActionDefinition->GetDamageFragment(),
 		Data->GetCollisionFragment(AttackDegree)
 	);
 }
@@ -73,7 +83,6 @@ void UMCOGameplayAbility_MonsterMelee::OnTaskCompleted()
 
 void UMCOGameplayAbility_MonsterMelee::OnTaskCancelled()
 {
-	MCOLOG(TEXT("Attack Cancelled"));
 	IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(MonsterInterface);
 	MonsterInterface->OnAttackFinished.ExecuteIfBound(EBTNodeResult::Failed);

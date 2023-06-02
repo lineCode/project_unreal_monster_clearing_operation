@@ -4,9 +4,9 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
-#include "AbilitySystem/ActionData/MCOAttackFragment_Timer.h"
-#include "AbilitySystem/ActionData/MCOAttackFragment_Damage.h"
-#include "AbilitySystem/ActionData/MCOAttackFragment_Collision.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Damage.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Physics/MCOPhysics.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOAttackedInterface.h"
@@ -23,9 +23,9 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 }
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-	UMCOAttackFragment_Timer* InTimerFragment,
-	UMCOAttackFragment_Damage* InDamageFragment,
-	UMCOAttackFragment_Collision* InCollisionFragment)
+	const UMCOActionFragment_Timer* InTimerFragment,
+	const UMCOActionFragment_Damage* InDamageFragment,
+	const UMCOActionFragment_Collision* InCollisionFragment)
 {
 	TimerFragment = InTimerFragment;
 	DamageFragment = InDamageFragment;
@@ -458,12 +458,12 @@ void UMCOGameplayAbility_CommonAttack::ResetTimer()
 	DamageTimerHandle.Invalidate();
 }
 
-float UMCOGameplayAbility_CommonAttack::GetCurrentDamageBeginFrameCount()
+float UMCOGameplayAbility_CommonAttack::GetCurrentDamageBeginFrameCount() const
 {
 	return TimerFragment->GetDamageBeginTimeAfterPrevEndTime(CurrentDamageTimingIdx);
 }
 
-float UMCOGameplayAbility_CommonAttack::GetCurrentDamageEndFrameCount()
+float UMCOGameplayAbility_CommonAttack::GetCurrentDamageEndFrameCount() const
 {
 	return TimerFragment->GetDamageExistTime(CurrentDamageTimingIdx);
 }

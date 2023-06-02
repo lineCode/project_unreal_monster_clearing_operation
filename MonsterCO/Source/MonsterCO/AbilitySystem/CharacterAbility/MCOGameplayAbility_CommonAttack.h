@@ -7,9 +7,9 @@
 
 class UGameplayEffect;
 class UMCOMontageData;
-class UMCOAttackFragment_Timer;
-class UMCOAttackFragment_Damage;
-class UMCOAttackFragment_Collision;
+class UMCOActionFragment_Timer;
+class UMCOActionFragment_Damage;
+class UMCOActionFragment_Collision;
 
 
 UCLASS()
@@ -23,9 +23,9 @@ public:
 // --- Ability
 protected:
 	void StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-		UMCOAttackFragment_Timer* InTimerFragment,
-		UMCOAttackFragment_Damage* InDamageFragment,
-		UMCOAttackFragment_Collision* InCollisionFragment
+		const UMCOActionFragment_Timer* InTimerFragment,
+		const UMCOActionFragment_Damage* InDamageFragment,
+		const UMCOActionFragment_Collision* InCollisionFragment
 	);
 
 	virtual void OnTaskCompleted() override;
@@ -53,7 +53,7 @@ protected:
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = "MCO|Effect")
+	UPROPERTY()
 	TSubclassOf<UGameplayEffect> AttributeEffect;
 	
 
@@ -63,8 +63,8 @@ protected:
 	void ResetTimer();
 	
 private:
-	float GetCurrentDamageBeginFrameCount();
-	float GetCurrentDamageEndFrameCount();
+	float GetCurrentDamageBeginFrameCount() const;
+	float GetCurrentDamageEndFrameCount() const;
 	void StartDamageBeginTimer();
 	void StartDamageEndTimer();
 	
@@ -73,13 +73,13 @@ protected:
 	uint8 bIsUsingCollision : 1;
 	
 	UPROPERTY()
-	TObjectPtr<UMCOAttackFragment_Damage> DamageFragment;
+	TObjectPtr<const UMCOActionFragment_Damage> DamageFragment;
 
 	UPROPERTY()
-	TObjectPtr<UMCOAttackFragment_Collision> CollisionFragment;
+	TObjectPtr<const UMCOActionFragment_Collision> CollisionFragment;
 	
 	UPROPERTY()
-	TObjectPtr<UMCOAttackFragment_Timer> TimerFragment;
+	TObjectPtr<const UMCOActionFragment_Timer> TimerFragment;
 	
 	
 private:

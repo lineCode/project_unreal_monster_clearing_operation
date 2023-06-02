@@ -21,6 +21,6 @@ protected:
 	virtual void OnTaskCancelled() override;
 	
 protected:	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Montage)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
 	TObjectPtr<UMCOMontageDataDirectional> Data;
 };

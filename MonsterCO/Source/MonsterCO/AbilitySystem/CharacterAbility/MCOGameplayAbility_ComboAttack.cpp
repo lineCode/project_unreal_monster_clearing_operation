@@ -3,8 +3,9 @@
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
-#include "AbilitySystem/ActionData/MCOMontageDataUnit.h"
-#include "AbilitySystem/ActionData/MCOAttackFragment_Timer.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
+#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -42,20 +43,20 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	ComboTimerHandle.Invalidate();
 	
 	ensure(nullptr != Data);
-	UMCOMontageDataUnit* DataUnit = Data->GetMontageData(CurrentCombo - 1);
-	ensure(DataUnit);
+	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
+	ensure(nullptr != MontageFragment);
+	ensure(nullptr != MontageFragment->ActionDefinition);
 	
-	// Set Cooldown Effect
-	SetCooldownFragment(DataUnit->CooldownFragment);
+	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
 	
 	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
-		DataUnit->GetMontage(),
+		MontageFragment->GetMontage(),
 		Data->MontageSectionName,
-		DataUnit->TimerFragment,
-		DataUnit->DamageFragment,
-		DataUnit->CollisionFragment
+		MontageFragment->ActionDefinition->GetTimerFragment(),
+		MontageFragment->ActionDefinition->GetDamageFragment(),
+		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
 
 	SetComboTimer();
@@ -88,7 +89,6 @@ void UMCOGameplayAbility_ComboAttack::OnTaskCancelled()
 		return;
 	}
 	
-	MCOLOG(TEXT("Combo Cancelled"));
 	ComboTimerHandle.Invalidate();
 	Super::OnTaskCancelled();
 }
@@ -152,16 +152,16 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 
 	bIsDoingCombo = true;
 	
-	UMCOMontageDataUnit* DataUnit = Data->GetMontageData(CurrentCombo - 1);
-	ensure(DataUnit);
+	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
+	ensure(MontageFragment);
 	
 	// Play next Montage
 	StartActivation_CommonAttack(
-		DataUnit->GetMontage(),
+		MontageFragment->GetMontage(),
 		Data->MontageSectionName,
-		DataUnit->TimerFragment,
-		DataUnit->DamageFragment,
-		DataUnit->CollisionFragment
+		MontageFragment->ActionDefinition->GetTimerFragment(),
+		MontageFragment->ActionDefinition->GetDamageFragment(),
+		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
 		
 	SetComboTimer();

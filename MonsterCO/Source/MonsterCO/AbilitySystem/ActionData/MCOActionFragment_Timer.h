@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MCOAttackDefinition.h"
-#include "MCOAttackFragment_Timer.generated.h"
+#include "MCOActionDefinition.h"
+#include "MCOActionFragment_Timer.generated.h"
 
 
 USTRUCT(BlueprintType)
@@ -22,7 +22,7 @@ public:
 
 
 UCLASS()
-class MONSTERCO_API UMCOAttackFragment_Timer : public UMCOAttackFragment
+class MONSTERCO_API UMCOActionFragment_Timer : public UMCOActionFragment
 {
 	GENERATED_BODY()
 	
@@ -37,10 +37,10 @@ public:
 	float NextComboFrameCount = 0.0f;
 	
 public:
-	float GetDamageBeginTimeAfterPrevEndTime(uint8 InDamageIdx, float SpeedRate = 1.0f);
-	float GetDamageExistTime(uint8 InDamageIdx, float SpeedRate = 1.0f);
-	float GetComboCheckTime(float SpeedRate = 1.0f);
+	float GetDamageBeginTimeAfterPrevEndTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
+	float GetDamageExistTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
+	float GetComboCheckTime(float SpeedRate = 1.0f) const;
 
 protected:
-	float CalculateTime(float FrameCount, float SpeedRate = 1.0f);
+	float CalculateTime(float FrameCount, float SpeedRate = 1.0f) const;
 };

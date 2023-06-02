@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "MCOAttackDefinition.h"
-#include "MCOAttackFragment_Cooldown.generated.h"
+#include "MCOActionDefinition.h"
+#include "MCOActionFragment_Cooldown.generated.h"
 
 UCLASS()
-class MONSTERCO_API UMCOAttackFragment_Cooldown : public UMCOAttackFragment
+class MONSTERCO_API UMCOActionFragment_Cooldown : public UMCOActionFragment
 {
 	GENERATED_BODY()
 	

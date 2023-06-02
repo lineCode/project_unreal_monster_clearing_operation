@@ -2,7 +2,8 @@
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "GameFramework/Character.h"
-#include "AbilitySystem/ActionData/MCOAttackFragment_Cooldown.h"
+#include "AbilitySystem/ActionData/MCOActionData.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
 
 
 
@@ -19,8 +20,18 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+
+}
+
+void UMCOGameplayAbility_Jump::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
 	
-	CooldownFragment->CooldownTime = 2.0f;
+	ensure(nullptr != Data);
+	ensure(nullptr != Data->ActionDefinition);
+	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
+	ensure(nullptr != Fragment);
+	CooldownFragment = Fragment;
 }
 
 bool UMCOGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const

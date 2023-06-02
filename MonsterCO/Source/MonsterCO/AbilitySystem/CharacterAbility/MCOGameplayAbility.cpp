@@ -3,7 +3,7 @@
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
-#include "AbilitySystem/ActionData/MCOAttackFragment_Cooldown.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOHUDInterface.h"
@@ -14,7 +14,7 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	// Effect 
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
 	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_AbilityTags.GE_AbilityTags_C"));
-	CooldownFragment = CreateDefaultSubobject<UMCOAttackFragment_Cooldown>(TEXT("NAME_CooldownFragment"));
+	// CooldownFragment = CreateDefaultSubobject<UMCOActionFragment_Cooldown>(TEXT("NAME_CooldownFragment"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -109,7 +109,7 @@ UAbilitySystemComponent* UMCOGameplayAbility::GetAbilitySystemComponent() const
 	return ASCInterface->GetAbilitySystemComponent();
 }
 
-void UMCOGameplayAbility::SetCooldownFragment(UMCOAttackFragment_Cooldown* InCooldownFragment)
+void UMCOGameplayAbility::UpdateCooldownFragment(const UMCOActionFragment_Cooldown* InCooldownFragment)
 {
 	CooldownFragment = InCooldownFragment;
 }
