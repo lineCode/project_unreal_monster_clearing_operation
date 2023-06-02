@@ -9,11 +9,15 @@
 
 UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 {
-	AbilityInputID = EMCOAbilityID::Jump;
-	AbilityTag = FMCOCharacterTags::Get().JumpTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
+	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Jump.DA_Player_Jump"));
 
+	ensure(nullptr != Data->ActionDefinition);
+	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
+	ensure(nullptr != Fragment);
+	UpdateCooldownFragment(Fragment);
+	
+	SetID(EMCOAbilityID::Jump, Data->ActivationTag);
+	
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
 
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
@@ -21,17 +25,6 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
 
-}
-
-void UMCOGameplayAbility_Jump::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
-{
-	Super::OnAvatarSet(ActorInfo, Spec);
-	
-	ensure(nullptr != Data);
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
-	ensure(nullptr != Fragment);
-	CooldownFragment = Fragment;
 }
 
 bool UMCOGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
@@ -47,7 +40,7 @@ bool UMCOGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHand
 
 void UMCOGameplayAbility_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->Jump();

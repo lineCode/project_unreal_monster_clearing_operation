@@ -8,22 +8,14 @@
 
 UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 {
-	AbilityInputID = EMCOAbilityID::NormalAttack;
-	AbilityTag = FMCOCharacterTags::Get().AttackTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
-	
-}
+	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Claw.DA_Dragon_Claw"));
 
-void UMCOGameplayAbility_MonsterMelee::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
-{
-	Super::OnAvatarSet(ActorInfo, Spec);
+	SetID(EMCOAbilityID::NormalAttack, Data->ActivationTag);
 	
-	ensure(nullptr != Data);
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
 	ensure(nullptr != Fragment);
-	CooldownFragment = Fragment;
+	UpdateCooldownFragment(Fragment);
 }
 
 bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -61,7 +53,7 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 	ensure(nullptr != Data);
 	ensure(nullptr != Data->ActionDefinition);
 	
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
 		Data->GetMontage(AttackDegree),

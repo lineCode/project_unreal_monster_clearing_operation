@@ -5,10 +5,7 @@
 
 UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 {
-	AbilityInputID = EMCOAbilityID::Dash;
-	AbilityTag = FMCOCharacterTags::Get().DashTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
+	SetID(EMCOAbilityID::Dash, FMCOCharacterTags::Get().DashTag);
 
 	// Tag required to activate this ability 
 	ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
@@ -30,7 +27,7 @@ bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHand
 
 void UMCOGameplayAbility_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ensure(PlayerInterface);

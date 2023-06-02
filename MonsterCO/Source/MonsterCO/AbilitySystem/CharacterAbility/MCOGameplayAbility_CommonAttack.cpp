@@ -16,7 +16,7 @@
 UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 {
 	// Class, Asset
-	GETCLASS(AttributeEffect, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attributes.GE_Attributes_C"));
+	GETCLASS(AttributeEffect, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveDamage.GE_GiveDamage_C"));
 
 	// Setting 
 	bIsUsingCollision = false;

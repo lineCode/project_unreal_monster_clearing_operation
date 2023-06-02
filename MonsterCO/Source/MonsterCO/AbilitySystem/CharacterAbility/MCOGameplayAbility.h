@@ -18,12 +18,17 @@ class MONSTERCO_API UMCOGameplayAbility : public UGameplayAbility
 		
 public:
 	UMCOGameplayAbility();
+	
+protected:
+	void SetID(const EMCOAbilityID& InAbilityID, const FGameplayTag& InActivationTag);
+	void SetTriggerTag(const FGameplayTag& InTag);
 
+public:
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
-	bool SetAndCommitAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
+	bool SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
 	void CancelAllAbility();
-
+	
 // --- Getter
 protected:
 	ACharacter* GetCharacter() const;
@@ -45,11 +50,12 @@ protected:
 	UPROPERTY()
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
 
+private:
 	UPROPERTY()
 	TObjectPtr<const UMCOActionFragment_Cooldown> CooldownFragment;
 	
 // --- Setting
-public:
+protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Ability")
 	FGameplayTag AbilityTag;
 	
@@ -61,9 +67,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability")
 	uint8 bActivateAbilityOnGranted:1;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability")
-	uint8 bCanBeCancelled : 1;
 
 public:
 	EMCOAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }

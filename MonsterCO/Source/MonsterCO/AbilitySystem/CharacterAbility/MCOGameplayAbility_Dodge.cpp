@@ -11,11 +11,16 @@
 
 UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& ObjectInitializer)
 {
-	AbilityInputID = EMCOAbilityID::Dodge;
-	AbilityTag = FMCOCharacterTags::Get().DodgeTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
-
+	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Dodge.DA_Player_Dodge"));
+	
+	SetID(EMCOAbilityID::Dodge, Data->ActivationTag);
+	
+	ensure(nullptr != Data);
+	ensure(nullptr != Data->ActionDefinition);
+	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
+	ensure(nullptr != Fragment);
+	UpdateCooldownFragment(Fragment);
+	
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
 
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
@@ -24,17 +29,6 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 
 	Strength = 500.0f;
 	Duration = 0.5f;
-}
-
-void UMCOGameplayAbility_Dodge::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
-{
-	Super::OnAvatarSet(ActorInfo, Spec);
-	
-	ensure(nullptr != Data);
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
-	ensure(nullptr != Fragment);
-	CooldownFragment = Fragment;
 }
 
 bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -50,7 +44,7 @@ bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHan
 
 void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ensure(nullptr != PlayerInterface);

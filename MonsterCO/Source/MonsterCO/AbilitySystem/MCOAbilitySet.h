@@ -69,8 +69,8 @@ protected:
 	UPROPERTY()
 	TArray<FGameplayAbilitySpecHandle> AbilitySpecHandles;
 
-	UPROPERTY()
-	TArray<FActiveGameplayEffectHandle> GameplayEffectHandles;
+	UPROPERTY() 
+	TArray<FActiveGameplayEffectHandle> GameplayEffectHandles; // Only for ongoing effects
 
 	UPROPERTY()
 	TArray<TObjectPtr<UAttributeSet>> GrantedAttributeSets;

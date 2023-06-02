@@ -147,6 +147,7 @@ void UMCOAbilitySet::GiveToAbilitySystem(UMCOAbilitySystemComponent* MCOASC, FMC
 		
 		if (OutGrantedHandles)
 		{
+			// GameplayEffectHandle will be -1 if it's an instant effect (because it finished)
 			OutGrantedHandles->AddGameplayEffectHandle(GameplayEffectHandle);
 		}
 	}

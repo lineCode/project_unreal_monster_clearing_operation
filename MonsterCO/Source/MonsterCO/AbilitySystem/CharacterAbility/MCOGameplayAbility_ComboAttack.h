@@ -30,10 +30,12 @@ protected:
 protected:
 	void SetComboTimer();
 	void DoNextCombo();
-	
+
+protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
 	TObjectPtr<UMCOMontageDataCombo> Data;
 
+protected:
 	int32 CurrentCombo;
 	bool bIsComboCommandPressed;
 	bool bIsDoingCombo; 

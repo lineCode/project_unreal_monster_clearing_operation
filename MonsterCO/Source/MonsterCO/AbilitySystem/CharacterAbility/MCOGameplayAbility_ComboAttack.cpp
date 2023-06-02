@@ -10,18 +10,13 @@
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 {
-	AbilityInputID = EMCOAbilityID::NormalAttack;
-	AbilityTag = FMCOCharacterTags::Get().AttackTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
+	SetID(EMCOAbilityID::NormalAttack, FMCOCharacterTags::Get().AttackTag);
 	
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
 
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
-
-	// Set Data...
 }
 
 bool UMCOGameplayAbility_ComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -49,7 +44,7 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	
 	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
 	
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
 		MontageFragment->GetMontage(),

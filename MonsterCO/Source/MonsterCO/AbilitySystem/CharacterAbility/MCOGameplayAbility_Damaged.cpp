@@ -10,22 +10,13 @@
 
 UMCOGameplayAbility_Damaged::UMCOGameplayAbility_Damaged()
 {
-	AbilityInputID = EMCOAbilityID::Damaged;
-	AbilityTag = FMCOCharacterTags::Get().DamagedTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
-		
-	FAbilityTriggerData TriggerData;
-	TriggerData.TriggerTag = FMCOCharacterTags::Get().GameplayEvent_DamagedTag;
-	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-	AbilityTriggers.Emplace(TriggerData);
-
-	// set direction option & data...
+	SetID(EMCOAbilityID::Damaged, FMCOCharacterTags::Get().DamagedTag);
+	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag);
 }
 
 void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	if (nullptr != PlayerInterface)

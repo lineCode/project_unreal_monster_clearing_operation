@@ -13,20 +13,34 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 {
 	// Effect 
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
-	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_AbilityTags.GE_AbilityTags_C"));
-	// CooldownFragment = CreateDefaultSubobject<UMCOActionFragment_Cooldown>(TEXT("NAME_CooldownFragment"));
+	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
-	bCanBeCancelled = true;
-
+	
 	ActivationPolicy = EMCOAbilityActivationPolicy::OnInputTriggered;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
+	
 	// Tags that can't be cancelled
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DeadTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().StunTag);	
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+}
+
+void UMCOGameplayAbility::SetID(const EMCOAbilityID& InAbilityID, const FGameplayTag& InActivationTag)
+{
+	AbilityInputID = InAbilityID; 
+	AbilityTag = InActivationTag; 
+	AbilityTags.AddTag(AbilityTag);
+	ActivationOwnedTags.AddTag(AbilityTag);
+}
+
+void UMCOGameplayAbility::SetTriggerTag(const FGameplayTag& InTag)
+{
+	FAbilityTriggerData TriggerData;
+	TriggerData.TriggerTag = InTag;
+	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+	AbilityTriggers.Emplace(TriggerData);
 }
 
 void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
@@ -48,12 +62,13 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 	return true;
 }
 
-bool UMCOGameplayAbility::SetAndCommitAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ensure(nullptr != ActorInfo);
 	
-	SetCanBeCanceled(bCanBeCancelled);
-		
+	// Set can be cancelled
+	SetCanBeCanceled(bIsCanBeCancelled);
+	
 	// if (bHasBlueprintActivate)
 	// {
 	// 	// A Blueprinted ActivateAbility function must call CommitAbility somewhere in its execution chain.
@@ -190,8 +205,6 @@ void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, co
 void UMCOGameplayAbility::StartActivationWithMontageAndEventTag(UAnimMontage* InMontage, const FName& SectionName)
 {
 	ensure(nullptr != InMontage);
-	
-	SetCanBeCanceled(bCanBeCancelled);
 	
 	UMCOAbilityTask_PlayMontageAndWaitForEvent* Task = UMCOAbilityTask_PlayMontageAndWaitForEvent::PlayMontageAndWaitForEvent(
 		this,                               // UGameplayAbility * OwningAbility,

@@ -6,23 +6,15 @@
 
 UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
 {
-	AbilityInputID = EMCOAbilityID::Dead;
-	AbilityTag = FMCOCharacterTags::Get().DeadTag;
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
+	SetID(EMCOAbilityID::Dead, FMCOCharacterTags::Get().DeadTag);
+	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag);
 	
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
-	
-	FAbilityTriggerData TriggerData;
-	TriggerData.TriggerTag = FMCOCharacterTags::Get().GameplayEvent_DeadTag;
-	TriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-	AbilityTriggers.Emplace(TriggerData);
 }
 
 void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ISTRUE(SetAndCommitAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != CharacterInterface);
