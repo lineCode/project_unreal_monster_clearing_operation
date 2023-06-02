@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Character")
 	FName CharacterName;
 
-	virtual void SetCharacterData();
+	void SetCharacterData();
 	
 // --- Ability
 public:

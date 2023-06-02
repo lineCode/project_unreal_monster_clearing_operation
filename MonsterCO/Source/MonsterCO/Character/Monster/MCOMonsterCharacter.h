@@ -20,8 +20,6 @@ public:
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
-
-	virtual void SetCharacterData() override;
 	
 // --- AI
 protected:

@@ -34,7 +34,6 @@ AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitial
 	ModeComponent = CreateDefaultSubobject<UMCOPlayerModeComponent>(TEXT("NAME_ModeComponent"));
 	
 	SetCharacterData();
-	SetSpeed(EMCOCharacterSpeed::Normal);
 	SetControlData();
 }
 
@@ -48,6 +47,10 @@ void AMCOPlayerCharacter::SetControlData()
 	GetCharacterMovement()->bUseControllerDesiredRotation = CharacterControlData->bUseControllerDesiredRotation;
 	GetCharacterMovement()->JumpZVelocity = CharacterControlData->JumpZVelocity;
 	GetCharacterMovement()->GravityScale = CharacterControlData->GravityScale;
+	
+	ISTRUE(true == CharacterControlData->WalkSpeeds.Contains(EMCOCharacterSpeed::Normal));
+	GetCharacterMovement()->MaxWalkSpeed = CharacterControlData->WalkSpeeds[EMCOCharacterSpeed::Normal];
+	GetCharacterMovement()->MinAnalogWalkSpeed = CharacterControlData->WalkSpeeds[EMCOCharacterSpeed::Normal];
 	
 	SpringArm->TargetArmLength = CharacterControlData->TargetArmLength;
 	SpringArm->SetRelativeLocationAndRotation(CharacterControlData->SpringArmRelativeLocation, CharacterControlData->SpringArmRelativeRotation);

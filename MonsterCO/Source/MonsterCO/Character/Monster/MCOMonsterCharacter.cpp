@@ -46,13 +46,6 @@ void AMCOMonsterCharacter::BeginPlay()
 
 	OnDamagedBegin.BindUObject(this, &ThisClass::StopAI);
 	OnDamagedEnd.BindUObject(this, &ThisClass::ContinueAI);
-}
-
-void AMCOMonsterCharacter::SetCharacterData()
-{
-	Super::SetCharacterData();
-
-	ensure(nullptr != CharacterData);
 	
 	// Body = CreateDefaultSubobject<UCapsuleComponent>(TEXT("NAME_MonsterBody"));
 	// Body->SetCollisionProfileName(CPROFILE_MCOCAPSULE);
