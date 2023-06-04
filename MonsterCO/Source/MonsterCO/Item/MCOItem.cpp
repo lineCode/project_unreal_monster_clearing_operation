@@ -1,10 +1,13 @@
 #include "Item/MCOItem.h"
+#include "MCOItemData_Potion.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Interface/MCOCharacterItemInterface.h"
 #include "Physics/MCOPhysics.h"
 
 AMCOItem::AMCOItem()
 {
+	GETASSET(Data, UMCOItemData_Potion, TEXT("/Game/Data/Item/DA_Item_Potion_Small.DA_Item_Potion_Small"));
 	GETASSET(PickupMontage, UAnimMontage, TEXT("/Game/Items/Egg/Montages/Realistic_EggCracking_Montage.Realistic_EggCracking_Montage"));
 	
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("NAME_TriggerBox"));
@@ -12,12 +15,7 @@ AMCOItem::AMCOItem()
 	
 	SetRootComponent(Trigger);
 	SkeletalMesh->SetupAttachment(Trigger);
-	
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletalMeshRef(TEXT("/Game/Assets/UnkaDragon/Meshes/Eggs/Realistic/Realistic_Egg.Realistic_Egg"));
-	if (true == SkeletalMeshRef.Succeeded())
-	{
-		SkeletalMesh->SetSkeletalMesh(SkeletalMeshRef.Object);
-	}
+	SkeletalMesh->SetSkeletalMesh(Data->SkeletalMesh);
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimRef(TEXT("/Game/Items/Egg/ABP_Item_Egg.ABP_Item_Egg_C"));
 	if (true == AnimRef.Succeeded())
@@ -34,6 +32,7 @@ AMCOItem::AMCOItem()
 	
 	Trigger->SetBoxExtent(FVector(45.0f, 45.0f, 45.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
+	
 }
 
 void AMCOItem::BeginPlay()
@@ -48,10 +47,16 @@ void AMCOItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	
 	SetActorEnableCollision(false);
 
+	IMCOCharacterItemInterface* OverlappingPawn = Cast<IMCOCharacterItemInterface>(OtherActor);
+	if (OverlappingPawn)
+	{
+		OverlappingPawn->TakeItem(Data);
+	}
+	
 	ISTRUE(SkeletalMesh);
 	ISTRUE(SkeletalMesh->GetAnimInstance());
-	SkeletalMesh->GetAnimInstance()->Montage_Play(PickupMontage);
 	SkeletalMesh->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ThisClass::OnPickupFinished);
+	SkeletalMesh->GetAnimInstance()->Montage_Play(PickupMontage);
 }
 
 void AMCOItem::OnPickupFinished(UAnimMontage* Montage, bool bInterrupted)

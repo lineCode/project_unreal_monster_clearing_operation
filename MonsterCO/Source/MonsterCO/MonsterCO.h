@@ -141,6 +141,16 @@ enum class EMCOAbilityActivationPolicy : uint8
 	OnSpawn
 };
 
+UENUM(BlueprintType)
+enum class EMCOItemType : uint8
+{
+	Weapon        UMETA(DisplayName = "Weapon"),
+	Potion        UMETA(DisplayName = "Potion"),
+	Scroll        UMETA(DisplayName = "Scroll")
+};
+
+
+
 
 // --- Helper
 class MONSTERCO_API FHelper

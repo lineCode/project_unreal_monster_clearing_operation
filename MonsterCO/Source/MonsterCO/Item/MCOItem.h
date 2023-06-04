@@ -5,7 +5,7 @@
 #include "MCOItem.generated.h"
 
 class UBoxComponent;
-
+class UMCOItemData_Potion;
 
 UCLASS()
 class MONSTERCO_API AMCOItem : public AActor
@@ -35,5 +35,8 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Montage)
 	TObjectPtr<UAnimMontage> PickupMontage;
-	
+
+protected:
+	UPROPERTY(EditAnywhere, Category = Data)
+	TObjectPtr<UMCOItemData_Potion> Data;
 };
