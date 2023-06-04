@@ -2,6 +2,7 @@
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 #include "GameplayEffectTypes.h"
+#include "MCOCharacterTags.h"
 
 UMCOAttributeSet::UMCOAttributeSet()
 	: Health(0.0f)
@@ -45,7 +46,9 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute() && Data.EvaluatedData.Magnitude > 0.0f)
+	ISTRUE(Data.EvaluatedData.Magnitude > 0.0f);
+
+	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
 	{
 		float NewHealth = FMath::Clamp(GetHealth() - GetDamage(), 0.0f, GetMaxHealth());
 		SetHealth(NewHealth);
@@ -53,30 +56,15 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 
 		if (GetHealth() <= 0.0f)
 		{
-			if (true == OnOutOfHealthDelegate.IsBound())
-			{
-				const FGameplayEffectContextHandle& EffectContext = Data.EffectSpec.GetEffectContext();
-				AActor* Instigator = EffectContext.GetOriginalInstigator();
-				AActor* Causer = EffectContext.GetEffectCauser();
-
-				OnOutOfHealthDelegate.Broadcast(Instigator, Causer, Data.EffectSpec, Data.EvaluatedData.Magnitude);
-			}
+			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag, Data);
 		}		
 	}
-	else if (Data.EvaluatedData.Attribute == GetStiffnessAttribute() && Data.EvaluatedData.Magnitude > 0.0f)
+	else if (Data.EvaluatedData.Attribute == GetStiffnessAttribute())
 	{
 		if (GetMaxStiffness() <= GetStiffness())
 		{
 			SetStiffness(GetStiffness() - GetMaxStiffness());
-
-			if (true == OnOutOfStiffnessDelegate.IsBound())
-			{
-				const FGameplayEffectContextHandle& EffectContext = Data.EffectSpec.GetEffectContext();
-				AActor* Instigator = EffectContext.GetOriginalInstigator();
-				AActor* Causer = EffectContext.GetEffectCauser();
-
-				OnOutOfStiffnessDelegate.Broadcast(Instigator, Causer, Data.EffectSpec, Data.EvaluatedData.Magnitude);
-			}
+			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag, Data);
 		}
 	}
 }
@@ -114,4 +102,18 @@ void UMCOAttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float
 		// Do not allow max health to drop below 1.
 		NewValue = FMath::Max(NewValue, 1.0f);
 	}
+}
+
+void UMCOAttributeSet::HandleEventWithTag(const FGameplayTag& InTag, const FGameplayEffectModCallbackData& Data) const
+{
+	ISTRUE(true == OnHandleAttributeEventDelegate.IsBound());
+	
+	const FGameplayEffectContextHandle& EffectContext = Data.EffectSpec.GetEffectContext();
+	AActor* Instigator = EffectContext.GetOriginalInstigator();
+	AActor* Causer = EffectContext.GetEffectCauser();
+
+	OnHandleAttributeEventDelegate.Broadcast(
+		InTag,
+		Instigator, Causer, Data.EffectSpec, Data.EvaluatedData.Magnitude
+	);
 }

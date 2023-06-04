@@ -2,6 +2,7 @@
 
 #include "MonsterCO.h"
 #include "AttributeSet.h"
+#include "GameplayTagContainer.h"
 #include "AbilitySystemComponent.h"
 #include "MCOAttributeSet.generated.h"
 
@@ -13,7 +14,8 @@
 	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 // Delegate used to broadcast attribute events.
-DECLARE_MULTICAST_DELEGATE_FourParams(FMCOAttributeEventDelegate,
+DECLARE_MULTICAST_DELEGATE_FiveParams(FMCOHandleAttributeEventDelegate,
+	const FGameplayTag& /*InTag*/, 
 	AActor* /*EffectInstigator*/,
 	AActor* /*EffectCauser*/,
 	const FGameplayEffectSpec& /*EffectSpec*/,
@@ -34,8 +36,7 @@ public:
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stiffness)
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStiffness)
 
-	mutable FMCOAttributeEventDelegate OnOutOfHealthDelegate;
-	mutable FMCOAttributeEventDelegate OnOutOfStiffnessDelegate;
+	mutable FMCOHandleAttributeEventDelegate OnHandleAttributeEventDelegate;
 		
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "MCO|Health", ReplicatedUsing = OnRep_Health, Meta = (AllowPrivateAccess = true))
@@ -78,4 +79,5 @@ protected:
 	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
 	
 	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
+	void HandleEventWithTag(const FGameplayTag& InTag, const FGameplayEffectModCallbackData& Data) const;
 };

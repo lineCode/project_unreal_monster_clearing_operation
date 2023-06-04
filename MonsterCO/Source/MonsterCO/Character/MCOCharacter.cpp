@@ -8,12 +8,23 @@
 #include "UI/MCOHpWidget.h"
 #include "UI/MCOAttributeWidget.h"
 #include "MCOPlayerState.h"
+#include "Item/MCOItemData.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// PrimaryActorTick.bCanEverTick = true;
+	
+	TakeItemActions.Emplace(EMCOItemType::Weapon, FTakeItemDelegateWrapper(
+		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::EquipWeapon)
+	));
+	TakeItemActions.Emplace(EMCOItemType::Potion, FTakeItemDelegateWrapper(
+		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::DrinkPotion)
+	));
+	TakeItemActions.Emplace(EMCOItemType::Scroll, FTakeItemDelegateWrapper(
+		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::ReadScroll)
+	));
 }
 
 void AMCOCharacter::SetCharacterData()
@@ -256,6 +267,28 @@ void AMCOCharacter::ControlMoving(bool bToStop)
 	CharacterMC->MovementMode = (true == bToStop) ? MOVE_None : MOVE_Walking;
 }
 
+void AMCOCharacter::TakeItem(const UMCOItemData* InItemData)
+{
+	ensure(nullptr != InItemData);
+	TakeItemActions[InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+}
+
+void AMCOCharacter::DrinkPotion(const UMCOItemData* InItemData)
+{
+	MCOPRINT(TEXT("Drink Potion"));
+	
+}
+
+void AMCOCharacter::EquipWeapon(const UMCOItemData* InItemData)
+{
+	MCOPRINT(TEXT("Equip Weapon"));
+}
+
+void AMCOCharacter::ReadScroll(const UMCOItemData* InItemData)
+{
+	MCOPRINT(TEXT("Read Scroll"));
+}
+
 void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget)
 {
 	ISTRUE(InHpWidget != nullptr);
@@ -273,23 +306,23 @@ void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidg
 	AMCOPlayerState* MCOPlayerState = Cast<AMCOPlayerState>(GetPlayerState());
 	ISTRUE(MCOPlayerState);
 
-	MCOPlayerState->CreateOrUseDelegateAndBind(
+	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetHealthAttribute().GetName(), InHpWidget, &UMCOHpWidget::UpdateHpBar
 	);
-	MCOPlayerState->CreateOrUseDelegateAndBind(
+	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetMaxHealthAttribute().GetName(), InHpWidget, &UMCOHpWidget::SetMaxHp
 	);
 
-	MCOPlayerState->CreateOrUseDelegateAndBind(
+	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetHealthAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateHealth
 	);
-	MCOPlayerState->CreateOrUseDelegateAndBind(
+	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetMaxHealthAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateMaxHealth
 	);
-	MCOPlayerState->CreateOrUseDelegateAndBind(
+	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetStiffnessAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateStiffness
 	);
-	MCOPlayerState->CreateOrUseDelegateAndBind(
+	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetMaxStiffnessAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateMaxStiffness
 	);
 }

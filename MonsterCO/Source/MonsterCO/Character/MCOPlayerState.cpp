@@ -19,32 +19,15 @@ void AMCOPlayerState::InitializeAbilityDelegates()
     ISTRUE(nullptr != AbilitySystemComponent);
 
     AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
-    AttributeSet->OnOutOfHealthDelegate.AddUObject(this, &ThisClass::HandleOutOfHealth);
-    AttributeSet->OnOutOfStiffnessDelegate.AddUObject(this, &ThisClass::HandleOutOfStiffness);
+    AttributeSet->OnHandleAttributeEventDelegate.AddUObject(this, &ThisClass::HandleEventWithTag);
     AbilitySystemComponent->AttributeSet = AttributeSet;
     
-    // connect Attributes in AttributeSet to Changed Functions in PlayerState
-    // if Attributes change, Changed Functions here will be called
-    HealthChangeDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-        AttributeSet->GetHealthAttribute()
-    ).AddUObject(this, &AMCOPlayerState::OnAttributeChanged);
-    
-    MaxHealthChangeDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-        AttributeSet->GetMaxHealthAttribute()
-    ).AddUObject(this, &AMCOPlayerState::OnAttributeChanged);
-    
-    StiffnessChangeDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-        AttributeSet->GetStiffnessAttribute()
-    ).AddUObject(this, &AMCOPlayerState::OnAttributeChanged);
+    RegisterAttributeChangedDelegate(AttributeSet->GetHealthAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetMaxHealthAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetStiffnessAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetMaxStiffnessAttribute());
 
-    MaxStiffnessChangeDelegateHandle = AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-        AttributeSet->GetMaxStiffnessAttribute()
-    ).AddUObject(this, &AMCOPlayerState::OnAttributeChanged);
-    
-    // connect GameplayTag to Changed Function in PlayerState
-    AbilitySystemComponent->RegisterGameplayTagEvent(
-        FGameplayTag::RequestGameplayTag((FName("State.Debuff.Stun")), EGameplayTagEventType::NewOrRemoved)
-    ).AddUObject(this, &AMCOPlayerState::StunTagChanged);
+    AbilitySystemComponent->RegisterGameplayTagEvent(FMCOCharacterTags::Get().StunTag).AddUObject(this, &ThisClass::StunTagChanged);
 }
 
 void AMCOPlayerState::BeginPlay()
@@ -72,6 +55,13 @@ void AMCOPlayerState::ShowAbilityConfirmCancelText(bool ShowText)
     // TODO : implement HUD later
 }
 
+void AMCOPlayerState::RegisterAttributeChangedDelegate(const FGameplayAttribute& Attribute) 
+{
+    AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
+        Attribute
+    ).AddUObject(this, &AMCOPlayerState::OnAttributeChanged);
+}
+
 void AMCOPlayerState::OnAttributeChanged(const FOnAttributeChangeData& Data)
 {
     //MCOPRINT(TEXT("%s is changed! : %f"), *Data.Attribute.GetName(), Data.NewValue);
@@ -85,42 +75,33 @@ void AMCOPlayerState::OnAttributeChanged(const FOnAttributeChangeData& Data)
 
 void AMCOPlayerState::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
-    MCOPRINT(TEXT("StunTag changed! And cancelled some abilities"));
-    
     ISTRUE(NewCount > 0);
+    
+    MCOPRINT(TEXT("StunTag changed! And cancelled some abilities"));
 
 	FGameplayTagContainer AbilityTagsToCancel;
-	AbilityTagsToCancel.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability")));
+	AbilityTagsToCancel.AddTag(FGameplayTag::RequestGameplayTag(FName("State")));
 
 	FGameplayTagContainer AbilityTagsToIgnore;
-	AbilityTagsToIgnore.AddTag(FGameplayTag::RequestGameplayTag(FName("Ability.NotCancelByStun")));
+	// AbilityTagsToIgnore.AddTag();
 
 	AbilitySystemComponent->CancelAbilities(&AbilityTagsToCancel, &AbilityTagsToIgnore);
-}
-
-void AMCOPlayerState::HandleOutOfHealth(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude)
-{
-    HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag, DamageInstigator, DamageCauser, DamageEffectSpec, DamageMagnitude);
-}
-
-void AMCOPlayerState::HandleOutOfStiffness(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude)
-{
-    HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag, DamageInstigator, DamageCauser, DamageEffectSpec, DamageMagnitude);
 }
 
 void AMCOPlayerState::HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude) const
 {
     ISTRUE(nullptr != AbilitySystemComponent);
     
-    // Send the "InTag" gameplay event through the owner's ability system.  This can be used to trigger a death gameplay ability.
+    // Send the "InTag" gameplay event through the owner's ability system.
+    // This can be used to trigger a death gameplay ability.
     FGameplayEventData Payload;
-    Payload.EventTag = InTag;
-    Payload.Instigator = DamageInstigator;
-    Payload.Target = AbilitySystemComponent->GetAvatarActor();
+    Payload.EventTag       = InTag;
+    Payload.Instigator     = DamageInstigator;
+    Payload.Target         = AbilitySystemComponent->GetAvatarActor();
     Payload.OptionalObject = DamageEffectSpec.Def;
-    Payload.ContextHandle = DamageEffectSpec.GetEffectContext();
+    Payload.ContextHandle  = DamageEffectSpec.GetEffectContext();
     Payload.InstigatorTags = *DamageEffectSpec.CapturedSourceTags.GetAggregatedTags();
-    Payload.TargetTags = *DamageEffectSpec.CapturedTargetTags.GetAggregatedTags();
+    Payload.TargetTags     = *DamageEffectSpec.CapturedTargetTags.GetAggregatedTags();
     Payload.EventMagnitude = DamageMagnitude;
 
     FScopedPredictionWindow NewScopedWindow(AbilitySystemComponent, true);

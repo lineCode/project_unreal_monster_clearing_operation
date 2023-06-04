@@ -1,29 +1,33 @@
 #include "MCOCharacterTags.h"
 #include "Containers/UnrealString.h"
+#include "GameplayEffectTypes.h"
 
 FMCOCharacterTags FMCOCharacterTags::CharacterTags;
+
 FMCOCharacterTags::FMCOCharacterTags()
 {
-	MoveTag = FGameplayTag::RequestGameplayTag(FName("Input.Move"));
-	LookTag = FGameplayTag::RequestGameplayTag(FName("Input.Look"));
+	const bool ErrorIfNotFount = EGameplayTagEventType::NewOrRemoved;
 	
-	GameplayEffect_DamageTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"));
-	GameplayEffect_StiffnessTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stiffness"));
-	GameplayEffect_CooldownTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"));
-	GameplayEffect_AfterDodgeTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.AfterDodge"));
+	MoveTag = FGameplayTag::RequestGameplayTag(FName("Input.Move"), ErrorIfNotFount);
+	LookTag = FGameplayTag::RequestGameplayTag(FName("Input.Look"), ErrorIfNotFount);
 	
-	GameplayEvent_DeadTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Dead"));
-	GameplayEvent_DamagedTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Damaged"));
+	GameplayEffect_DamageTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"), ErrorIfNotFount);
+	GameplayEffect_StiffnessTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stiffness"), ErrorIfNotFount);
+	GameplayEffect_CooldownTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"), ErrorIfNotFount);
+	GameplayEffect_AfterDodgeTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.AfterDodge"), ErrorIfNotFount);
 	
-	DamagedTag = FGameplayTag::RequestGameplayTag(FName("State.Damaged"));
-	StunTag = FGameplayTag::RequestGameplayTag(FName("State.Debuff.Stun"));
-	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
-	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("State.RemoveOnDeath"));
+	GameplayEvent_DeadTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Dead"), ErrorIfNotFount);
+	GameplayEvent_DamagedTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Damaged"), ErrorIfNotFount);
+	
+	DamagedTag = FGameplayTag::RequestGameplayTag(FName("State.Damaged"), ErrorIfNotFount);
+	StunTag = FGameplayTag::RequestGameplayTag(FName("State.Debuff.Stun"), ErrorIfNotFount);
+	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"), ErrorIfNotFount);
+	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("State.RemoveOnDeath"), ErrorIfNotFount);
 		
-	JumpTag = FGameplayTag::RequestGameplayTag(FName("State.Jump"));
-	EquipTag = FGameplayTag::RequestGameplayTag(FName("State.Equip"));
-	DodgeTag = FGameplayTag::RequestGameplayTag(FName("State.Dodge"));
-	DashTag = FGameplayTag::RequestGameplayTag(FName("State.Dash"));
-	AttackTag = FGameplayTag::RequestGameplayTag(FName("State.Attack"));
+	JumpTag = FGameplayTag::RequestGameplayTag(FName("State.Jump"), ErrorIfNotFount);
+	EquipTag = FGameplayTag::RequestGameplayTag(FName("State.Equip"), ErrorIfNotFount);
+	DodgeTag = FGameplayTag::RequestGameplayTag(FName("State.Dodge"), ErrorIfNotFount);
+	DashTag = FGameplayTag::RequestGameplayTag(FName("State.Dash"), ErrorIfNotFount);
+	AttackTag = FGameplayTag::RequestGameplayTag(FName("State.Attack"), ErrorIfNotFount);
 }
 

@@ -7,22 +7,40 @@
 #include "AbilitySystem/MCOAbilitySet.h"
 #include "Interface/MCOAttackedInterface.h"
 #include "Interface/MCOCharacterInterface.h"
+#include "Interface/MCOCharacterItemInterface.h"
 #include "MCOCharacter.generated.h"
 
 
-class FObjectInitializer;
 class UMCOAbilitySystemComponent;
 class UMCOAttributeSet;
 class UMCOCharacterData;
 class UMCOHpWidget;
 class UMCOAttributeWidget;
+class UMCOItemData;
+
+
+DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, const UMCOItemData* /*InItemData*/);
+
+USTRUCT(BlueprintType)
+struct FTakeItemDelegateWrapper
+{
+	GENERATED_BODY()
+
+	FTakeItemDelegateWrapper() {}
+	FTakeItemDelegateWrapper(const FOnTakeItemDelegate& InItemDelegate) : ItemDelegate(InItemDelegate) {}
+	FOnTakeItemDelegate ItemDelegate;
+};
 
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedSignature, AMCOCharacter*, InCharacter);
 
 UCLASS()
-class MONSTERCO_API AMCOCharacter : public ACharacter, public IAbilitySystemInterface, public IMCOCharacterInterface, public IMCOAttackedInterface
+class MONSTERCO_API AMCOCharacter : public ACharacter,
+	public IAbilitySystemInterface,
+	public IMCOCharacterInterface,
+	public IMCOAttackedInterface,
+	public IMCOCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -124,7 +142,17 @@ protected:
 // --- Stop
 public:
 	virtual void ControlMoving(bool bToStop) override;
-
+	
+// --- Item
+public:
+	virtual void TakeItem(const UMCOItemData* InItemData) override;
+	virtual void DrinkPotion(const UMCOItemData* InItemData);
+	virtual void EquipWeapon(const UMCOItemData* InItemData);
+	virtual void ReadScroll(const UMCOItemData* InItemData);
+	
+	UPROPERTY()
+	TMap<EMCOItemType, FTakeItemDelegateWrapper> TakeItemActions;
+	
 // --- Widget
 public:
 	virtual void InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget) override;

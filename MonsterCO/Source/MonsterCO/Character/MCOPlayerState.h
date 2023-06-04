@@ -16,9 +16,12 @@ struct FAttributeDelegateWrapper
 {
 	GENERATED_BODY()
 
+public:
 	FAttributeDelegateWrapper() {}
 	FAttributeDelegateWrapper(const FCharacterAttributeDelegate& InDelegate) : AttributeDelegate(InDelegate) {}
+
 	FCharacterAttributeDelegate AttributeDelegate;
+	FDelegateHandle DelegateHandle;
 };
 
 UCLASS()
@@ -50,8 +53,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MCO|UI")
 	void ShowAbilityConfirmCancelText(bool ShowText);
 
-	virtual void HandleOutOfHealth(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude);
-	virtual void HandleOutOfStiffness(AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude);
+	UFUNCTION()
 	void HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude) const;
 	
 protected:
@@ -63,28 +65,24 @@ public:
 	TMap<FName, FAttributeDelegateWrapper> OnAttributeChangedDelegate;
 	
 	template<class UserClass, typename Func>
-	void CreateOrUseDelegateAndBind(FName InName, UserClass* InUserObject, Func ToDoFunc);
+	void BindAttributeChangedDelegate(const FName& InName, UserClass* InUserObject, Func ToDoFunc);
 	
 protected:
-	virtual void OnAttributeChanged(const FOnAttributeChangeData& Data);
-	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
-
-protected:
-	FDelegateHandle HealthChangeDelegateHandle;
-	FDelegateHandle MaxHealthChangeDelegateHandle;
-	FDelegateHandle StiffnessChangeDelegateHandle;
-	FDelegateHandle MaxStiffnessChangeDelegateHandle;
-	FDelegateHandle CharacterLevelChangeDelegateHandle;
+	void RegisterAttributeChangedDelegate(const FGameplayAttribute& Attribute);
+	void OnAttributeChanged(const FOnAttributeChangeData& Data);
+	void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 };
 
-
 template<class UserClass, typename Func>
-void AMCOPlayerState::CreateOrUseDelegateAndBind(FName InName, UserClass* InUserObject, Func ToDoFunc)
+void AMCOPlayerState::BindAttributeChangedDelegate(const FName& InName, UserClass* InUserObject, Func ToDoFunc)
 {
 	if (false == OnAttributeChangedDelegate.Contains(InName))
 	{
 		OnAttributeChangedDelegate.Emplace(InName, FAttributeDelegateWrapper());
 	}
 	
-	OnAttributeChangedDelegate[InName].AttributeDelegate.AddUObject(InUserObject, ToDoFunc);
+	OnAttributeChangedDelegate[InName].DelegateHandle = OnAttributeChangedDelegate[InName].AttributeDelegate.AddUObject(
+		InUserObject,
+		ToDoFunc
+	);
 }
