@@ -176,7 +176,8 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	);
 
 	UpdateStaminaFragment(MontageFragment->ActionDefinition->GetStaminaFragment());
-	ConsumeStaminaByPolicy(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+	
+	ApplyStaminaEffectByPolicy();
 	
 	SetComboTimer();
 }

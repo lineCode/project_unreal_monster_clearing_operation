@@ -14,9 +14,10 @@ FMCOCharacterTags::FMCOCharacterTags()
 	GameplayEffect_DamageTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"), ErrorIfNotFount);
 	GameplayEffect_StiffnessTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stiffness"), ErrorIfNotFount);
 	GameplayEffect_CooldownTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"), ErrorIfNotFount);
-	GameplayEffect_StaminaTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stamina"), ErrorIfNotFount);
+	GameplayEffect_StaminaConsumeTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.StaminaConsume"), ErrorIfNotFount);
 	GameplayEffect_AfterDodgeTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.AfterDodge"), ErrorIfNotFount);
 	
+	GameplayEvent_StaminaChargeTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.StaminaCharge"), ErrorIfNotFount);
 	GameplayEvent_DeadTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Dead"), ErrorIfNotFount);
 	GameplayEvent_DamagedTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Damaged"), ErrorIfNotFount);
 	
@@ -25,6 +26,7 @@ FMCOCharacterTags::FMCOCharacterTags()
 	DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"), ErrorIfNotFount);
 	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("State.RemoveOnDeath"), ErrorIfNotFount);
 		
+	ChargingTag = FGameplayTag::RequestGameplayTag(FName("State.Charging"), ErrorIfNotFount);
 	JumpTag = FGameplayTag::RequestGameplayTag(FName("State.Jump"), ErrorIfNotFount);
 	EquipTag = FGameplayTag::RequestGameplayTag(FName("State.Equip"), ErrorIfNotFount);
 	DodgeTag = FGameplayTag::RequestGameplayTag(FName("State.Dodge"), ErrorIfNotFount);

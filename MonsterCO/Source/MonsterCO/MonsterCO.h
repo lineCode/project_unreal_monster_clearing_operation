@@ -68,6 +68,7 @@ enum class EMCOAbilityID : uint8
 	Confirm        UMETA(DisplayName = "Confirm"),
 	Cancel         UMETA(DisplayName = "Cancel"),
       
+	Idle           UMETA(DisplayName = "Idle"),
 	Jump           UMETA(DisplayName = "Jump"),
 	Dodge          UMETA(DisplayName = "Roll"),
 	Dash           UMETA(DisplayName = "Dash"),

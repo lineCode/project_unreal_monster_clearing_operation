@@ -13,6 +13,9 @@ public:
 	bool CanConsumeStamina() const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ChargingDelay = 0.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float StaminaUsage = 0.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

@@ -54,7 +54,7 @@ public:
 	void ShowAbilityConfirmCancelText(bool ShowText);
 
 	UFUNCTION()
-	void HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude) const;
+	void HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& EffectSpec, float Magnitude) const;
 	
 protected:
 	UPROPERTY()

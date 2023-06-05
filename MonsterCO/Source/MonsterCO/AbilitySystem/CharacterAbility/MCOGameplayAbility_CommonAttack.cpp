@@ -20,12 +20,22 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 
 	// Setting 
 	bIsUsingCollision = false;
+
+	// Cancel these 
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+}
+
+void UMCOGameplayAbility_CommonAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	
+	ActivateStaminaChargeAbility();
 }
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-	const UMCOActionFragment_Timer* InTimerFragment,
-	const UMCOActionFragment_Damage* InDamageFragment,
-	const UMCOActionFragment_Collision* InCollisionFragment)
+                                                                    const UMCOActionFragment_Timer* InTimerFragment,
+                                                                    const UMCOActionFragment_Damage* InDamageFragment,
+                                                                    const UMCOActionFragment_Collision* InCollisionFragment)
 {
 	TimerFragment = InTimerFragment;
 	DamageFragment = InDamageFragment;

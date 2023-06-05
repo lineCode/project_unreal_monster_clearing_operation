@@ -18,10 +18,11 @@ public:
 	FGameplayTag GameplayEffect_DamageTag;
 	FGameplayTag GameplayEffect_StiffnessTag;
 	FGameplayTag GameplayEffect_CooldownTag;
-	FGameplayTag GameplayEffect_StaminaTag;
+	FGameplayTag GameplayEffect_StaminaConsumeTag;
 	FGameplayTag GameplayEffect_AfterDodgeTag;
 
 	// Event
+	FGameplayTag GameplayEvent_StaminaChargeTag;
 	FGameplayTag GameplayEvent_DamagedTag;
 	FGameplayTag GameplayEvent_DeadTag;
 
@@ -32,6 +33,7 @@ public:
 	FGameplayTag EffectRemoveOnDeathTag;
 
 	// Player ability
+	FGameplayTag ChargingTag;
 	FGameplayTag JumpTag;
 	FGameplayTag EquipTag;
 	FGameplayTag DodgeTag;

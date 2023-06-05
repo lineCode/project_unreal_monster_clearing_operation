@@ -62,11 +62,13 @@ private:
 // --- Stamina
 protected:
 	void UpdateStaminaFragment(const UMCOActionFragment_Stamina* InStaminaFragment);
-	void ConsumeStaminaByPolicy(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
+	void ApplyStaminaEffectByPolicy();
+	void ActivateStaminaChargeAbility();
+	void HandleStaminaChargeEvent();
 	
 private:
-	void ConsumeStamina(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const;
-	void StopConsumeStamina();
+	void ApplyStaminaEffect(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
+	void StopStaminaEffect();
 	
 protected:
 	UPROPERTY()
@@ -78,6 +80,9 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<const UMCOActionFragment_Stamina> StaminaFragment;
+
+	FTimerHandle StaminaChargingDelayTimer;
+	
 	
 // --- Setting
 protected:

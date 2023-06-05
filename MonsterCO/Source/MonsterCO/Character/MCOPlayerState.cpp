@@ -90,7 +90,7 @@ void AMCOPlayerState::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCo
 	AbilitySystemComponent->CancelAbilities(&AbilityTagsToCancel, &AbilityTagsToIgnore);
 }
 
-void AMCOPlayerState::HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& DamageEffectSpec, float DamageMagnitude) const
+void AMCOPlayerState::HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& EffectSpec, float Magnitude) const
 {
     ISTRUE(nullptr != AbilitySystemComponent);
     
@@ -100,11 +100,11 @@ void AMCOPlayerState::HandleEventWithTag(const FGameplayTag& InTag, AActor* Dama
     Payload.EventTag       = InTag;
     Payload.Instigator     = DamageInstigator;
     Payload.Target         = AbilitySystemComponent->GetAvatarActor();
-    Payload.OptionalObject = DamageEffectSpec.Def;
-    Payload.ContextHandle  = DamageEffectSpec.GetEffectContext();
-    Payload.InstigatorTags = *DamageEffectSpec.CapturedSourceTags.GetAggregatedTags();
-    Payload.TargetTags     = *DamageEffectSpec.CapturedTargetTags.GetAggregatedTags();
-    Payload.EventMagnitude = DamageMagnitude;
+    Payload.OptionalObject = EffectSpec.Def;
+    Payload.ContextHandle  = EffectSpec.GetEffectContext();
+    Payload.InstigatorTags = *EffectSpec.CapturedSourceTags.GetAggregatedTags();
+    Payload.TargetTags     = *EffectSpec.CapturedTargetTags.GetAggregatedTags();
+    Payload.EventMagnitude = Magnitude;
 
     FScopedPredictionWindow NewScopedWindow(AbilitySystemComponent, true);
     AbilitySystemComponent->HandleGameplayEvent(Payload.EventTag, &Payload);

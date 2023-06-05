@@ -10,6 +10,9 @@ UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag);
 	
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+
+	// Cancel these 
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 
 void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)

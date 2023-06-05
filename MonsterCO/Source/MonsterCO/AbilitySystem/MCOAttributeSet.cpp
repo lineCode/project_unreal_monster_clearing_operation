@@ -79,6 +79,17 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag, Data);
 		}
 	}
+	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	{
+		if (GetMaxStamina() <= GetStamina())
+		{
+			MCOLOG(TEXT("--------------------------Cancel stamina ability with tag because stamina is full"));
+		
+			FGameplayTagContainer Tags;
+			Tags.AddTag(FMCOCharacterTags::Get().ChargingTag);
+			GetOwningAbilitySystemComponent()->CancelAbilities(&Tags);
+		}
+	}
 }
 
 void UMCOAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -135,7 +146,6 @@ void UMCOAttributeSet::HandleEventWithTag(const FGameplayTag& InTag, const FGame
 	AActor* Causer = EffectContext.GetEffectCauser();
 
 	OnHandleAttributeEventDelegate.Broadcast(
-		InTag,
-		Instigator, Causer, Data.EffectSpec, Data.EvaluatedData.Magnitude
+		InTag, Instigator, Causer, Data.EffectSpec, Data.EvaluatedData.Magnitude
 	);
 }

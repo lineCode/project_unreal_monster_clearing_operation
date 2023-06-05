@@ -21,6 +21,7 @@ protected:
 	void OnStaminaFull();
 
 protected:
+	bool bIsTimerTicking = false;
 	FTimerHandle StaminaTimerHandle;
 	
 protected:

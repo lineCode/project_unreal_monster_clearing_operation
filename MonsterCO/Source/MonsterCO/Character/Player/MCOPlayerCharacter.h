@@ -126,6 +126,7 @@ protected:
 	FOnStaminaChangedDelegate OnStaminaChangedDelegate;
 	FOnStaminaStoppedDelegate OnStaminaStoppedDelegate;
 
+	bool bIsStaminaTimerTicking = false;
 	float AdditiveStaminaValueForWidget;
 	float CurrentStaminaForWidget;
 	

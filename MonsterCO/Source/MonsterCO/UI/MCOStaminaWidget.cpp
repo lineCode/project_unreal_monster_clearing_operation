@@ -11,6 +11,8 @@ void UMCOStaminaWidget::NativeConstruct()
 	ensure(StaminaRadialProgressBar);
 	StaminaRadialProgressBar->SetVisibility(ESlateVisibility::Visible);
 
+	bIsTimerTicking = false;
+	
 	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(OwningActor);
 	if (nullptr != HUDInterface)
 	{
@@ -19,28 +21,37 @@ void UMCOStaminaWidget::NativeConstruct()
 }
 
 void UMCOStaminaWidget::SetPercent(const float& InPercent)
-{
+{	
 	SetImagePercent(InPercent);
 
 	if (InPercent >= 1.0f)
 	{
-		StaminaTimerHandle.Invalidate();
+		bIsTimerTicking = true;
+		
 		GetWorld()->GetTimerManager().SetTimer(
 			StaminaTimerHandle,
 			this,
 			&ThisClass::OnStaminaFull,
-			3.0f,
+			1.5f,
 			false
 		);
 	}
 	else
 	{
-		SetVisibility(ESlateVisibility::Visible);
+		if (true == bIsTimerTicking)
+		{
+			GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
+		}
+		else
+		{
+			SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 }
 
 void UMCOStaminaWidget::OnStaminaFull()
-{	
+{
+	bIsTimerTicking = false;
 	SetVisibility(ESlateVisibility::Hidden);
 	GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
 	StaminaTimerHandle.Invalidate();

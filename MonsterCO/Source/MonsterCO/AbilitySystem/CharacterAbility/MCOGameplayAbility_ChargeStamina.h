@@ -1,27 +1,25 @@
 #pragma once
 
-#include "MonsterCO.h"
-#include "MCOGameplayAbility.h"
-#include "MCOGameplayAbility_Damaged.generated.h"
+#include "CoreMinimal.h"
+#include "AbilitySystem/CharacterAbility/MCOGameplayAbility.h"
+#include "MCOGameplayAbility_ChargeStamina.generated.h"
 
-class UMCOMontageDataDirectional;
+class UMCOActionData;
+
 
 UCLASS()
-class MONSTERCO_API UMCOGameplayAbility_Damaged : public UMCOGameplayAbility
+class MONSTERCO_API UMCOGameplayAbility_ChargeStamina : public UMCOGameplayAbility
 {
 	GENERATED_BODY()
-	
 public:
-	UMCOGameplayAbility_Damaged();
+	UMCOGameplayAbility_ChargeStamina();
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
-	
-	virtual void OnTaskCompleted() override;
-	virtual void OnTaskCancelled() override;
+
 	
 protected:	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
-	TObjectPtr<UMCOMontageDataDirectional> Data;
+	TObjectPtr<UMCOActionData> Data;
 };

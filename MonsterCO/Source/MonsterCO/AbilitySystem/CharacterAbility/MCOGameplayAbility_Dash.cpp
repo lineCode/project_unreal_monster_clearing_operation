@@ -20,6 +20,9 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
+	
+	// Cancel these 
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 
 bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -52,9 +55,14 @@ void UMCOGameplayAbility_Dash::InputReleased(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility_Dash::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	MCOPRINT(TEXT("End : Dash"));
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE(PlayerInterface);
 	PlayerInterface->SetSpeed(EMCOCharacterSpeed::Normal);
+	
+	ActivateStaminaChargeAbility();
+
 }

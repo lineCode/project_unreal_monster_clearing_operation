@@ -12,6 +12,9 @@ UMCOGameplayAbility_Damaged::UMCOGameplayAbility_Damaged()
 {
 	SetID(EMCOAbilityID::Damaged, FMCOCharacterTags::Get().DamagedTag);
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag);
+	
+	// Cancel these 
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 
 void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -31,6 +34,13 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 	// CharacterInterface->OffAllCollision();
 	CharacterInterface->OnDamagedBegin.ExecuteIfBound();
 	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().AttackedDegree));
+}
+
+void UMCOGameplayAbility_Damaged::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	ActivateStaminaChargeAbility();
 }
 
 void UMCOGameplayAbility_Damaged::OnTaskCompleted()
