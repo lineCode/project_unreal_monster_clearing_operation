@@ -16,8 +16,11 @@
 #include "Character/MCOCharacterData.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
+#include "AbilitySystem/MCOAttributeSet.h"
 #include "CharacterAttachment/MCOPlayerModeComponent.h"
 #include "CharacterAttachment/MCOWeapon.h"
+#include "UI/MCOStaminaWidget.h"
+#include "UI/MCOWidgetComponent.h"
 
 
 AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -35,6 +38,18 @@ AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitial
 	
 	SetCharacterData();
 	SetControlData();
+
+	WidgetComponent = CreateDefaultSubobject<UMCOWidgetComponent>(TEXT("NAME_WidgetComponent"));
+	WidgetComponent->SetupAttachment(GetMesh());
+	WidgetComponent->SetRelativeLocation(FVector(20.0f, -50.0f, 160.0f));
+	static ConstructorHelpers::FClassFinder<UUserWidget> StaminaWidgetRef(TEXT("/Game/UI/WBP_PlayerStamina.WBP_PlayerStamina_C"));
+	if (StaminaWidgetRef.Class)
+	{
+		WidgetComponent->SetWidgetClass(StaminaWidgetRef.Class); 
+		WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen); 
+		WidgetComponent->SetDrawSize(FVector2D(50.0f, 50.0f)); 
+		WidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 }
 
 void AMCOPlayerCharacter::SetControlData()
@@ -373,3 +388,15 @@ void AMCOPlayerCharacter::StartCooldownWidget(const FGameplayTag& InTag, const f
 	HUDWidget->StartSkillWidget(InTag, InCooldownTime);
 }
 
+void AMCOPlayerCharacter::StartStaminaWidget(const float& InAdditiveValue) const
+{
+	OnStaminaChangedDelegate.ExecuteIfBound(InAdditiveValue);
+}
+
+void AMCOPlayerCharacter::SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget)
+{
+	ISTRUE(nullptr != InStaminaWidget);
+
+	InStaminaWidget->SetWidgetValues(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
+	OnStaminaChangedDelegate.BindUObject(InStaminaWidget, &UMCOStaminaWidget::StartWidget);
+}

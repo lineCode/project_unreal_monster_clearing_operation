@@ -15,7 +15,7 @@ protected:
 	virtual void NativeConstruct() override;
 	
 public:
-	bool IsActive() { return bIsActive; } 
+	bool IsActive();
 	void SetSkillWidget(UTexture2D* InTexture, const FText& InKeyText);
 	void UnSetSkillWidget();
 	void StartSkillCooldown(const float& InCooldownTime);
@@ -23,7 +23,6 @@ public:
 	void ResetCooldownTimer();
 
 protected:
-	bool bIsActive = false;
 	float MaxCooldownTime;
 	FTimerHandle CooldownTimerHandle;
 	FTimerHandle CooldownResetTimerHandle;

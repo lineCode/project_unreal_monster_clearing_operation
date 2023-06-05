@@ -33,6 +33,7 @@ class MONSTERCO_API IMCOCharacterInterface
 
 public:	
 // --- Action
+	virtual bool CanActionWithStamina(const float& InStaminaUsage) const = 0;
 	virtual void OffAllCollision() = 0;
 	virtual bool CanAttack() const = 0;
 	virtual void ControlMoving(bool InToStop) = 0;

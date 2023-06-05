@@ -32,6 +32,8 @@ public:
 	
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Health)
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxHealth)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stamina)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStamina)
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Damage)
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stiffness)
 	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStiffness)
@@ -44,6 +46,12 @@ private:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxHealth", ReplicatedUsing = OnRep_MaxHealth, Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData MaxHealth;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Stamina", ReplicatedUsing = OnRep_Stamina, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Stamina;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxStamina", ReplicatedUsing = OnRep_MaxStamina, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxStamina;
 	
 	// Damage is a meta attribute used by the DamageExecution to calculate final damage, 
 	// which then turns into -Health
@@ -64,6 +72,12 @@ protected:
 
 	UFUNCTION()
 	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+	
+	UFUNCTION()
+	virtual void OnRep_Stamina(const FGameplayAttributeData& OldStamina);
+
+	UFUNCTION()
+	virtual void OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina);
 	
 	UFUNCTION()
 	virtual void OnRep_MaxStiffness(const FGameplayAttributeData& OldMaxStiffness);

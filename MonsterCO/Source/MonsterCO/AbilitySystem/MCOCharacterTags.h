@@ -18,6 +18,7 @@ public:
 	FGameplayTag GameplayEffect_DamageTag;
 	FGameplayTag GameplayEffect_StiffnessTag;
 	FGameplayTag GameplayEffect_CooldownTag;
+	FGameplayTag GameplayEffect_StaminaTag;
 	FGameplayTag GameplayEffect_AfterDodgeTag;
 
 	// Event

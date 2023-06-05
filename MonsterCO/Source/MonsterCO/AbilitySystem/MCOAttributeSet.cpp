@@ -22,6 +22,16 @@ void UMCOAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealt
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, MaxHealth, OldMaxHealth);
 }
 
+void UMCOAttributeSet::OnRep_Stamina(const FGameplayAttributeData& OldStamina)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, Stamina, OldStamina);
+}
+
+void UMCOAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, MaxStamina, OldMaxStamina);
+}
+
 void UMCOAttributeSet::OnRep_MaxStiffness(const FGameplayAttributeData& OldMaxStiffness)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, MaxStiffness, OldMaxStiffness);
@@ -33,6 +43,8 @@ void UMCOAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, MaxStiffness, COND_None, REPNOTIFY_Always);
 }
 
@@ -98,6 +110,16 @@ void UMCOAttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float
 		NewValue = FMath::Clamp(NewValue, 0.0f, (GetMaxHealth() != 0.0f ? GetMaxHealth() : 100.0f));
 	}
 	else if (Attribute == GetMaxHealthAttribute())
+	{
+		// Do not allow max health to drop below 1.
+		NewValue = FMath::Max(NewValue, 1.0f);
+	}
+	else if (Attribute == GetStaminaAttribute())
+	{
+		// Do not allow health to go negative or above max health.
+		NewValue = FMath::Clamp(NewValue, 0.0f, (GetMaxStamina() != 0.0f ? GetMaxStamina() : 100.0f));
+	}
+	else if (Attribute == GetMaxStaminaAttribute())
 	{
 		// Do not allow max health to drop below 1.
 		NewValue = FMath::Max(NewValue, 1.0f);

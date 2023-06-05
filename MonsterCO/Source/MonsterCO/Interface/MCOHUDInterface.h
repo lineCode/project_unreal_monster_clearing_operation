@@ -6,6 +6,7 @@
 #include "MCOHUDInterface.generated.h"
 
 class UMCOHUDWidget;
+class UMCOStaminaWidget;
 class IMCOCharacterInterface;
 
 UINTERFACE(MinimalAPI)
@@ -22,4 +23,6 @@ public:
 	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) = 0;
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) = 0;
 	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const = 0;
+	virtual void StartStaminaWidget(const float& InAdditiveValue) const = 0;
+	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) = 0;
 };

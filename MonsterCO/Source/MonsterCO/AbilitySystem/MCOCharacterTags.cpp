@@ -14,6 +14,7 @@ FMCOCharacterTags::FMCOCharacterTags()
 	GameplayEffect_DamageTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"), ErrorIfNotFount);
 	GameplayEffect_StiffnessTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stiffness"), ErrorIfNotFount);
 	GameplayEffect_CooldownTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"), ErrorIfNotFount);
+	GameplayEffect_StaminaTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stamina"), ErrorIfNotFount);
 	GameplayEffect_AfterDodgeTag = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.AfterDodge"), ErrorIfNotFount);
 	
 	GameplayEvent_DeadTag = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Dead"), ErrorIfNotFount);

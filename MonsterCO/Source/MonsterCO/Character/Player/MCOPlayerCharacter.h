@@ -14,6 +14,13 @@ class UMCOInputConfig;
 class USpringArmComponent;
 class UCameraComponent;
 class UMCOHUDWidget;
+class UWidgetComponent;
+
+
+DECLARE_DELEGATE_OneParam(FOnStaminaChangedDelegate, const float& /*InAdditiveValue*/);
+
+
+
 
 UCLASS()
 class MONSTERCO_API AMCOPlayerCharacter : public AMCOCharacter, public IMCOHUDInterface, public IMCOPlayerInterface
@@ -105,10 +112,19 @@ public:
 	void InitializeHUD();
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;
 	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const override;
+	virtual void StartStaminaWidget(const float& InAdditiveValue) const override;
+	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) override;
 
+public:
+	FOnStaminaChangedDelegate OnStaminaChangedDelegate;
+	
+protected:	
 	UPROPERTY()
 	uint8 bIsMonsterInfoShowed : 1;
 
 	UPROPERTY()
 	TWeakObjectPtr<UMCOHUDWidget> HUDWidget;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWidgetComponent> WidgetComponent;
 };

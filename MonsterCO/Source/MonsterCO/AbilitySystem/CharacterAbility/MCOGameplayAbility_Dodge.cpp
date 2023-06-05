@@ -15,11 +15,11 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 	
 	SetID(EMCOAbilityID::Dodge, Data->ActivationTag);
 	
-	ensure(nullptr != Data);
 	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
-	ensure(nullptr != Fragment);
-	UpdateCooldownFragment(Fragment);
+	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
+	UpdateCooldownFragment(Cooldown);
+	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
+	UpdateStaminaFragment(Stamina);
 	
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
 

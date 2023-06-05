@@ -2,18 +2,21 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
-#include "AbilitySystem/MCOCharacterTags.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Stamina.h"
 #include "GameFramework/Character.h"
+#include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOHUDInterface.h"
 
 
 UMCOGameplayAbility::UMCOGameplayAbility()
 {
 	// Effect 
-	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
 	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
+	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
+	GETCLASS(StaminaEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Stamina.GE_Stamina_C"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -58,6 +61,13 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 	ISTRUE_F(true == Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 	ISTRUE_F(nullptr != ActorInfo);
 	ISTRUE_F(true == ActorInfo->AvatarActor.IsValid());
+	
+	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE_F(CharacterInterface);
+	if (nullptr != StaminaFragment)
+	{
+		ISTRUE_F(CharacterInterface->CanActionWithStamina(StaminaFragment->StaminaUsage));
+	}
 
 	return true;
 }
@@ -98,6 +108,8 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
+	ConsumeStamina(Handle, ActorInfo, ActivationInfo);
+
 	return true;
 }
 
@@ -137,7 +149,7 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	
 	//MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *FHelper::GetEnumDisplayName(TEXT("EMCOAbilityID"), (int32)AbilityInputID), CooldownTimeMax);
 	
-	FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
+	const FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
 	ISTRUE(true == HandleForCooldown.IsValid());
 	
 	HandleForCooldown.Data->SetSetByCallerMagnitude(
@@ -169,6 +181,41 @@ void UMCOGameplayAbility::StartCooldownWidget() const
 	const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != HUDInterface);
 	HUDInterface->StartCooldownWidget(AbilityTag, CooldownFragment->CooldownTime);
+}
+
+void UMCOGameplayAbility::UpdateStaminaFragment(const UMCOActionFragment_Stamina* InStaminaFragment)
+{
+	StaminaFragment = InStaminaFragment;
+}
+
+void UMCOGameplayAbility::ConsumeStamina(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	ISTRUE(nullptr != StaminaFragment);
+	ISTRUE(nullptr != StaminaEffectClass);
+	ISTRUE(true == StaminaFragment->CanConsumeStamina());
+
+	MCOLOG(TEXT("Consume Stamina : %f"), StaminaFragment->StaminaUsage);
+	
+	const FGameplayEffectSpecHandle HandleForStamina = MakeOutgoingGameplayEffectSpec(StaminaEffectClass);
+	ISTRUE(true == HandleForStamina.IsValid());
+	
+	HandleForStamina.Data->SetSetByCallerMagnitude(
+		FMCOCharacterTags::Get().GameplayEffect_StaminaTag,
+		-StaminaFragment->StaminaUsage
+	);
+	
+	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, HandleForStamina);
+
+	StartStaminaWidget();
+}
+
+void UMCOGameplayAbility::StartStaminaWidget() const
+{
+	ISTRUE(nullptr != CurrentActorInfo);
+	
+	const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE(nullptr != HUDInterface);
+	HUDInterface->StartStaminaWidget(-StaminaFragment->StaminaUsage);
 }
 
 void UMCOGameplayAbility::CancelAllAbility()

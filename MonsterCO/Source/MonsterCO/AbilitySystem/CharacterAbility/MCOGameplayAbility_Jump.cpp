@@ -12,9 +12,10 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Jump.DA_Player_Jump"));
 
 	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
-	ensure(nullptr != Fragment);
-	UpdateCooldownFragment(Fragment);
+	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
+	UpdateCooldownFragment(Cooldown);
+	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
+	UpdateStaminaFragment(Stamina);
 	
 	SetID(EMCOAbilityID::Jump, Data->ActivationTag);
 	

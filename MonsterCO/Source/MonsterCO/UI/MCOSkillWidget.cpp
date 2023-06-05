@@ -14,19 +14,25 @@ void UMCOSkillWidget::NativeConstruct()
 	UnSetSkillWidget();
 }
 
+bool UMCOSkillWidget::IsActive()
+{
+	return Image->GetVisibility() == ESlateVisibility::Visible;
+}
+
 void UMCOSkillWidget::SetSkillWidget(UTexture2D* InTexture, const FText& InKeyText)
 {
-	Image->SetBrushFromTexture(InTexture);
+	if (InTexture != nullptr)
+	{
+		Image->SetBrushFromTexture(InTexture);
+	}
 	Image->SetVisibility(ESlateVisibility::Visible);
 	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
-	bIsActive = true;
 }
 
 void UMCOSkillWidget::UnSetSkillWidget()
 {
 	Image->SetVisibility(ESlateVisibility::Hidden);
 	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
-	bIsActive = false;
 }
 
 void UMCOSkillWidget::StartSkillCooldown(const float& InCooldownTime)

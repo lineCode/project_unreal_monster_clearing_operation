@@ -33,7 +33,8 @@ public:
 	void SetData(const FGameplayTag& InTag, const uint8 InSlotLocation, const FText& InKeyText);
 	UTexture2D* GetTexture(const FGameplayTag& InTag);
 	int8 GetIndex(const FGameplayTag& InTag);
-	
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget)
 	TMap<FGameplayTag, FSkillUIData> SkillUIDatas;
 };

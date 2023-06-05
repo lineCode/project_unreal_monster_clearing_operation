@@ -6,10 +6,23 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Stamina.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 {
+	GETASSET(Data, UMCOMontageDataCombo, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Combo.DA_Twohand_Combo"));
+	
+	CurrentCombo = 1;
+	ensure(nullptr != Data);
+	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
+	ensure(nullptr != MontageFragment);
+	ensure(nullptr != MontageFragment->ActionDefinition);
+	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
+	const UMCOActionFragment_Stamina* Stamina = MontageFragment->ActionDefinition->GetStaminaFragment();
+	UpdateStaminaFragment(Stamina);
+
+	
 	SetID(EMCOAbilityID::NormalAttack, FMCOCharacterTags::Get().AttackTag);
 	
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
@@ -41,8 +54,10 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
 	ensure(nullptr != MontageFragment);
 	ensure(nullptr != MontageFragment->ActionDefinition);
-	
 	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
+	const UMCOActionFragment_Stamina* Stamina = MontageFragment->ActionDefinition->GetStaminaFragment();
+	UpdateStaminaFragment(Stamina);
+	
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	

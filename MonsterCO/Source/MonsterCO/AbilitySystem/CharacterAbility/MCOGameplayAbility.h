@@ -9,6 +9,7 @@ class AMCOCharacter;
 class AController;
 class UMCOAbilitySystemComponent;
 class UMCOActionFragment_Cooldown;
+class UMCOActionFragment_Stamina;
 
 
 UCLASS()
@@ -46,13 +47,28 @@ protected:
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 	void StartCooldownWidget() const;
-	
+
+protected:
 	UPROPERTY()
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
 
 private:
 	UPROPERTY()
 	TObjectPtr<const UMCOActionFragment_Cooldown> CooldownFragment;
+
+// --- Stamina
+protected:
+	void UpdateStaminaFragment(const UMCOActionFragment_Stamina* InStaminaFragment);
+	void ConsumeStamina(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const;
+	void StartStaminaWidget() const;
+
+protected:
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> StaminaEffectClass;
+	
+private:
+	UPROPERTY()
+	TObjectPtr<const UMCOActionFragment_Stamina> StaminaFragment;
 	
 // --- Setting
 protected:

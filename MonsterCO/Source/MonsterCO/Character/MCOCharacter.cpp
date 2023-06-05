@@ -92,12 +92,22 @@ void AMCOCharacter::Initialize()
 	AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
 	ISTRUE(nullptr != AttributeSet);
 	
-	MCOLOG(TEXT("%s : InitValues: Health = %f / %f"), *CharacterName.ToString(), GetHealth(), GetMaxHealth());
+	MCOLOG(TEXT("%s : InitValues: Health = %f / %f, Stemina = %f / %f"),
+		*CharacterName.ToString(),
+		GetHealth(), GetMaxHealth(),
+		GetStamina(), GetMaxStamina()
+	);
 }
 
 bool AMCOCharacter::IsAlive() const
 {
 	return GetHealth() > 0.0f;
+}
+
+bool AMCOCharacter::CanActionWithStamina(const float& InStaminaUsage) const
+{
+	MCOLOG(TEXT("Stamina check before do ability : %f <= %f"), InStaminaUsage, GetStamina());
+	return InStaminaUsage <= GetStamina();
 }
 
 FVector AMCOCharacter::GetSocketLocation(const FName& InSocketName)
@@ -148,6 +158,24 @@ float AMCOCharacter::GetMaxStiffness() const
 	if (true == AttributeSet.IsValid())
 	{
 		return AttributeSet->GetMaxStiffness();
+	}
+	return 0.0f;
+}
+
+float AMCOCharacter::GetStamina() const
+{
+	if (true == AttributeSet.IsValid())
+	{
+		return AttributeSet->GetStamina();
+	}
+	return 0.0f;
+}
+
+float AMCOCharacter::GetMaxStamina() const
+{
+	if (true == AttributeSet.IsValid())
+	{
+		return AttributeSet->GetMaxStamina();
 	}
 	return 0.0f;
 }

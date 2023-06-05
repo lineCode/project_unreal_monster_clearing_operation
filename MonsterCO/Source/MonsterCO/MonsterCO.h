@@ -11,6 +11,7 @@
 
 
 const int SLOT_MAX = 5;
+const float WIDGET_RATE = 0.05;
 
 
 

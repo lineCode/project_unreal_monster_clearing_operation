@@ -2,7 +2,10 @@
 
 void UMCOSkillWidgetData::SetData(const FGameplayTag& InTag, const uint8 InSlotLocation, const FText& InKeyText)
 {
-	ensure(true == SkillUIDatas.Contains(InTag));
+	if(false == SkillUIDatas.Contains(InTag))
+	{
+		SkillUIDatas.Emplace(InTag, FSkillUIData());
+	}
 
 	SkillUIDatas[InTag].SlotLocation = InSlotLocation;
 	SkillUIDatas[InTag].KeyText = InKeyText;
@@ -10,15 +13,19 @@ void UMCOSkillWidgetData::SetData(const FGameplayTag& InTag, const uint8 InSlotL
 
 UTexture2D* UMCOSkillWidgetData::GetTexture(const FGameplayTag& InTag)
 {
-	ensure(true == SkillUIDatas.Contains(InTag));
+	if(false == SkillUIDatas.Contains(InTag))
+	{
+		return nullptr;
+	}
+	
 	return SkillUIDatas[InTag].SkillImage;
 }
 
 int8 UMCOSkillWidgetData::GetIndex(const FGameplayTag& InTag)
 {
-	if (true == SkillUIDatas.Contains(InTag))
+	if (false == SkillUIDatas.Contains(InTag))
 	{
-		return SkillUIDatas[InTag].SlotLocation;
+		return -1;
 	}
-	return -1;
+	return SkillUIDatas[InTag].SlotLocation;
 }

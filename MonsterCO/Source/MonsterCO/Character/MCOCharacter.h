@@ -76,6 +76,7 @@ protected:
 	FMCOAbilitySet_GrantedHandles AbilitySetHandles;
 	
 public:
+	virtual bool CanActionWithStamina(const float& InStaminaUsage) const override;
 	virtual bool CanAttack() const override { return true; }
 	virtual FVector GetSocketLocation(const FName& InSocketName);
 
@@ -99,6 +100,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
 	float GetMaxStiffness() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetStamina() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetMaxStamina() const;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Character|Attributes")
