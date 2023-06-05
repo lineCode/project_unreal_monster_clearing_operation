@@ -150,6 +150,14 @@ enum class EMCOItemType : uint8
 	Scroll        UMETA(DisplayName = "Scroll")
 };
 
+UENUM(BlueprintType)
+enum class EMCOStaminaConsumptionPolicy : uint8
+{
+	Infinite      UMETA(DisplayName = "Infinite"),
+	Instant       UMETA(DisplayName = "Instant")
+};
+
+
 
 
 

@@ -26,6 +26,8 @@ void AMCOPlayerState::InitializeAbilityDelegates()
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxHealthAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetStiffnessAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxStiffnessAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetStaminaAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetMaxStaminaAttribute());
 
     AbilitySystemComponent->RegisterGameplayTagEvent(FMCOCharacterTags::Get().StunTag).AddUObject(this, &ThisClass::StunTagChanged);
 }

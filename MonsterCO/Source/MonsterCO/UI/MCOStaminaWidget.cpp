@@ -18,80 +18,30 @@ void UMCOStaminaWidget::NativeConstruct()
 	}
 }
 
-void UMCOStaminaWidget::SetWidgetValues(const float& InCurrentValue, const float& InMaxStamina)
+void UMCOStaminaWidget::SetPercent(const float& InPercent)
 {
-	MCOLOG(TEXT("Set Widget Stamina : %f / %f"), InCurrentValue, InMaxStamina);
-	
-	CurrentValue = InCurrentValue;
-	MaxValue = InMaxStamina;
+	SetImagePercent(InPercent);
 
-	SetImagePercent(CurrentValue / MaxValue);
-}
-
-void UMCOStaminaWidget::StartWidget(const float& InAdditiveValue)
-{
-	StartValue = CurrentValue;
-	AdditiveValue += InAdditiveValue;
-
-	if (GetWorld()->GetTimerManager().GetTimerRemaining(StaminaTimerHandle) <= 0.0f)
+	if (InPercent >= 1.0f)
 	{
-		StartUpdatingStaminaWidget();
+		StaminaTimerHandle.Invalidate();
+		GetWorld()->GetTimerManager().SetTimer(
+			StaminaTimerHandle,
+			this,
+			&ThisClass::OnStaminaFull,
+			3.0f,
+			false
+		);
 	}
-}
-
-void UMCOStaminaWidget::StartUpdatingStaminaWidget()
-{
-	StaminaRadialProgressBar->SetVisibility(ESlateVisibility::Visible);
-
-	ResetTimer();
-	
-	GetWorld()->GetTimerManager().SetTimer(
-		StaminaTimerHandle,
-		this,
-		&ThisClass::UpdateStaminaProgressBar,
-		WIDGET_RATE,
-		true,
-		0.0f
-	);
-}
-
-void UMCOStaminaWidget::UpdateStaminaProgressBar()
-{
-	ensure(MaxValue != 0.0f);
-
-	CurrentValue += AdditiveValue * WIDGET_RATE;
-	SetImagePercent(CurrentValue / MaxValue);
-
-	if (CurrentValue >= MaxValue)
+	else
 	{
-		OnStaminaFull();
+		SetVisibility(ESlateVisibility::Visible);
 	}
-	if (CurrentValue <= 0.0f)
-	{
-		OnStaminaEnd();
-	}
-	if (true == FMath::IsNearlyEqual(CurrentValue, StartValue + AdditiveValue))
-	{
-		OnStaminaEnd();
-	}
-}
-
-void UMCOStaminaWidget::ResetTimer()
-{
-	GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
-}
-
-void UMCOStaminaWidget::OnStaminaEnd()
-{
-	AdditiveValue = 0;
-	ResetTimer();
 }
 
 void UMCOStaminaWidget::OnStaminaFull()
-{
-	CurrentValue = MaxValue;
-	AdditiveValue = 0;
-	
-	// StaminaRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
-	ResetTimer();
+{	
+	SetVisibility(ESlateVisibility::Hidden);
+	GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
+	StaminaTimerHandle.Invalidate();
 }

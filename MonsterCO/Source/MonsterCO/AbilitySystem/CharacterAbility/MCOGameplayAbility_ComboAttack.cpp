@@ -164,6 +164,7 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	
 	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
 	ensure(MontageFragment);
+	ensure(MontageFragment->ActionDefinition);
 	
 	// Play next Montage
 	StartActivation_CommonAttack(
@@ -173,7 +174,10 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 		MontageFragment->ActionDefinition->GetDamageFragment(),
 		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
-		
+
+	UpdateStaminaFragment(MontageFragment->ActionDefinition->GetStaminaFragment());
+	ConsumeStaminaByPolicy(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+	
 	SetComboTimer();
 }
 

@@ -106,7 +106,6 @@ bool AMCOCharacter::IsAlive() const
 
 bool AMCOCharacter::CanActionWithStamina(const float& InStaminaUsage) const
 {
-	MCOLOG(TEXT("Stamina check before do ability : %f <= %f"), InStaminaUsage, GetStamina());
 	return InStaminaUsage <= GetStamina();
 }
 

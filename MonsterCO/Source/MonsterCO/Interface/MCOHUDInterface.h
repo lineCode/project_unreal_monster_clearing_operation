@@ -1,8 +1,8 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "MonsterCO.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Interface.h"
-#include "AbilitySystem/CharacterAbility/MCOCommonMontageData.h"
 #include "MCOHUDInterface.generated.h"
 
 class UMCOHUDWidget;
@@ -23,6 +23,11 @@ public:
 	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) = 0;
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) = 0;
 	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const = 0;
-	virtual void StartStaminaWidget(const float& InAdditiveValue) const = 0;
+
+// --- Stamina
+public:
 	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) = 0;
+	// virtual void OnStaminaChanged() = 0;
+	// virtual void StartStaminaWidget(const EMCOStaminaConsumptionPolicy& InConsumptionPolicy, const float& InAdditiveValue) const = 0;
+	// virtual void StopStaminaWidget() const = 0;
 };

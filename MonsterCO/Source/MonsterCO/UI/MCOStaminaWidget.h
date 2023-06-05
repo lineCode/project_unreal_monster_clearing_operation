@@ -15,21 +15,12 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-	void SetWidgetValues(const float& InCurrentValue, const float& InMaxStamina);
-	void StartWidget(const float& InAdditiveValue);
-
+	void SetPercent(const float& InPercent);
+	
 protected:
-	void StartUpdatingStaminaWidget();
-	void UpdateStaminaProgressBar();
-	void ResetTimer();
-	void OnStaminaEnd();
 	void OnStaminaFull();
 
 protected:
-	float StartValue;
-	float AdditiveValue;
-	float CurrentValue;
-	float MaxValue;
 	FTimerHandle StaminaTimerHandle;
 	
 protected:

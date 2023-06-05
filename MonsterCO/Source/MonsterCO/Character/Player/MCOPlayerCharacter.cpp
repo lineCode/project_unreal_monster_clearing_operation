@@ -17,6 +17,7 @@
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOAttributeSet.h"
+#include "Character/MCOPlayerState.h"
 #include "CharacterAttachment/MCOPlayerModeComponent.h"
 #include "CharacterAttachment/MCOWeapon.h"
 #include "UI/MCOStaminaWidget.h"
@@ -103,7 +104,8 @@ void AMCOPlayerCharacter::Initialize()
 	
 	bGetInput = true;
 	bIsMonsterInfoShowed = false;
-	SetSpeed(EMCOCharacterSpeed::Normal);	
+	SetSpeed(EMCOCharacterSpeed::Normal);
+	CurrentStaminaForWidget = GetStamina();
 }
 
 void AMCOPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -388,15 +390,68 @@ void AMCOPlayerCharacter::StartCooldownWidget(const FGameplayTag& InTag, const f
 	HUDWidget->StartSkillWidget(InTag, InCooldownTime);
 }
 
-void AMCOPlayerCharacter::StartStaminaWidget(const float& InAdditiveValue) const
-{
-	OnStaminaChangedDelegate.ExecuteIfBound(InAdditiveValue);
-}
-
 void AMCOPlayerCharacter::SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget)
 {
 	ISTRUE(nullptr != InStaminaWidget);
+	
+	AMCOPlayerState* MCOPlayerState = Cast<AMCOPlayerState>(GetPlayerState());
+	ISTRUE(nullptr != MCOPlayerState);
 
-	InStaminaWidget->SetWidgetValues(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
-	OnStaminaChangedDelegate.BindUObject(InStaminaWidget, &UMCOStaminaWidget::StartWidget);
+	MCOPlayerState->BindAttributeChangedDelegate(
+		*AttributeSet->GetStaminaAttribute().GetName(), this, &ThisClass::OnStaminaChanged
+	);
+	
+	InStaminaWidget->SetPercent(GetStamina() / GetMaxStamina());	
+	OnStaminaChangedDelegate.BindUObject(InStaminaWidget, &UMCOStaminaWidget::SetPercent);
+}
+
+void AMCOPlayerCharacter::OnStaminaChanged(float NewStaminaValue)
+{
+	AdditiveStaminaValueForWidget = NewStaminaValue - CurrentStaminaForWidget;
+	
+	MCOLOG(TEXT("[Stamina] Changed : %f => %f"), AdditiveStaminaValueForWidget, NewStaminaValue);
+		
+	if (GetWorld()->GetTimerManager().GetTimerRemaining(StaminaTimerHandle) <= 0.0f)
+	{
+		StartStaminaTimer();
+	}
+}
+
+void AMCOPlayerCharacter::StartStaminaTimer()
+{
+	MCOLOG(TEXT("Start stamina timer"));
+	
+	StaminaTimerHandle.Invalidate();
+	GetWorld()->GetTimerManager().SetTimer(
+		StaminaTimerHandle,
+		this,
+		&ThisClass::UpdateStaminaWidget,
+		WIDGET_RATE,
+		true,
+		0.0f
+	);
+}
+
+void AMCOPlayerCharacter::UpdateStaminaWidget()
+{
+	CurrentStaminaForWidget += AdditiveStaminaValueForWidget * WIDGET_RATE;
+	
+	OnStaminaChangedDelegate.ExecuteIfBound(CurrentStaminaForWidget / GetMaxStamina());
+
+	MCOLOG(TEXT("[Stamina] Updating : %f / %f => %f"), CurrentStaminaForWidget, GetMaxStamina(), GetStamina());
+	
+	if (FMath::IsNearlyEqual(CurrentStaminaForWidget, GetStamina(), 1.0f))
+	{
+		MCOLOG(TEXT("[Stamina] Stop : %f / %f"), CurrentStaminaForWidget, GetMaxStamina());
+		StopStaminaTimer();
+	}
+}
+
+void AMCOPlayerCharacter::StopStaminaTimer()
+{
+	GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
+	StaminaTimerHandle.Invalidate();
+	
+	CurrentStaminaForWidget = GetStamina();
+	AdditiveStaminaValueForWidget = 0.0f;
 }

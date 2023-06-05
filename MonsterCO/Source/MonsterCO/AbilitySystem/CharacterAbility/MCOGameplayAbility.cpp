@@ -16,7 +16,8 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	// Effect 
 	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
-	GETCLASS(StaminaEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Stamina.GE_Stamina_C"));
+	GETCLASS(InstantStaminaEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Stamina_Instant.GE_Stamina_Instant_C"));
+	GETCLASS(InfiniteStaminaEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Stamina_Infinite.GE_Stamina_Infinite_C"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -72,6 +73,13 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 	return true;
 }
 
+void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	StopConsumeStamina();
+}
+
 bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ensure(nullptr != ActorInfo);
@@ -108,7 +116,7 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
-	ConsumeStamina(Handle, ActorInfo, ActivationInfo);
+	ConsumeStaminaByPolicy(Handle, ActorInfo, ActivationInfo);
 
 	return true;
 }
@@ -188,34 +196,62 @@ void UMCOGameplayAbility::UpdateStaminaFragment(const UMCOActionFragment_Stamina
 	StaminaFragment = InStaminaFragment;
 }
 
-void UMCOGameplayAbility::ConsumeStamina(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+void UMCOGameplayAbility::ConsumeStaminaByPolicy(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	ISTRUE(nullptr != StaminaFragment);
-	ISTRUE(nullptr != StaminaEffectClass);
+	ISTRUE(true == StaminaFragment->CanConsumeStamina());
+
+	if (StaminaFragment->StaminaConsumptionPolicy == EMCOStaminaConsumptionPolicy::Instant)
+	{
+		MCOLOG(TEXT("Instant effect"));
+		ConsumeStamina(InstantStaminaEffectClass, Handle, ActorInfo, ActivationInfo);
+	}
+	else if (StaminaFragment->StaminaConsumptionPolicy == EMCOStaminaConsumptionPolicy::Infinite)
+	{
+		MCOLOG(TEXT("Infinite effect"));
+		ConsumeStamina(InfiniteStaminaEffectClass, Handle, ActorInfo, ActivationInfo);
+	}	
+}
+
+void UMCOGameplayAbility::ConsumeStamina(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	ISTRUE(nullptr != StaminaFragment);
+	ISTRUE(nullptr != GameplayEffectClass);
 	ISTRUE(true == StaminaFragment->CanConsumeStamina());
 
 	MCOLOG(TEXT("Consume Stamina : %f"), StaminaFragment->StaminaUsage);
-	
-	const FGameplayEffectSpecHandle HandleForStamina = MakeOutgoingGameplayEffectSpec(StaminaEffectClass);
+
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
+		
+	const FGameplayEffectSpecHandle HandleForStamina = MakeOutgoingGameplayEffectSpec(GameplayEffectClass);
 	ISTRUE(true == HandleForStamina.IsValid());
 	
 	HandleForStamina.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_StaminaTag,
 		-StaminaFragment->StaminaUsage
 	);
-	
-	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, HandleForStamina);
 
-	StartStaminaWidget();
+	FGameplayTagContainer Tags;
+	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
+	HandleForStamina.Data->DynamicGrantedTags = Tags;
+	
+	const FActiveGameplayEffectHandle ActiveEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(
+		*HandleForStamina.Data.Get(),
+		ASC->GetPredictionKeyForNewAction()
+	);
 }
 
-void UMCOGameplayAbility::StartStaminaWidget() const
+void UMCOGameplayAbility::StopConsumeStamina()
 {
-	ISTRUE(nullptr != CurrentActorInfo);
+	ISTRUE(nullptr != StaminaFragment);
+	ISTRUE(true == StaminaFragment->CanConsumeStamina());
 	
-	const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
-	ISTRUE(nullptr != HUDInterface);
-	HUDInterface->StartStaminaWidget(-StaminaFragment->StaminaUsage);
+	MCOLOG(TEXT("Stop Consuming Stamina"));
+	
+	FGameplayTagContainer Tags;
+	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
+	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags 
 }
 
 void UMCOGameplayAbility::CancelAllAbility()

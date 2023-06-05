@@ -3,6 +3,7 @@
 #include "MonsterCO.h"
 #include "Abilities/GameplayAbility.h"
 #include "MCOCommonMontageData.h"
+#include "GameplayEffectTypes.h"
 #include "MCOGameplayAbility.generated.h"
 
 class AMCOCharacter;
@@ -27,6 +28,8 @@ protected:
 public:
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
 	bool SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
 	void CancelAllAbility();
 	
@@ -59,12 +62,18 @@ private:
 // --- Stamina
 protected:
 	void UpdateStaminaFragment(const UMCOActionFragment_Stamina* InStaminaFragment);
-	void ConsumeStamina(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const;
-	void StartStaminaWidget() const;
-
+	void ConsumeStaminaByPolicy(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
+	
+private:
+	void ConsumeStamina(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const;
+	void StopConsumeStamina();
+	
 protected:
 	UPROPERTY()
-	TSubclassOf<UGameplayEffect> StaminaEffectClass;
+	TSubclassOf<UGameplayEffect> InstantStaminaEffectClass;
+	
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> InfiniteStaminaEffectClass;
 	
 private:
 	UPROPERTY()

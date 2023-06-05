@@ -17,7 +17,9 @@ class UMCOHUDWidget;
 class UWidgetComponent;
 
 
-DECLARE_DELEGATE_OneParam(FOnStaminaChangedDelegate, const float& /*InAdditiveValue*/);
+
+DECLARE_DELEGATE_OneParam(FOnStaminaStoppedDelegate, const float& /*InCurrentValue*/);
+DECLARE_DELEGATE_OneParam(FOnStaminaChangedDelegate, const float& /*InPercent*/);
 
 
 
@@ -112,11 +114,20 @@ public:
 	void InitializeHUD();
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;
 	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const override;
-	virtual void StartStaminaWidget(const float& InAdditiveValue) const override;
 	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) override;
 
-public:
+protected:
+	void OnStaminaChanged(float NewStaminaValue);
+	void StartStaminaTimer();
+	void StopStaminaTimer();
+	void UpdateStaminaWidget();
+	
+protected:
 	FOnStaminaChangedDelegate OnStaminaChangedDelegate;
+	FOnStaminaStoppedDelegate OnStaminaStoppedDelegate;
+
+	float AdditiveStaminaValueForWidget;
+	float CurrentStaminaForWidget;
 	
 protected:	
 	UPROPERTY()
@@ -127,4 +138,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UWidgetComponent> WidgetComponent;
+	
+	FTimerHandle StaminaTimerHandle;
 };

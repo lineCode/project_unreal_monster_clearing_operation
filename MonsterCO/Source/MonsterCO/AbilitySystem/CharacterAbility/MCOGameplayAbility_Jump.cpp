@@ -3,7 +3,7 @@
 #include "Interface/MCOPlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
+#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 
 
 

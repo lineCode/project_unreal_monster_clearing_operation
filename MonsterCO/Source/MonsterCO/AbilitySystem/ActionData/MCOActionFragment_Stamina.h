@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "MonsterCO.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
 #include "MCOActionFragment_Stamina.generated.h"
 
@@ -14,4 +14,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float StaminaUsage = 0.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EMCOStaminaConsumptionPolicy StaminaConsumptionPolicy = EMCOStaminaConsumptionPolicy::Instant;
 };

@@ -1,11 +1,19 @@
 #include "MCOGameplayAbility_Dash.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOPlayerInterface.h"
+#include "AbilitySystem/ActionData/MCOActionData.h"
+#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 
 
 UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 {
-	SetID(EMCOAbilityID::Dash, FMCOCharacterTags::Get().DashTag);
+	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Dash.DA_Twohand_Dash"));
+
+	ensure(nullptr != Data->ActionDefinition);
+	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
+	UpdateStaminaFragment(Stamina);
+	
+	SetID(EMCOAbilityID::Dash, Data->ActivationTag);
 
 	// Tag required to activate this ability 
 	ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
@@ -16,11 +24,11 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 
 bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == true);
-
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE_F(nullptr != PlayerInterface);
 	ISTRUE_F(true == PlayerInterface->CanDashAction());
+
+	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == true);
 
 	return true;
 }
