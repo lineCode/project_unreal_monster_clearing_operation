@@ -14,9 +14,10 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	UpdateStaminaFragment(Stamina);
 	
 	SetID(EMCOAbilityID::Dash, Data->ActivationTag);
+	SetTriggerTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 
 	// Tag required to activate this ability 
-	ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
+	// ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
@@ -27,6 +28,8 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 
 bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
+	MCOLOG_C(MCOAbility, TEXT("CanActivateAbility : Dash"));
+	
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE_F(nullptr != PlayerInterface);
 	ISTRUE_F(true == PlayerInterface->CanDashAction());
@@ -38,6 +41,8 @@ bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHand
 
 void UMCOGameplayAbility_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	MCOLOG_C(MCOAbility, TEXT("ActivateAbility : Dash"));
+	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
@@ -47,6 +52,8 @@ void UMCOGameplayAbility_Dash::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 void UMCOGameplayAbility_Dash::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
+	MCOLOG_C(MCOAbility, TEXT("InputReleased : Dash"));
+	
 	ISTRUE(ActorInfo != nullptr);
 	ISTRUE(ActorInfo->AvatarActor != nullptr);
 	
@@ -55,7 +62,7 @@ void UMCOGameplayAbility_Dash::InputReleased(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility_Dash::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	MCOPRINT(TEXT("End : Dash"));
+	MCOLOG_C(MCOAbility, TEXT("End : Dash"));
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	

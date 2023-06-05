@@ -270,6 +270,7 @@ bool AMCOPlayerCharacter::CanDashAction() const
 	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
+	ISTRUE_F(UGameplayStatics::GetPlayerController(GetWorld(), 0)->IsInputKeyDown(EKeys::W));
 
 	return true;
 }

@@ -77,18 +77,30 @@ void UMCOGameplayAbility_Dodge::OnTaskFinished()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 
-	MCOLOG(TEXT("End : Dodge"));
+	MCOLOG_C(MCOAbility, TEXT("End : Dodge"));
 	
 	if (true == bIsDodgeForward)
 	{
-		FGameplayEffectSpecHandle HandleForDash = MakeOutgoingGameplayEffectSpec(TagEffectClass);
-		ISTRUE(true == HandleForDash.IsValid());
-	
-		FGameplayTagContainer Tags;
-		Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
-		HandleForDash.Data->DynamicGrantedTags = Tags;
+		FGameplayEventData Payload;
+		Payload.EventTag       = FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag;
+		Payload.Instigator     = CurrentActorInfo->AvatarActor.Get();
+		Payload.Target         = CurrentActorInfo->AvatarActor.Get();
+		// Payload.OptionalObject = EffectSpec.Def;
+		// Payload.ContextHandle  = EffectSpec.GetEffectContext();
+		// Payload.InstigatorTags = *EffectSpec.CapturedSourceTags.GetAggregatedTags();
+		// Payload.TargetTags     = *EffectSpec.CapturedTargetTags.GetAggregatedTags();
+		// Payload.EventMagnitude = Magnitude;
+		GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
 
-		ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, HandleForDash);
+	
+		// FGameplayEffectSpecHandle HandleForDash = MakeOutgoingGameplayEffectSpec(TagEffectClass);
+		// ISTRUE(true == HandleForDash.IsValid());
+		//
+		// FGameplayTagContainer Tags;
+		// Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
+		// HandleForDash.Data->DynamicGrantedTags = Tags;
+		//
+		// ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, HandleForDash);
 	}
 
 	ActivateStaminaChargeAbility();

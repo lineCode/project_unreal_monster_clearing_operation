@@ -35,8 +35,9 @@ void UMCOAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inpu
 	{
 		if (AbilitySpec.Ability == nullptr) continue;
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) == false) continue;
+		if (InputTag == FMCOCharacterTags::Get().DashTag == true) continue; // Ignore dash pressed event
 
-		//MCOLOG(TEXT("[%s] is pressed"), *InputTag.GetTagName().ToString());
+		// MCOLOG_C(MCOAbility, TEXT("[%s] is pressed"), *InputTag.GetTagName().ToString());
 
 		InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
 		InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
@@ -51,8 +52,8 @@ void UMCOAbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 	{
 		if (AbilitySpec.Ability == nullptr) continue;
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) == false) continue;
-		
-		//MCOLOG(TEXT("[%s] is released"), *InputTag.GetTagName().ToString());
+
+		//MCOLOG_C(MCOAbility, TEXT("[%s] is released"), *InputTag.GetTagName().ToString());
 		
 		InputReleasedSpecHandles.AddUnique(AbilitySpec.Handle);
 		InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);

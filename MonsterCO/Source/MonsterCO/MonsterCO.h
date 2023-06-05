@@ -24,6 +24,9 @@ const float WIDGET_RATE = 0.05;
 
 // --- Log
 DECLARE_LOG_CATEGORY_EXTERN(MCOLog, Display, All);
+DECLARE_LOG_CATEGORY_EXTERN(MCOAbility, Display, All);
+
+
 
 class MONSTERCO_API FLog
 {
@@ -41,8 +44,8 @@ public:
 #define MCOLOG_CALLINFO                  (FString(__FUNCTION__) + TEXT("(") + FString::FromInt(__LINE__) + TEXT(")"))
 #define MCOLOG(Format, ...)              UE_LOG(MCOLog, Warning, TEXT("%s"), *FString::Printf(Format, ##__VA_ARGS__))
 #define MCOLOG_V(Verbosity, Format, ...) UE_LOG(MCOLog, Verbosity, TEXT("%s"), *FString::Printf(Format, ##__VA_ARGS__))
-#define MCOLOG_C(Format, ...)            UE_LOG(MCOLog, Warning, TEXT("%s%s"), MCOLOG_CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
-
+#define MCOLOG_I(Format, ...)            UE_LOG(MCOLog, Warning, TEXT("%s%s"), MCOLOG_CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
+#define MCOLOG_C(Category, Format, ...)  UE_LOG(Category, Warning, TEXT("%s"), *FString::Printf(Format, ##__VA_ARGS__))
 
 // -- ConstructorHelpers
 #define GETASSET(OutResult, ClassType, Path)\
