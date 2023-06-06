@@ -8,7 +8,7 @@ class UMCOActionFragment_Cooldown;
 class UMCOActionFragment_Damage;
 class UMCOActionFragment_Montage;
 class UMCOActionFragment_Timer;
-class UMCOActionFragment_Stamina;
+class UMCOActionFragment_Attribute;
 
 
 UCLASS(DefaultToInstanced, EditInlineNew, Abstract)
@@ -33,7 +33,7 @@ public:
 	const UMCOActionFragment_Damage* GetDamageFragment() const;
 	const UMCOActionFragment_Montage* GetMontageFragment() const;
 	const UMCOActionFragment_Timer* GetTimerFragment() const;
-	const UMCOActionFragment_Stamina* GetStaminaFragment() const;
+	const UMCOActionFragment_Attribute* GetAttributeFragment() const;
 
 protected:
 	const UMCOActionFragment* FindFragmentByClass(TSubclassOf<UMCOActionFragment> FragmentClass) const;

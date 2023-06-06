@@ -10,7 +10,7 @@ class AMCOCharacter;
 class AController;
 class UMCOAbilitySystemComponent;
 class UMCOActionFragment_Cooldown;
-class UMCOActionFragment_Stamina;
+class UMCOActionFragment_Attribute;
 
 
 UCLASS()
@@ -32,6 +32,7 @@ public:
 
 	bool SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
 	void CancelAllAbility();
+	void HandleGameplayEventWithTag(const FGameplayTag& InTag);
 	
 // --- Getter
 protected:
@@ -59,29 +60,37 @@ private:
 	UPROPERTY()
 	TObjectPtr<const UMCOActionFragment_Cooldown> CooldownFragment;
 
-// --- Stamina
+// --- Attribute Effect
 protected:
-	void UpdateStaminaFragment(const UMCOActionFragment_Stamina* InStaminaFragment);
-	void ApplyStaminaEffectByPolicy();
-	void ActivateStaminaChargeAbility();
-	void HandleStaminaChargeEvent();
+	void UpdateAttributeFragment(const UMCOActionFragment_Attribute* InAttributeFragment);
+	void ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
 	
 private:
-	void ApplyStaminaEffect(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
-	void StopStaminaEffect();
+	void StopAttributeEffect();
 	
 protected:
 	UPROPERTY()
-	TSubclassOf<UGameplayEffect> InstantStaminaEffectClass;
+	TSubclassOf<UGameplayEffect> InstantAttributeEffectClass;
 	
 	UPROPERTY()
-	TSubclassOf<UGameplayEffect> InfiniteStaminaEffectClass;
+	TSubclassOf<UGameplayEffect> InfiniteAttributeEffectClass;
 	
 private:
 	UPROPERTY()
-	TObjectPtr<const UMCOActionFragment_Stamina> StaminaFragment;
+	TObjectPtr<const UMCOActionFragment_Attribute> AttributeFragment;
+	
+// --- Stamina charge
+protected:
+	void StartStaminaChargeTimer();
 
-	FTimerHandle StaminaChargingDelayTimer;
+private:
+	void ActivateStaminaChargeAbility();
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Stamina")
+	float StaminaChargeDelay; 
+	
+	FTimerHandle StaminaChargeDelayTimer;
 	
 	
 // --- Setting

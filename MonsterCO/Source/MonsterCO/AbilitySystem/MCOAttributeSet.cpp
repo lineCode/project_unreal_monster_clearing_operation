@@ -7,8 +7,14 @@
 UMCOAttributeSet::UMCOAttributeSet()
 	: Health(0.0f)
 	, MaxHealth(0.0f)
+	, Stamina(0.0f)
+	, MaxStamina(0.0f)
 	, Stiffness(0.0f)
 	, MaxStiffness(0.0f)
+	, AdditiveHealth(0.0f)
+	, AdditiveStamina(0.0f)
+	, AdditiveStiffness(0.0f)
+	, AdditiveDamage(0.0f)
 {
 }
 
@@ -32,6 +38,11 @@ void UMCOAttributeSet::OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStam
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, MaxStamina, OldMaxStamina);
 }
 
+void UMCOAttributeSet::OnRep_Stiffness(const FGameplayAttributeData& OldStiffness)
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, Stiffness, OldStiffness);
+}
+
 void UMCOAttributeSet::OnRep_MaxStiffness(const FGameplayAttributeData& OldMaxStiffness)
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UMCOAttributeSet, MaxStiffness, OldMaxStiffness);
@@ -45,6 +56,7 @@ void UMCOAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, Stamina, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, MaxStamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, Stiffness, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UMCOAttributeSet, MaxStiffness, COND_None, REPNOTIFY_Always);
 }
 
@@ -58,38 +70,63 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	ISTRUE(Data.EvaluatedData.Magnitude > 0.0f);
+	ISTRUE(Data.EvaluatedData.Magnitude != 0.0f);
 
-	if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	// Set{Attribute}() will call bound function in PlayerState
+	
+	// Additive attributes
+	if (Data.EvaluatedData.Attribute == GetAdditiveDamageAttribute())
 	{
-		float NewHealth = FMath::Clamp(GetHealth() - GetDamage(), 0.0f, GetMaxHealth());
+		const float NewHealth = FMath::Clamp(GetHealth() + GetAdditiveDamage(), 0.0f, GetMaxHealth());
 		SetHealth(NewHealth);
-		SetDamage(0.0f);
 
 		if (GetHealth() <= 0.0f)
 		{
 			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag, Data);
-		}		
+		}
+		
+		SetAdditiveDamage(0.0f);
 	}
-	else if (Data.EvaluatedData.Attribute == GetStiffnessAttribute())
+	else if (Data.EvaluatedData.Attribute == GetAdditiveHealthAttribute())
 	{
-		if (GetMaxStiffness() <= GetStiffness())
+		const float NewHealth = FMath::Clamp(GetHealth() + GetAdditiveHealth(), 0.0f, GetMaxHealth());
+		SetHealth(NewHealth);		
+		SetAdditiveHealth(0.0f);
+	}
+	else if (Data.EvaluatedData.Attribute == GetAdditiveStiffnessAttribute())
+	{
+		float NewStiffness = GetStiffness() + GetAdditiveStiffness();
+
+		if (GetMaxStiffness() <= NewStiffness)
 		{
-			SetStiffness(GetStiffness() - GetMaxStiffness());
+			NewStiffness -= GetMaxStiffness();
 			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag, Data);
 		}
+		
+		SetStiffness(NewStiffness);
+		SetAdditiveStiffness(0.0f);
 	}
-	else if (Data.EvaluatedData.Attribute == GetStaminaAttribute())
+	else if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())
 	{
+		const float NewStamina = FMath::Clamp(GetStamina() + GetAdditiveStamina(), 0.0f, GetMaxStamina());
+		SetStamina(NewStamina);
+		
 		if (GetMaxStamina() <= GetStamina())
 		{
-			MCOLOG(TEXT("--------------------------Cancel stamina ability with tag because stamina is full"));
+			MCOLOG(TEXT("--------------------------Cancel stamina charging ability with tag because stamina is full"));
 		
 			FGameplayTagContainer Tags;
 			Tags.AddTag(FMCOCharacterTags::Get().ChargingTag);
 			GetOwningAbilitySystemComponent()->CancelAbilities(&Tags);
 		}
+		// else if (GetAdditiveStamina() < 0.0f) 
+		// {
+		// 	HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag, Data);
+		// }
+		
+		SetAdditiveStamina(0.0f);
 	}
+	
 }
 
 void UMCOAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
@@ -127,12 +164,10 @@ void UMCOAttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float
 	}
 	else if (Attribute == GetStaminaAttribute())
 	{
-		// Do not allow health to go negative or above max health.
 		NewValue = FMath::Clamp(NewValue, 0.0f, (GetMaxStamina() != 0.0f ? GetMaxStamina() : 100.0f));
 	}
 	else if (Attribute == GetMaxStaminaAttribute())
 	{
-		// Do not allow max health to drop below 1.
 		NewValue = FMath::Max(NewValue, 1.0f);
 	}
 }

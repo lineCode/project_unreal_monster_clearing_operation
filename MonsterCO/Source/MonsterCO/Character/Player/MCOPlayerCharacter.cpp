@@ -297,7 +297,7 @@ bool AMCOPlayerCharacter::CanAttack() const
 // 	AbilitySystemComponent->CancelAbilities(&EffectsTagToRemove);
 // }
 
-void AMCOPlayerCharacter::SetSpeed(EMCOCharacterSpeed InSpeed) const
+void AMCOPlayerCharacter::SetSpeed(const EMCOCharacterSpeed& InSpeed) const
 {
 	ISTRUE(nullptr != CharacterControlData);
 	ISTRUE(true == CharacterControlData->WalkSpeeds.Contains(InSpeed));
@@ -410,6 +410,7 @@ void AMCOPlayerCharacter::SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget)
 void AMCOPlayerCharacter::OnStaminaChanged(float NewStaminaValue)
 {
 	AdditiveStaminaValueForWidget = NewStaminaValue - CurrentStaminaForWidget;
+	ISTRUE(AdditiveStaminaValueForWidget != 0.0f);
 	
 	MCOLOG(TEXT("[Stamina] Start : %f -> %f ( %f per sec)"), CurrentStaminaForWidget, NewStaminaValue, AdditiveStaminaValueForWidget);
 		

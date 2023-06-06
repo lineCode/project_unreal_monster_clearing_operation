@@ -18,11 +18,12 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
 	UpdateCooldownFragment(Cooldown);
-	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
-	UpdateStaminaFragment(Stamina);
+	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
+	UpdateAttributeFragment(Stamina);
 	
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
 
+	// This can be blocked by these tags
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
@@ -81,17 +82,7 @@ void UMCOGameplayAbility_Dodge::OnTaskFinished()
 	
 	if (true == bIsDodgeForward)
 	{
-		FGameplayEventData Payload;
-		Payload.EventTag       = FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag;
-		Payload.Instigator     = CurrentActorInfo->AvatarActor.Get();
-		Payload.Target         = CurrentActorInfo->AvatarActor.Get();
-		// Payload.OptionalObject = EffectSpec.Def;
-		// Payload.ContextHandle  = EffectSpec.GetEffectContext();
-		// Payload.InstigatorTags = *EffectSpec.CapturedSourceTags.GetAggregatedTags();
-		// Payload.TargetTags     = *EffectSpec.CapturedTargetTags.GetAggregatedTags();
-		// Payload.EventMagnitude = Magnitude;
-		GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
-
+		HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 	
 		// FGameplayEffectSpecHandle HandleForDash = MakeOutgoingGameplayEffectSpec(TagEffectClass);
 		// ISTRUE(true == HandleForDash.IsValid());
@@ -103,5 +94,5 @@ void UMCOGameplayAbility_Dodge::OnTaskFinished()
 		// ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, HandleForDash);
 	}
 
-	ActivateStaminaChargeAbility();
+	StartStaminaChargeTimer();
 }

@@ -29,58 +29,6 @@ class MONSTERCO_API UMCOAttributeSet : public UAttributeSet
 	
 public:
 	UMCOAttributeSet();
-	
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Health)
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxHealth)
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stamina)
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStamina)
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Damage)
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stiffness)
-	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStiffness)
-
-	mutable FMCOHandleAttributeEventDelegate OnHandleAttributeEventDelegate;
-		
-private:
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|Health", ReplicatedUsing = OnRep_Health, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData Health;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxHealth", ReplicatedUsing = OnRep_MaxHealth, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData MaxHealth;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|Stamina", ReplicatedUsing = OnRep_Stamina, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData Stamina;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxStamina", ReplicatedUsing = OnRep_MaxStamina, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData MaxStamina;
-	
-	// Damage is a meta attribute used by the DamageExecution to calculate final damage, 
-	// which then turns into -Health
-	// Temporary value that only exists on the Server. Not replicated.
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|Damage", Meta = (HideFromModifiers, AllowPrivateAccess = true))
-	FGameplayAttributeData Damage;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|Stiffness", Meta = (HideFromModifiers, AllowPrivateAccess = true))
-	FGameplayAttributeData Stiffness;
-	
-	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxStiffness", ReplicatedUsing = OnRep_MaxStiffness, Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData MaxStiffness;
-
-protected:
-	// Functions for replication
-	UFUNCTION()
-	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
-
-	UFUNCTION()
-	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
-	
-	UFUNCTION()
-	virtual void OnRep_Stamina(const FGameplayAttributeData& OldStamina);
-
-	UFUNCTION()
-	virtual void OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina);
-	
-	UFUNCTION()
-	virtual void OnRep_MaxStiffness(const FGameplayAttributeData& OldMaxStiffness);
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -94,4 +42,84 @@ protected:
 	
 	void ClampAttribute(const FGameplayAttribute& Attribute, float& NewValue) const;
 	void HandleEventWithTag(const FGameplayTag& InTag, const FGameplayEffectModCallbackData& Data) const;
+
+public:
+	mutable FMCOHandleAttributeEventDelegate OnHandleAttributeEventDelegate;
+
+	
+// ---- Main 
+public:
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Health)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxHealth)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stamina)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStamina)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, Stiffness)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, MaxStiffness)
+	
+protected:
+	// Functions for replication
+	UFUNCTION()
+	virtual void OnRep_Health(const FGameplayAttributeData& OldHealth);
+
+	UFUNCTION()
+	virtual void OnRep_MaxHealth(const FGameplayAttributeData& OldMaxHealth);
+	
+	UFUNCTION()
+	virtual void OnRep_Stamina(const FGameplayAttributeData& OldStamina);
+	
+	UFUNCTION()
+	virtual void OnRep_MaxStamina(const FGameplayAttributeData& OldMaxStamina);
+	
+	UFUNCTION()
+	virtual void OnRep_Stiffness(const FGameplayAttributeData& OldStiffness);
+	
+	UFUNCTION()
+	virtual void OnRep_MaxStiffness(const FGameplayAttributeData& OldMaxStiffness);
+
+private:
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Health", ReplicatedUsing = OnRep_Health, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Health;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxHealth", ReplicatedUsing = OnRep_MaxHealth, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxHealth;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Stamina", ReplicatedUsing = OnRep_Stamina, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Stamina;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxStamina", ReplicatedUsing = OnRep_MaxStamina, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxStamina;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Stiffness", ReplicatedUsing = OnRep_Stiffness, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData Stiffness;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|MaxStiffness", ReplicatedUsing = OnRep_MaxStiffness, Meta = (AllowPrivateAccess = true))
+	FGameplayAttributeData MaxStiffness;
+
+	
+	
+// --- Additive 
+public:
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, AdditiveHealth)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, AdditiveStamina)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, AdditiveStiffness)
+	ATTRIBUTE_ACCESSORS(UMCOAttributeSet, AdditiveDamage)
+
+private:
+	// Damage is a meta attribute used by the DamageExecution to calculate final damage, 
+	// which then turns into -Health
+	// Temporary value that only exists on the Server. Not replicated.
+
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Additive", Meta = (HideFromModifiers, AllowPrivateAccess = true))
+	FGameplayAttributeData AdditiveHealth;
+
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Additive", Meta = (HideFromModifiers, AllowPrivateAccess = true))
+	FGameplayAttributeData AdditiveStamina;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Additive", Meta = (HideFromModifiers, AllowPrivateAccess = true))
+	FGameplayAttributeData AdditiveStiffness;
+	
+	UPROPERTY(BlueprintReadOnly, Category = "MCO|Additive", Meta = (HideFromModifiers, AllowPrivateAccess = true))
+	FGameplayAttributeData AdditiveDamage;
+	
+
 };

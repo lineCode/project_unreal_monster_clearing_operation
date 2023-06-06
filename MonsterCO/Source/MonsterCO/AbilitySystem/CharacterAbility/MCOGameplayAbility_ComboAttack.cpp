@@ -6,7 +6,7 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Stamina.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -19,14 +19,15 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 	ensure(nullptr != MontageFragment);
 	ensure(nullptr != MontageFragment->ActionDefinition);
 	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
-	const UMCOActionFragment_Stamina* Stamina = MontageFragment->ActionDefinition->GetStaminaFragment();
-	UpdateStaminaFragment(Stamina);
-
+	const UMCOActionFragment_Attribute* Stamina = MontageFragment->ActionDefinition->GetAttributeFragment();
+	UpdateAttributeFragment(Stamina);
 	
 	SetID(EMCOAbilityID::NormalAttack, FMCOCharacterTags::Get().AttackTag);
-	
+
+	// Cancel these
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
 
+	// This can be blocked by these tags
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
@@ -55,8 +56,8 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	ensure(nullptr != MontageFragment);
 	ensure(nullptr != MontageFragment->ActionDefinition);
 	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
-	const UMCOActionFragment_Stamina* Stamina = MontageFragment->ActionDefinition->GetStaminaFragment();
-	UpdateStaminaFragment(Stamina);
+	const UMCOActionFragment_Attribute* Stamina = MontageFragment->ActionDefinition->GetAttributeFragment();
+	UpdateAttributeFragment(Stamina);
 	
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
@@ -175,9 +176,9 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
 
-	UpdateStaminaFragment(MontageFragment->ActionDefinition->GetStaminaFragment());
+	UpdateAttributeFragment(MontageFragment->ActionDefinition->GetAttributeFragment());
 	
-	ApplyStaminaEffectByPolicy();
+	ApplyAttributeEffect(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 	
 	SetComboTimer();
 }

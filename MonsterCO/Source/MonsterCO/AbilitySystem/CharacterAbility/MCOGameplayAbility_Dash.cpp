@@ -10,8 +10,8 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Dash.DA_Twohand_Dash"));
 
 	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
-	UpdateStaminaFragment(Stamina);
+	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
+	UpdateAttributeFragment(Stamina);
 	
 	SetID(EMCOAbilityID::Dash, Data->ActivationTag);
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
@@ -19,11 +19,13 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	// Tag required to activate this ability 
 	// ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 
+	// This can be blocked by these tags
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	
 	// Cancel these 
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+	
 }
 
 bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -70,6 +72,6 @@ void UMCOGameplayAbility_Dash::EndAbility(const FGameplayAbilitySpecHandle Handl
 	ISTRUE(PlayerInterface);
 	PlayerInterface->SetSpeed(EMCOCharacterSpeed::Normal);
 	
-	ActivateStaminaChargeAbility();
+	StartStaminaChargeTimer();
 
 }

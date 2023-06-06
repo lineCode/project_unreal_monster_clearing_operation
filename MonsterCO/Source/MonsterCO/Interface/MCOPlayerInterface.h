@@ -22,7 +22,7 @@ public:
 	virtual bool CanEquipAction() const = 0;
 	virtual bool CanDodgeAction() const = 0;
 	virtual bool CanDashAction() const = 0;
-	virtual void SetSpeed(EMCOCharacterSpeed CharacterSpeed) const = 0;
+	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const = 0;
 	
 	virtual FVector GetInputDirection() const = 0;
 	virtual bool IsDashForward() const = 0;

@@ -15,11 +15,13 @@ public:
 	FGameplayTag LookTag;
 
 	// Effect
+	FGameplayTag GameplayEffect_CooldownTag;
+	FGameplayTag GameplayEffect_AfterDodgeTag;
+	
 	FGameplayTag GameplayEffect_DamageTag;
 	FGameplayTag GameplayEffect_StiffnessTag;
-	FGameplayTag GameplayEffect_CooldownTag;
-	FGameplayTag GameplayEffect_StaminaConsumeTag;
-	FGameplayTag GameplayEffect_AfterDodgeTag;
+	FGameplayTag GameplayEffect_HealthTag;
+	FGameplayTag GameplayEffect_StaminaTag;
 
 	// Event
 	FGameplayTag GameplayEvent_StaminaChargeTag;

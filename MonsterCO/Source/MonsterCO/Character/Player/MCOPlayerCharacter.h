@@ -72,7 +72,7 @@ public:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	
-	virtual void SetSpeed(EMCOCharacterSpeed CharacterSpeed) const override; 
+	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const override; 
 	virtual void ControlMoving(bool bToStop) override;
 	
 	virtual FVector GetInputDirection() const override;

@@ -15,8 +15,8 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
 	UpdateCooldownFragment(Cooldown);
-	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
-	UpdateStaminaFragment(Stamina);
+	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
+	UpdateAttributeFragment(Stamina);
 	
 	SetID(EMCOAbilityID::Jump, Data->ActivationTag);
 	
@@ -24,6 +24,7 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 
+	// This can be blocked by these tags
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
@@ -70,7 +71,7 @@ void UMCOGameplayAbility_Jump::EndAbility(const FGameplayAbilitySpecHandle Handl
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	ActivateStaminaChargeAbility();
+	StartStaminaChargeTimer();
 
 	
 	//if (ScopeLockCount > 0)

@@ -24,10 +24,10 @@ void AMCOPlayerState::InitializeAbilityDelegates()
     
     RegisterAttributeChangedDelegate(AttributeSet->GetHealthAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxHealthAttribute());
-    RegisterAttributeChangedDelegate(AttributeSet->GetStiffnessAttribute());
-    RegisterAttributeChangedDelegate(AttributeSet->GetMaxStiffnessAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetStaminaAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxStaminaAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetStiffnessAttribute());
+    RegisterAttributeChangedDelegate(AttributeSet->GetMaxStiffnessAttribute());
 
     AbilitySystemComponent->RegisterGameplayTagEvent(FMCOCharacterTags::Get().StunTag).AddUObject(this, &ThisClass::StunTagChanged);
 }
@@ -66,7 +66,7 @@ void AMCOPlayerState::RegisterAttributeChangedDelegate(const FGameplayAttribute&
 
 void AMCOPlayerState::OnAttributeChanged(const FOnAttributeChangeData& Data)
 {
-    //MCOPRINT(TEXT("%s is changed! : %f"), *Data.Attribute.GetName(), Data.NewValue);
+    MCOPRINT(TEXT("Attribute changed : [%s] -> [%f]"), *Data.Attribute.GetName(), Data.NewValue);
     
     FName CurName = *Data.Attribute.GetName();
     ISTRUE(true == OnAttributeChangedDelegate.Contains(CurName));

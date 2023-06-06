@@ -6,7 +6,7 @@
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Stamina.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOHUDInterface.h"
@@ -17,8 +17,8 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	// Effect 
 	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
-	GETCLASS(InstantStaminaEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Stamina_Instant.GE_Stamina_Instant_C"));
-	GETCLASS(InfiniteStaminaEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Stamina_Infinite.GE_Stamina_Infinite_C"));
+	GETCLASS(InstantAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Instant.GE_Attribute_Instant_C"));
+	GETCLASS(InfiniteAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -69,9 +69,9 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 	
 	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE_F(CharacterInterface);
-	if (nullptr != StaminaFragment)
+	if (nullptr != AttributeFragment)
 	{
-		ISTRUE_F(CharacterInterface->CanActionWithStamina(StaminaFragment->StaminaUsage));
+		ISTRUE_F(CharacterInterface->CanActionWithStamina(AttributeFragment->GetStaminaAdditiveValue()));
 	}
 
 	return true;
@@ -81,7 +81,7 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	StopStaminaEffect();
+	StopAttributeEffect();
 }
 
 bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -120,7 +120,7 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
-	ApplyStaminaEffectByPolicy();
+	ApplyAttributeEffect(Handle, ActorInfo, ActivationInfo);
 
 	return true;
 }
@@ -195,98 +195,93 @@ void UMCOGameplayAbility::StartCooldownWidget() const
 	HUDInterface->StartCooldownWidget(AbilityTag, CooldownFragment->CooldownTime);
 }
 
-void UMCOGameplayAbility::UpdateStaminaFragment(const UMCOActionFragment_Stamina* InStaminaFragment)
+void UMCOGameplayAbility::UpdateAttributeFragment(const UMCOActionFragment_Attribute* InAttributeFragment)
 {
-	StaminaFragment = InStaminaFragment;
+	AttributeFragment = InAttributeFragment;
 }
 
-void UMCOGameplayAbility::ApplyStaminaEffectByPolicy()
+void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	ISTRUE(nullptr != StaminaFragment);
-	
-	if (StaminaFragment->StaminaConsumptionPolicy == EMCOStaminaConsumptionPolicy::Instant)
-	{
-		ApplyStaminaEffect(InstantStaminaEffectClass, CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
-	}
-	else if (StaminaFragment->StaminaConsumptionPolicy == EMCOStaminaConsumptionPolicy::Infinite)
-	{
-		ApplyStaminaEffect(InfiniteStaminaEffectClass, CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
-	}	
-}
-
-void UMCOGameplayAbility::ApplyStaminaEffect(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	ISTRUE(nullptr != StaminaFragment);
-	ISTRUE(nullptr != GameplayEffectClass);
-	ISTRUE(true == StaminaFragment->CanConsumeStamina());
-
-	MCOLOG(TEXT("Consume Stamina : %f"), StaminaFragment->StaminaUsage);
+	ISTRUE(nullptr != AttributeFragment);
+	ISTRUE(nullptr != InstantAttributeEffectClass);
+	ISTRUE(nullptr != InfiniteAttributeEffectClass);
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
-		
-	const FGameplayEffectSpecHandle HandleForStamina = MakeOutgoingGameplayEffectSpec(GameplayEffectClass);
-	ISTRUE(true == HandleForStamina.IsValid());
 	
-	HandleForStamina.Data->SetSetByCallerMagnitude(
-		FMCOCharacterTags::Get().GameplayEffect_StaminaConsumeTag,
-		-StaminaFragment->StaminaUsage
+	const FGameplayEffectSpecHandle NewInstantHandle = MakeOutgoingGameplayEffectSpec(InstantAttributeEffectClass);
+	ISTRUE(true == NewInstantHandle.IsValid());
+	
+	const FGameplayEffectSpecHandle NewInfiniteHandle = MakeOutgoingGameplayEffectSpec(InfiniteAttributeEffectClass);
+	ISTRUE(true == NewInfiniteHandle.IsValid());
+
+	AttributeFragment->ApplyAttributeAdditiveValue(
+		NewInstantHandle, NewInfiniteHandle,
+		FMCOCharacterTags::Get().GameplayEffect_HealthTag
 	);
 
-	FGameplayTagContainer Tags;
-	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaConsumeTag);
-	HandleForStamina.Data->DynamicGrantedTags = Tags;
-	
-	const FActiveGameplayEffectHandle ActiveEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(
-		*HandleForStamina.Data.Get(),
-		ASC->GetPredictionKeyForNewAction()
+	AttributeFragment->ApplyAttributeAdditiveValue(
+		NewInstantHandle, NewInfiniteHandle,
+		FMCOCharacterTags::Get().GameplayEffect_StaminaTag
 	);
+	
+	AttributeFragment->ApplyAttributeAdditiveValue(
+		NewInstantHandle, NewInfiniteHandle,
+		FMCOCharacterTags::Get().GameplayEffect_StiffnessTag
+	);
+
+
+	if (NewInstantHandle.Data->DynamicGrantedTags.Num() > 0)
+	{
+		ASC->ApplyGameplayEffectSpecToSelf(
+			*NewInstantHandle.Data.Get(),
+			ASC->GetPredictionKeyForNewAction()
+		);
+	}
+	if (NewInfiniteHandle.Data->DynamicGrantedTags.Num() > 0)
+	{
+		ASC->ApplyGameplayEffectSpecToSelf(
+			*NewInfiniteHandle.Data.Get(),
+			ASC->GetPredictionKeyForNewAction()
+		);
+	}
 }
 
-void UMCOGameplayAbility::StopStaminaEffect()
+void UMCOGameplayAbility::StopAttributeEffect()
 {
-	ISTRUE(nullptr != StaminaFragment);
-	ISTRUE(true == StaminaFragment->CanConsumeStamina());
+	ISTRUE(nullptr != AttributeFragment);
 		
 	FGameplayTagContainer Tags;
-	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaConsumeTag);
+	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_HealthTag);
+	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag);
+	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
+	
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags 
 }
 
-void UMCOGameplayAbility::ActivateStaminaChargeAbility()
+void UMCOGameplayAbility::StartStaminaChargeTimer()
 {
-	ISTRUE(nullptr != StaminaFragment);
-	ISTRUE(true == StaminaFragment->CanConsumeStamina());
-	MCOLOG(TEXT("--------------------------Try Activate charge ability"));
+	ISTRUE(nullptr != AttributeFragment);
+	ISTRUE(0.0f != AttributeFragment->GetStaminaAdditiveValue());
 
-	if (0.0f < StaminaFragment->ChargingDelay)
+	if (0.0f < StaminaChargeDelay && GetWorld()->GetTimerManager().GetTimerRemaining(StaminaChargeDelayTimer) <= 0.0f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
-			StaminaChargingDelayTimer,
+			StaminaChargeDelayTimer,
 			this,
-			&ThisClass::HandleStaminaChargeEvent,
-			StaminaFragment->ChargingDelay,
+			&ThisClass::ActivateStaminaChargeAbility,
+			StaminaChargeDelay,
 			false
 		);
 		return;
 	}
 	
-	HandleStaminaChargeEvent();
+	ActivateStaminaChargeAbility();
 }
 
-void UMCOGameplayAbility::HandleStaminaChargeEvent()
+void UMCOGameplayAbility::ActivateStaminaChargeAbility()
 {
-	FGameplayEventData Payload;
-	Payload.EventTag       = FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag;
-	Payload.Instigator     = CurrentActorInfo->AvatarActor.Get();
-	Payload.Target         = CurrentActorInfo->AvatarActor.Get();
-	// Payload.OptionalObject = EffectSpec.Def;
-	// Payload.ContextHandle  = EffectSpec.GetEffectContext();
-	// Payload.InstigatorTags = *EffectSpec.CapturedSourceTags.GetAggregatedTags();
-	// Payload.TargetTags     = *EffectSpec.CapturedTargetTags.GetAggregatedTags();
-	// Payload.EventMagnitude = Magnitude;
-
-	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
+	HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag);
 }
 
 void UMCOGameplayAbility::CancelAllAbility()
@@ -299,6 +294,21 @@ void UMCOGameplayAbility::CancelAllAbility()
 
 	// Cancel all abilities and block others from starting.
 	ASC->CancelAbilities(nullptr, &AbilityTypesToIgnore, this);
+}
+
+void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag       = InTag; //FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag;
+	Payload.Instigator     = CurrentActorInfo->AvatarActor.Get();
+	Payload.Target         = CurrentActorInfo->AvatarActor.Get();
+	// Payload.OptionalObject = EffectSpec.Def;
+	// Payload.ContextHandle  = EffectSpec.GetEffectContext();
+	// Payload.InstigatorTags = *EffectSpec.CapturedSourceTags.GetAggregatedTags();
+	// Payload.TargetTags     = *EffectSpec.CapturedTargetTags.GetAggregatedTags();
+	// Payload.EventMagnitude = Magnitude;
+
+	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
 }
 
 void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, const FName& SectionName)

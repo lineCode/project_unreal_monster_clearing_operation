@@ -3,7 +3,7 @@
 #include "MCOActionFragment_Cooldown.h"
 #include "MCOActionFragment_Damage.h"
 #include "MCOActionFragment_Montage.h"
-#include "MCOActionFragment_Stamina.h"
+#include "MCOActionFragment_Attribute.h"
 #include "MCOActionFragment_Timer.h"
 
 
@@ -32,9 +32,9 @@ const UMCOActionFragment_Timer* UMCOActionDefinition::GetTimerFragment() const
 	return Cast<UMCOActionFragment_Timer>(FindFragmentByClass(UMCOActionFragment_Timer::StaticClass()));
 }
 
-const UMCOActionFragment_Stamina* UMCOActionDefinition::GetStaminaFragment() const
+const UMCOActionFragment_Attribute* UMCOActionDefinition::GetAttributeFragment() const
 {
-	return Cast<UMCOActionFragment_Stamina>(FindFragmentByClass(UMCOActionFragment_Stamina::StaticClass()));
+	return Cast<UMCOActionFragment_Attribute>(FindFragmentByClass(UMCOActionFragment_Attribute::StaticClass()));
 }
 
 const UMCOActionFragment* UMCOActionDefinition::FindFragmentByClass(TSubclassOf<UMCOActionFragment> FragmentClass) const

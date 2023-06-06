@@ -15,10 +15,8 @@ UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
 	UpdateCooldownFragment(Fragment);
-	const UMCOActionFragment_Stamina* Stamina = Data->ActionDefinition->GetStaminaFragment();
-	UpdateStaminaFragment(Stamina);
-	
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag);
+	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
+	UpdateAttributeFragment(Stamina);
 }
 
 bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const

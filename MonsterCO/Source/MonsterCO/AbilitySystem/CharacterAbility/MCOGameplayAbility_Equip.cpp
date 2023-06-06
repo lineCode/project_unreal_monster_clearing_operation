@@ -11,12 +11,16 @@ UMCOGameplayAbility_Equip::UMCOGameplayAbility_Equip()
 	GETASSET(MontageOnUnequip, UAnimMontage, TEXT("/Game/Player/Animations/Montages/GreatSword_Unequip_Montage.GreatSword_Unequip_Montage"));
 	
 	SetID(EMCOAbilityID::Equip, FMCOCharacterTags::Get().EquipTag);
-	
+
+	// This can be blocked by these tags
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
-
+	
+	// Cancel these 
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+	
 	bIsToEquip = true;
 }
 
@@ -45,6 +49,13 @@ void UMCOGameplayAbility_Equip::ActivateAbility(const FGameplayAbilitySpecHandle
 	
 	CharacterInterface->ControlMoving(true);
 	PlayerInterface->SwitchEquipUnequip();
+}
+
+void UMCOGameplayAbility_Equip::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	
+	StartStaminaChargeTimer();
 }
 
 void UMCOGameplayAbility_Equip::OnTaskCompleted()

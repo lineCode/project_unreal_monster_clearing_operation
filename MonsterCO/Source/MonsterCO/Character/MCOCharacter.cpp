@@ -101,12 +101,22 @@ void AMCOCharacter::Initialize()
 
 bool AMCOCharacter::IsAlive() const
 {
-	return GetHealth() > 0.0f;
+	return 0.0f < GetHealth();
 }
 
-bool AMCOCharacter::CanActionWithStamina(const float& InStaminaUsage) const
+bool AMCOCharacter::CanActionWithStamina(const float& InAdditiveStamina) const
 {
-	return InStaminaUsage <= GetStamina();
+	return -InAdditiveStamina <= GetStamina();
+}
+
+bool AMCOCharacter::CanChargeStamina() const
+{
+	ISTRUE_F(true == IsAlive());
+	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
+	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
+	ISTRUE_F(GetStamina() < GetMaxStamina());
+
+	return true;
 }
 
 FVector AMCOCharacter::GetSocketLocation(const FName& InSocketName)
