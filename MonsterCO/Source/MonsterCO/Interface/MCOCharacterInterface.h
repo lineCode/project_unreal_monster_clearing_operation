@@ -37,7 +37,7 @@ public:
 	virtual bool CanChargeStamina() const = 0;
 	virtual void OffAllCollision() = 0;
 	virtual bool CanAttack() const = 0;
-	virtual void ControlMoving(bool InToStop) = 0;
+	virtual void StopCharacter(bool InToStop) = 0;
 	virtual float GetCapsuleRadius() const = 0;
 
 // --- Damaged

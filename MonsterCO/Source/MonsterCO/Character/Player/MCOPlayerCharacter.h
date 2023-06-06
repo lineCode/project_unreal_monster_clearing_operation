@@ -73,7 +73,7 @@ public:
 	void Look(const FInputActionValue& Value);
 	
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const override; 
-	virtual void ControlMoving(bool bToStop) override;
+	virtual void StopCharacter(bool bToStop) override;
 	
 	virtual FVector GetInputDirection() const override;
 	virtual bool IsDashForward() const override;

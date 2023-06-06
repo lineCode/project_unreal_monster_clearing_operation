@@ -259,26 +259,6 @@ void UMCOGameplayAbility::StopAttributeEffect()
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags 
 }
 
-void UMCOGameplayAbility::StartStaminaChargeTimer()
-{
-	ISTRUE(nullptr != AttributeFragment);
-	ISTRUE(0.0f != AttributeFragment->GetStaminaAdditiveValue());
-
-	if (0.0f < StaminaChargeDelay && GetWorld()->GetTimerManager().GetTimerRemaining(StaminaChargeDelayTimer) <= 0.0f)
-	{
-		GetWorld()->GetTimerManager().SetTimer(
-			StaminaChargeDelayTimer,
-			this,
-			&ThisClass::ActivateStaminaChargeAbility,
-			StaminaChargeDelay,
-			false
-		);
-		return;
-	}
-	
-	ActivateStaminaChargeAbility();
-}
-
 void UMCOGameplayAbility::ActivateStaminaChargeAbility()
 {
 	HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag);
@@ -309,6 +289,13 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 	// Payload.EventMagnitude = Magnitude;
 
 	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
+}
+
+void UMCOGameplayAbility::MakeCharacterMove() const
+{
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE(CharacterInterface);
+	CharacterInterface->StopCharacter(false);
 }
 
 void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, const FName& SectionName)

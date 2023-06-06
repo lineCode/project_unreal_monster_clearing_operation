@@ -47,31 +47,14 @@ void UMCOGameplayAbility_Equip::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	StartActivationWithMontage(PlayerInterface->IsEquipped() ? MontageOnUnequip : MontageOnEquip);
 	
-	CharacterInterface->ControlMoving(true);
+	CharacterInterface->StopCharacter(true);
 	PlayerInterface->SwitchEquipUnequip();
 }
 
 void UMCOGameplayAbility_Equip::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-	
-	StartStaminaChargeTimer();
-}
 
-void UMCOGameplayAbility_Equip::OnTaskCompleted()
-{
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
-	CharacterInterface->ControlMoving(false);
-	
-	Super::OnTaskCompleted();
-}
-
-void UMCOGameplayAbility_Equip::OnTaskCancelled()
-{
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
-	CharacterInterface->ControlMoving(false);
-	
-	Super::OnTaskCancelled();
+	MakeCharacterMove();
+	ActivateStaminaChargeAbility();
 }

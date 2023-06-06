@@ -40,7 +40,7 @@ void UMCOGameplayAbility_Damaged::EndAbility(const FGameplayAbilitySpecHandle Ha
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
-	StartStaminaChargeTimer();
+	ActivateStaminaChargeAbility();
 }
 
 void UMCOGameplayAbility_Damaged::OnTaskCompleted()

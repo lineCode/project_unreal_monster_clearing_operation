@@ -94,5 +94,5 @@ void UMCOGameplayAbility_Dodge::OnTaskFinished()
 		// ApplyGameplayEffectSpecToOwner(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, HandleForDash);
 	}
 
-	StartStaminaChargeTimer();
+	ActivateStaminaChargeAbility();
 }

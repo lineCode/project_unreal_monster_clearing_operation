@@ -5,7 +5,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
-
+#include "Interface/MCOCharacterInterface.h"
 
 
 UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
@@ -47,6 +47,10 @@ void UMCOGameplayAbility_Jump::ActivateAbility(const FGameplayAbilitySpecHandle 
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
+	ISTRUE(CharacterInterface);
+	CharacterInterface->StopCharacter(true);
+	
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->Jump();
 }
@@ -55,32 +59,35 @@ void UMCOGameplayAbility_Jump::InputReleased(const FGameplayAbilitySpecHandle Ha
 {
 	ISTRUE(ActorInfo != nullptr);
 	ISTRUE(ActorInfo->AvatarActor != nullptr);
-
-	EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-}
-
-void UMCOGameplayAbility_Jump::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
-{
-	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
-
+	
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->StopJumping();
+	
+	if (0.0f < AbilityEndDelay && GetWorld()->GetTimerManager().GetTimerRemaining(AbilityEndDelayTimer) <= 0.0f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			AbilityEndDelayTimer,
+			this,
+			&ThisClass::EndAbilityAfterDelay,
+			AbilityEndDelay,
+			false
+		);
+		return;
+	}
+	
+	EndAbilityAfterDelay();
 }
 
 void UMCOGameplayAbility_Jump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+		
+	ActivateStaminaChargeAbility();
+	MakeCharacterMove();
+}
 
-	StartStaminaChargeTimer();
-
-	
-	//if (ScopeLockCount > 0)
-	//{
-	//	WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &UGDGA_CharacterJump::CancelAbility, Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility));
-	//	return;
-	//}
-
-	// ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-	// Character->StopJumping();
+void UMCOGameplayAbility_Jump::EndAbilityAfterDelay()
+{	
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
 

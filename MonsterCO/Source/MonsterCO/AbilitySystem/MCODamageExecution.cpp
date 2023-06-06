@@ -6,14 +6,18 @@
 
 struct FDamageStatics
 {
-	FGameplayEffectAttributeCaptureDefinition AdditiveDamageDef;
+	FGameplayEffectAttributeCaptureDefinition AdditiveHealthDef;
+	FGameplayEffectAttributeCaptureDefinition AdditiveStaminaDef;
 	FGameplayEffectAttributeCaptureDefinition AdditiveStiffnessDef;
+	FGameplayEffectAttributeCaptureDefinition AdditiveDamageDef;
 
 	FDamageStatics()
 	{
 		// Capture optional Damage set on the damage GE as a Calculation Modifier under the ExecutionCalculation
-		AdditiveDamageDef = FGameplayEffectAttributeCaptureDefinition(UMCOAttributeSet::GetAdditiveDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		AdditiveHealthDef = FGameplayEffectAttributeCaptureDefinition(UMCOAttributeSet::GetAdditiveHealthAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		AdditiveStaminaDef = FGameplayEffectAttributeCaptureDefinition(UMCOAttributeSet::GetAdditiveStaminaAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 		AdditiveStiffnessDef = FGameplayEffectAttributeCaptureDefinition(UMCOAttributeSet::GetAdditiveStiffnessAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
+		AdditiveDamageDef = FGameplayEffectAttributeCaptureDefinition(UMCOAttributeSet::GetAdditiveDamageAttribute(), EGameplayEffectAttributeCaptureSource::Source, true);
 	}
 };
 
@@ -25,8 +29,10 @@ static const FDamageStatics& DamageStatics()
 
 UMCODamageExecution::UMCODamageExecution()
 {
-	RelevantAttributesToCapture.Add(DamageStatics().AdditiveDamageDef);
+	RelevantAttributesToCapture.Add(DamageStatics().AdditiveHealthDef);
+	RelevantAttributesToCapture.Add(DamageStatics().AdditiveStaminaDef);
 	RelevantAttributesToCapture.Add(DamageStatics().AdditiveStiffnessDef);
+	RelevantAttributesToCapture.Add(DamageStatics().AdditiveDamageDef);
 }
 
 // calculate damage and modify health 
@@ -56,24 +62,39 @@ void UMCODamageExecution::Execute_Implementation(
 	// Add SetByCaller damage if it exists
 	AdditiveDamage += Spec.GetSetByCallerMagnitude(FMCOCharacterTags::Get().GameplayEffect_DamageTag, false, 0.0f);
 	
+	float AdditiveHealth = 0.0f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AdditiveHealthDef, EvaluationParameters, AdditiveHealth);
+	AdditiveHealth = Spec.GetSetByCallerMagnitude(FMCOCharacterTags::Get().GameplayEffect_HealthTag, false, 0.0f);
+
+	float AdditiveStamina = 0.0f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AdditiveStaminaDef, EvaluationParameters, AdditiveStamina);
+	AdditiveStamina = Spec.GetSetByCallerMagnitude(FMCOCharacterTags::Get().GameplayEffect_StaminaTag, false, 0.0f);
+
 	float AdditiveStiffness = 0.0f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AdditiveStiffnessDef, EvaluationParameters, AdditiveStiffness);
 	AdditiveStiffness = Spec.GetSetByCallerMagnitude(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag, false, 0.0f);
 
-	UMCOAbilitySystemComponent* TargetMCOASC = Cast<UMCOAbilitySystemComponent>(TargetASC);
-	UMCOAbilitySystemComponent* SourceMCOASC = Cast<UMCOAbilitySystemComponent>(SourceASC);
-	ISTRUE(nullptr != TargetASC);
-	ISTRUE(nullptr != SourceMCOASC);
-
-	// Check Dodge
-	if (true == TargetASC->HasMatchingGameplayTag(FMCOCharacterTags::Get().DodgeTag))
-	{
-		MCOPRINT(TEXT("Escaped attack by dodging"));
-		return;
-	}
 	
-	// Broadcast damages to Target ASC
-	TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveDamage, TargetMCOASC->AttributeSet->GetStiffness() + AdditiveStiffness);
+	// Check Dodge
+	if (AdditiveDamage < 0.0f)
+	{		
+		if (true == TargetASC->HasMatchingGameplayTag(FMCOCharacterTags::Get().DodgeTag))
+		{
+			MCOPRINT(TEXT("Escaped attack by dodging"));
+			return;
+		}
+	}
+
+	if (0.0f < AdditiveStiffness)
+	{
+		UMCOAbilitySystemComponent* TargetMCOASC = Cast<UMCOAbilitySystemComponent>(TargetASC);
+		UMCOAbilitySystemComponent* SourceMCOASC = Cast<UMCOAbilitySystemComponent>(SourceASC);
+		ISTRUE(nullptr != TargetASC);
+		ISTRUE(nullptr != SourceMCOASC);
+		
+		// Broadcast damages to Target ASC
+		TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveDamage, TargetMCOASC->AttributeSet->GetStiffness() + AdditiveStiffness);
+	}
 	
 	if (AdditiveDamage != 0.0f)
 	{
@@ -83,6 +104,26 @@ void UMCODamageExecution::Execute_Implementation(
 				UMCOAttributeSet::GetAdditiveDamageAttribute(), 
 				EGameplayModOp::Additive, 
 				AdditiveDamage
+			)
+		);
+	}
+	if (AdditiveHealth != 0.0f)
+	{
+		OutExecutionOutput.AddOutputModifier(
+			FGameplayModifierEvaluatedData(
+				UMCOAttributeSet::GetAdditiveHealthAttribute(), 
+				EGameplayModOp::Additive, 
+				AdditiveHealth
+			)
+		);
+	}
+	if (AdditiveStamina != 0.0f)
+	{
+		OutExecutionOutput.AddOutputModifier(
+			FGameplayModifierEvaluatedData(
+				UMCOAttributeSet::GetAdditiveStaminaAttribute(), 
+				EGameplayModOp::Additive, 
+				AdditiveStamina
 			)
 		);
 	}
@@ -96,4 +137,6 @@ void UMCODamageExecution::Execute_Implementation(
 			)
 		);
 	}
+
+	
 }

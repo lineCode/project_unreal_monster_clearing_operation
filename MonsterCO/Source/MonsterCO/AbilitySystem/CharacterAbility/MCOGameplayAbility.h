@@ -33,6 +33,7 @@ public:
 	bool SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
 	void CancelAllAbility();
 	void HandleGameplayEventWithTag(const FGameplayTag& InTag);
+	void MakeCharacterMove() const;
 	
 // --- Getter
 protected:
@@ -81,16 +82,14 @@ private:
 	
 // --- Stamina charge
 protected:
-	void StartStaminaChargeTimer();
-
-private:
 	void ActivateStaminaChargeAbility();
 
+// --- Ability end delay
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Stamina")
-	float StaminaChargeDelay; 
+	float AbilityEndDelay; 
 	
-	FTimerHandle StaminaChargeDelayTimer;
+	FTimerHandle AbilityEndDelayTimer;
 	
 	
 // --- Setting

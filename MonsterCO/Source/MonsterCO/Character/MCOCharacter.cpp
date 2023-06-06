@@ -296,7 +296,7 @@ void AMCOCharacter::FinishDying()
 	AbilitySystemComponent = nullptr;
 }
 
-void AMCOCharacter::ControlMoving(bool bToStop)
+void AMCOCharacter::StopCharacter(bool bToStop)
 {
 	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	ISTRUE(CharacterMC);

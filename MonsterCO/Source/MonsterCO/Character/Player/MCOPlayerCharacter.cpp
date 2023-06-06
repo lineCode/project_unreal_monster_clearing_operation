@@ -306,7 +306,7 @@ void AMCOPlayerCharacter::SetSpeed(const EMCOCharacterSpeed& InSpeed) const
 	GetCharacterMovement()->MinAnalogWalkSpeed = CharacterControlData->WalkSpeeds[InSpeed];
 }
 
-void AMCOPlayerCharacter::ControlMoving(bool bToStop)
+void AMCOPlayerCharacter::StopCharacter(bool bToStop)
 {
 	bGetInput = bToStop == false;
 }

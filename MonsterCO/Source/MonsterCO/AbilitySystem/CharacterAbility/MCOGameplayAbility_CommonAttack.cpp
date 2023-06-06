@@ -29,7 +29,7 @@ void UMCOGameplayAbility_CommonAttack::EndAbility(const FGameplayAbilitySpecHand
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
-	StartStaminaChargeTimer();
+	ActivateStaminaChargeAbility();
 }
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
@@ -119,7 +119,7 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAtt
 	ISTRUE(nullptr != AttackedASC);
 
 	// Show Monster Widgets
-	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->OwnerActor.Get());
+	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
 	if (nullptr != HUDInterface && nullptr != CharacterInterface)
 	{

@@ -72,6 +72,6 @@ void UMCOGameplayAbility_Dash::EndAbility(const FGameplayAbilitySpecHandle Handl
 	ISTRUE(PlayerInterface);
 	PlayerInterface->SetSpeed(EMCOCharacterSpeed::Normal);
 	
-	StartStaminaChargeTimer();
+	ActivateStaminaChargeAbility();
 
 }

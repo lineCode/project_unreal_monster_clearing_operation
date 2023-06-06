@@ -27,7 +27,4 @@ public:
 // --- Stamina
 public:
 	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) = 0;
-	// virtual void OnStaminaChanged() = 0;
-	// virtual void StartStaminaWidget(const EMCOStaminaConsumptionPolicy& InConsumptionPolicy, const float& InAdditiveValue) const = 0;
-	// virtual void StopStaminaWidget() const = 0;
 };

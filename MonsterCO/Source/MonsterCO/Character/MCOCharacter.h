@@ -149,7 +149,7 @@ protected:
 
 // --- Stop
 public:
-	virtual void ControlMoving(bool bToStop) override;
+	virtual void StopCharacter(bool bToStop) override;
 	
 // --- Item
 public:
