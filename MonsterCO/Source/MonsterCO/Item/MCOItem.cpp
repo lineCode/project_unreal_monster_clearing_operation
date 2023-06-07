@@ -8,12 +8,10 @@
 
 AMCOItem::AMCOItem()
 {
-	GETASSET(Data, UMCOItemData_Potion, TEXT("/Game/Data/Item/DA_Item_Potion_Small.DA_Item_Potion_Small"));
 	GETASSET(PickupMontage, UAnimMontage, TEXT("/Game/Items/Egg/Montages/Realistic_EggCracking_Montage.Realistic_EggCracking_Montage"));
 	
 	Trigger = CreateDefaultSubobject<UBoxComponent>(TEXT("NAME_TriggerBox"));
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("NAME_SkeletalMesh"));
-	SkeletalMesh->SetSkeletalMesh(Data->SkeletalMesh);
 	
 	SetRootComponent(Trigger);
 	SkeletalMesh->SetupAttachment(Trigger);
@@ -45,8 +43,6 @@ void AMCOItem::PostInitializeComponents()
 	TArray<FPrimaryAssetId> Assets;
 	Manager.GetPrimaryAssetIdList(ITEMDATA_NAME, Assets);
 	ensure(0 < Assets.Num());
-
-	MCOPRINT(TEXT("%d"), Assets.Num());
 	
 	const int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
 	
@@ -58,8 +54,20 @@ void AMCOItem::PostInitializeComponents()
 
 	Data = Cast<UMCOItemData>(AssetPtr.Get());
 
+	// Set skeletal mesh 
+	if (Data->SkeletalMesh.IsPending())
+	{
+		Data->SkeletalMesh.LoadSynchronous();
+	}
+	SkeletalMesh->SetSkeletalMesh(Data->SkeletalMesh.Get());
+
+	
 	// Set material
-	SkeletalMesh->SetMaterial(0, Data->Material);
+	if (Data->Material.IsPending())
+	{
+		Data->Material.LoadSynchronous();
+	}
+	SkeletalMesh->SetMaterial(0, Data->Material.Get());
 	
 	ensure(nullptr != Data);
 }
@@ -101,5 +109,5 @@ void AMCOItem::OnPickupFinished(UAnimMontage* Montage, bool bInterrupted)
 	}
 	
 	SetActorHiddenInGame(true);
-	Destroy();
+	//Destroy();
 }

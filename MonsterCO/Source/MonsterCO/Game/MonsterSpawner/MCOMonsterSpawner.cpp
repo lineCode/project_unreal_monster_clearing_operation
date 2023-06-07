@@ -72,17 +72,5 @@ void AMCOMonsterSpawner::OnItemDestroyed()
 {
 	//SetState(EStageState::NEXT);
 	
-	GetWorld()->GetTimerManager().SetTimer(
-		Timer,
-		this,
-		&ThisClass::Tester,
-		5.0f,
-		false
-	);
 	
-}
-
-void AMCOMonsterSpawner::Tester()
-{
-	MCOPRINT(TEXT("%d"), Items.Num());
 }

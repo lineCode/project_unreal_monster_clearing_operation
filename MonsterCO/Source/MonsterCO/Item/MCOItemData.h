@@ -21,8 +21,8 @@ public:
 	EMCOItemType Type;
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<USkeletalMesh> SkeletalMesh;
+	TSoftObjectPtr<USkeletalMesh> SkeletalMesh;
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInstance> Material;
+	TSoftObjectPtr<UMaterialInstance> Material;
 };
