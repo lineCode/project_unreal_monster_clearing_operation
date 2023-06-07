@@ -32,7 +32,7 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 	
 	CancelAllAbility();
 	// CharacterInterface->OffAllCollision();
-	CharacterInterface->OnDamagedBegin.ExecuteIfBound();
+	CharacterInterface->StopCharacter(true);
 	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().AttackedDegree));
 }
 
@@ -47,7 +47,7 @@ void UMCOGameplayAbility_Damaged::OnTaskCompleted()
 {
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(CharacterInterface);
-	CharacterInterface->OnDamagedEnd.ExecuteIfBound();
+	CharacterInterface->StopCharacter(false);
 	
 	Super::OnTaskCompleted();
 }
@@ -56,7 +56,7 @@ void UMCOGameplayAbility_Damaged::OnTaskCancelled()
 {
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ensure(CharacterInterface);
-	CharacterInterface->OnDamagedEnd.ExecuteIfBound();
+	CharacterInterface->StopCharacter(false);
 	
 	Super::OnTaskCancelled();
 }

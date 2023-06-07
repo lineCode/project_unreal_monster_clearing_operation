@@ -29,7 +29,9 @@ class MONSTERCO_API UMCOActionFragment_Attribute : public UMCOActionFragment
 	GENERATED_BODY()
 		
 public:
+	float GetHealthAdditiveValue() const;
 	float GetStaminaAdditiveValue() const;
+	float GetStiffnessAdditiveValue() const;
 	bool CanApply(const FGameplayTag& InTag) const;
 	bool ApplyAttributeAdditiveValue(const FGameplayEffectSpecHandle& InInstantHandle,const FGameplayEffectSpecHandle& InInfiniteHandle, const FGameplayTag& InTag) const;
 	

@@ -9,10 +9,10 @@
 #include "UI/MCOAttributeWidget.h"
 #include "MCOPlayerState.h"
 #include "Item/MCOItemData.h"
+#include "Item/MCOItemData_Potion.h"
 
 
-AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) 
-	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// PrimaryActorTick.bCanEverTick = true;
 	
@@ -218,12 +218,14 @@ float AMCOCharacter::GetCapsuleRadius() const
 
 void AMCOCharacter::Die()
 {
-	MCOLOG(TEXT("%s : Die"), *CharacterName.ToString());
+	MCOLOG(TEXT("%s : Died"), *CharacterName.ToString());
 
 	if (nullptr != Controller)
 	{
 		Controller->SetIgnoreMoveInput(true);
 	}
+
+	StopCharacter(true);
 
 	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
 	ensure(nullptr != CapsuleComp);
@@ -235,7 +237,7 @@ void AMCOCharacter::Die()
 	MovementComp->StopMovementImmediately();
 	MovementComp->DisableMovement();
 
-	OnCharacterDied.Broadcast(this);
+	
 	
 	// AbilitySetHandles.TakeFromAbilitySystem(GetMCOAbilitySystemComponent());
 	
@@ -266,6 +268,8 @@ void AMCOCharacter::Die()
 
 void AMCOCharacter::FinishDying()
 {
+	OnCharacterDeathFinished.Broadcast(this);
+	
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		DetachFromControllerPendingDestroy();
@@ -273,6 +277,7 @@ void AMCOCharacter::FinishDying()
 	}
 	
 	SetActorHiddenInGame(true);
+	DestroyAllAttachedActors();
 	
 	// Uninitialize the ASC if we're still the avatar actor
 	// (otherwise another pawn already did it when they became the avatar actor)
@@ -296,6 +301,17 @@ void AMCOCharacter::FinishDying()
 	AbilitySystemComponent = nullptr;
 }
 
+void AMCOCharacter::DestroyAllAttachedActors()
+{
+	TArray<AActor*> Actors;
+	GetAttachedActors(Actors);
+
+	for (AActor* Actor : Actors)
+	{
+		Actor->Destroy();
+	}
+}
+
 void AMCOCharacter::StopCharacter(bool bToStop)
 {
 	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
@@ -308,12 +324,20 @@ void AMCOCharacter::TakeItem(const UMCOItemData* InItemData)
 {
 	ensure(nullptr != InItemData);
 	TakeItemActions[InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+	
+	FGameplayEventData Payload;
+	Payload.EventTag       = FMCOCharacterTags::Get().GameplayEvent_TakeItemTag;
+	Payload.Instigator     = this;
+	Payload.Target         = this;
+	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
 }
 
 void AMCOCharacter::DrinkPotion(const UMCOItemData* InItemData)
 {
-	MCOPRINT(TEXT("Drink Potion"));
+	const UMCOItemData_Potion* PotionData = Cast<UMCOItemData_Potion>(InItemData); 
+	ensure(nullptr != PotionData);
 	
+	ItemAttributeFragment = PotionData->AttributeFragment;
 }
 
 void AMCOCharacter::EquipWeapon(const UMCOItemData* InItemData)
@@ -324,6 +348,16 @@ void AMCOCharacter::EquipWeapon(const UMCOItemData* InItemData)
 void AMCOCharacter::ReadScroll(const UMCOItemData* InItemData)
 {
 	MCOPRINT(TEXT("Read Scroll"));
+}
+
+UMCOActionFragment_Attribute* AMCOCharacter::GetItemAttributeFragment()
+{
+	return ItemAttributeFragment;
+}
+
+void AMCOCharacter::EndTakeItem()
+{
+	ItemAttributeFragment = nullptr;
 }
 
 void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget)
@@ -337,6 +371,8 @@ void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidg
 
 	InAttributeWidget->UpdateHealth(GetHealth());
 	InAttributeWidget->UpdateMaxHealth(GetMaxHealth());
+	InAttributeWidget->UpdateStamina(GetStamina());
+	InAttributeWidget->UpdateMaxStamina(GetMaxStamina());
 	InAttributeWidget->UpdateStiffness(GetStiffness());
 	InAttributeWidget->UpdateMaxStiffness(GetMaxStiffness());
 
@@ -355,6 +391,12 @@ void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidg
 	);
 	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetMaxHealthAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateMaxHealth
+	);
+	MCOPlayerState->BindAttributeChangedDelegate(
+		*AttributeSet->GetStaminaAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateStamina
+	);
+	MCOPlayerState->BindAttributeChangedDelegate(
+		*AttributeSet->GetMaxStaminaAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateMaxStamina
 	);
 	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetStiffnessAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateStiffness

@@ -44,8 +44,8 @@ void AMCOMonsterCharacter::BeginPlay()
 	
 	ModeComponent->SpawnAttachment(this);
 
-	OnDamagedBegin.BindUObject(this, &ThisClass::StopAI);
-	OnDamagedEnd.BindUObject(this, &ThisClass::ContinueAI);
+	// OnDamagedBegin.BindUObject(this, &ThisClass::StopAI);
+	// OnDamagedEnd.BindUObject(this, &ThisClass::ContinueAI);
 	
 	// Body = CreateDefaultSubobject<UCapsuleComponent>(TEXT("NAME_MonsterBody"));
 	// Body->SetCollisionProfileName(CPROFILE_MCOCAPSULE);
@@ -121,6 +121,18 @@ void AMCOMonsterCharacter::AttackByAI()
 	ISTRUE(nullptr != ASC);
 
 	ASC->TryActivateAbilityByTag(FMCOCharacterTags::Get().AttackTag);
+}
+
+void AMCOMonsterCharacter::StopCharacter(bool bToStop)
+{
+	if (true == bToStop)
+	{
+		StopAI();
+	}
+	else
+	{
+		ContinueAI();
+	}
 }
 
 void AMCOMonsterCharacter::ContinueAI()

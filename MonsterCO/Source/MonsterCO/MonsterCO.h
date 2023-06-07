@@ -11,8 +11,8 @@
 
 
 const int SLOT_MAX = 5;
-const float WIDGET_RATE = 0.05;
-
+const float WIDGET_RATE = 0.05f;
+#define ITEMDATA_NAME "MCOItemData"
 
 
 // --- Check

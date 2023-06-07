@@ -170,6 +170,14 @@ void UMCOAttributeSet::ClampAttribute(const FGameplayAttribute& Attribute, float
 	{
 		NewValue = FMath::Max(NewValue, 1.0f);
 	}
+	else if (Attribute == GetStiffnessAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.0f, (GetMaxStamina() != 0.0f ? GetMaxStamina() : 100.0f));
+	}
+	else if (Attribute == GetMaxStiffnessAttribute())
+	{
+		NewValue = FMath::Max(NewValue, 1.0f);
+	}
 }
 
 void UMCOAttributeSet::HandleEventWithTag(const FGameplayTag& InTag, const FGameplayEffectModCallbackData& Data) const

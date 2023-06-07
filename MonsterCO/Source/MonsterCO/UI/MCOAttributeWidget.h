@@ -22,6 +22,12 @@ public:
 	void UpdateMaxHealth(float InValue);
 	
 	UFUNCTION()
+	void UpdateStamina(float InValue);
+	
+	UFUNCTION()
+	void UpdateMaxStamina(float InValue);
+	
+	UFUNCTION()
 	void UpdateStiffness(float InValue);
 	
 	UFUNCTION()
@@ -33,6 +39,12 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UTextBlock> MaxHealthText;
+	
+	UPROPERTY()
+	TObjectPtr<UTextBlock> StaminaText;
+	
+	UPROPERTY()
+	TObjectPtr<UTextBlock> MaxStaminaText;
 	
 	UPROPERTY()
 	TObjectPtr<UTextBlock> StiffnessText;

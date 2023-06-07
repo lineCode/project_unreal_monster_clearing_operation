@@ -37,6 +37,7 @@ protected:
 
 	virtual bool CanAttack() override;
 	virtual void AttackByAI() override;
+	virtual void StopCharacter(bool bToStop) override;
 
 protected:
 	void ContinueAI();

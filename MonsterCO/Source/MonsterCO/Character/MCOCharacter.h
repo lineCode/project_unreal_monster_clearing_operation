@@ -11,6 +11,7 @@
 #include "MCOCharacter.generated.h"
 
 
+class UMCOActionFragment_Attribute;
 class UMCOAbilitySystemComponent;
 class UMCOAttributeSet;
 class UMCOCharacterData;
@@ -33,7 +34,7 @@ struct FTakeItemDelegateWrapper
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedSignature, AMCOCharacter*, InCharacter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDiedSignature, const AMCOCharacter*, InCharacter);
 
 UCLASS()
 class MONSTERCO_API AMCOCharacter : public ACharacter,
@@ -141,7 +142,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MCO|Character")
 	virtual void FinishDying() override;
 
-	FCharacterDiedSignature OnCharacterDied;
+	void DestroyAllAttachedActors();
+
+	FCharacterDiedSignature OnCharacterDeathFinished;
 
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Animation")
@@ -157,9 +160,14 @@ public:
 	virtual void DrinkPotion(const UMCOItemData* InItemData);
 	virtual void EquipWeapon(const UMCOItemData* InItemData);
 	virtual void ReadScroll(const UMCOItemData* InItemData);
+	virtual UMCOActionFragment_Attribute* GetItemAttributeFragment() override;
+	virtual void EndTakeItem() override;
 	
 	UPROPERTY()
 	TMap<EMCOItemType, FTakeItemDelegateWrapper> TakeItemActions;
+	
+	UPROPERTY()
+	TObjectPtr<UMCOActionFragment_Attribute> ItemAttributeFragment;
 	
 // --- Widget
 public:

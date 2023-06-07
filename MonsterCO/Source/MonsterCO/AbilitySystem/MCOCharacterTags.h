@@ -24,6 +24,7 @@ public:
 	FGameplayTag GameplayEffect_StaminaTag;
 
 	// Event
+	FGameplayTag GameplayEvent_TakeItemTag;
 	FGameplayTag GameplayEvent_StaminaChargeTag;
 	FGameplayTag GameplayEvent_DamagedTag;
 	FGameplayTag GameplayEvent_DeadTag;
@@ -35,6 +36,7 @@ public:
 	FGameplayTag EffectRemoveOnDeathTag;
 
 	// Player ability
+	FGameplayTag TakeItem;
 	FGameplayTag ChargingTag;
 	FGameplayTag JumpTag;
 	FGameplayTag EquipTag;

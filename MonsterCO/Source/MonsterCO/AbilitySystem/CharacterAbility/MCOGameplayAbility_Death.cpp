@@ -2,6 +2,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
+#include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 
 
 UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
@@ -24,7 +25,7 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 	CharacterInterface->Die();
 	
 	CancelAllAbility();
-	StartActivationWithMontage(MontageToPlay);	
+	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().AttackedDegree));
 }
 
 void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

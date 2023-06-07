@@ -5,7 +5,12 @@
 #include "MCOItem.generated.h"
 
 class UBoxComponent;
-class UMCOItemData_Potion;
+class UMCOItemData;
+
+
+DECLARE_MULTICAST_DELEGATE(FMCOOnItemDestroyed);
+
+
 
 UCLASS()
 class MONSTERCO_API AMCOItem : public AActor
@@ -16,14 +21,21 @@ public:
 	AMCOItem();
 
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
 
+public:
+	float GetItemHalfHeight() const;
+	
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
 
 	UFUNCTION()
 	void OnPickupFinished(UAnimMontage* Montage, bool bInterrupted);
+
+public:
+	FMCOOnItemDestroyed OnItemDestroyed;
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = Box)
@@ -32,11 +44,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = Box)
 	TObjectPtr<UBoxComponent> Trigger;
 
-protected:
 	UPROPERTY(VisibleAnywhere, Category = Montage)
 	TObjectPtr<UAnimMontage> PickupMontage;
 
-protected:
 	UPROPERTY(EditAnywhere, Category = Data)
-	TObjectPtr<UMCOItemData_Potion> Data;
+	TObjectPtr<UMCOItemData> Data;
 };

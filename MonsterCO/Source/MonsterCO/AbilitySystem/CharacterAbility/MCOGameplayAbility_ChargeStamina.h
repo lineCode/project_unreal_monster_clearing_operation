@@ -11,6 +11,7 @@ UCLASS()
 class MONSTERCO_API UMCOGameplayAbility_ChargeStamina : public UMCOGameplayAbility
 {
 	GENERATED_BODY()
+	
 public:
 	UMCOGameplayAbility_ChargeStamina();
 
