@@ -164,36 +164,10 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAtt
 	// );
 }
 
-float UMCOGameplayAbility_CommonAttack::CalculateTargetDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& DestLocation, bool bLog) const
-{
-	const FVector Source = FVector(SourceLocation.X, SourceLocation.Y, 0.0f);
-	const FVector Dest = FVector(DestLocation.X, DestLocation.Y, 0.0f);
-	
-	const FVector ForwardVector = FVector(SourceForward.X, SourceForward.Y, 0.0f);
-	const FVector LookVector = (Dest - Source).GetSafeNormal();
-	
-	const float Dot = FVector::DotProduct(ForwardVector, LookVector);
-	const float Acos = FMath::Acos(Dot);
-	float Degree = FMath::RadiansToDegrees(Acos);
-
-	const FVector Cross = FVector::CrossProduct(ForwardVector, LookVector);
-	if (Cross.Z < 0.0f) // Left is minus
-	{
-		Degree = -Degree;
-	}
-
-	if (true == bLog)
-	{
-		MCOLOG(TEXT("Degree : %f"), Degree);
-	}
-	
-	return Degree;	
-}
-
-float UMCOGameplayAbility_CommonAttack::CalculateDamagedDegree(const FVector& TargetLocation, const FVector& TargetForward, const FVector& AttackDirection, bool bLog) const
+float UMCOGameplayAbility_CommonAttack::CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog) const
 {		
-	const FVector ForwardVector = FVector(TargetForward.X, TargetForward.Y, 0.0f);
-	const FVector LookVector = FVector(AttackDirection.X, AttackDirection.Y, 0.0f);
+	const FVector ForwardVector = FVector(SourceForward.X, SourceForward.Y, 0.0f);
+	const FVector LookVector = FVector(TargetDirection.X, TargetDirection.Y, 0.0f);
 	
 	const float Dot = FVector::DotProduct(ForwardVector, LookVector);
 	const float Acos = FMath::Acos(Dot);
@@ -207,28 +181,26 @@ float UMCOGameplayAbility_CommonAttack::CalculateDamagedDegree(const FVector& Ta
 
 	if (true == bLog)
 	{
-		MCOLOG(TEXT("Degree : %f"), Degree);
-	}
-
 #if ENABLE_DRAW_DEBUG
-	DrawDebugLine(
-		GetWorld(),
-		TargetLocation,
-		TargetLocation + ForwardVector * 1000.0f,
-		FColor::Red,
-		false,
-		2.0f
-	);
-	
-	DrawDebugLine(
-		GetWorld(),
-		TargetLocation,
-		TargetLocation + LookVector * 1000.0f,
-		FColor::Blue,
-		false,
-		2.0f
-	);
+		DrawDebugLine(
+			GetWorld(),
+			SourceLocation,
+			SourceLocation + ForwardVector * 1000.0f,
+			FColor::Red,
+			false,
+			2.0f
+		);
+		
+		DrawDebugLine(
+			GetWorld(),
+			SourceLocation,
+			SourceLocation + LookVector * 1000.0f,
+			FColor::Blue,
+			false,
+			2.0f
+		);
 #endif
+	}
 	
 	return Degree;
 }
@@ -238,66 +210,6 @@ void UMCOGameplayAbility_CommonAttack::SendDamagedDataToTarget(ACharacter* InAtt
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
 	ISTRUE(CharacterInterface);
 	CharacterInterface->SetDamagedData(CurrentDamagedData);
-}
-
-FVector UMCOGameplayAbility_CommonAttack::GetDirectionVector(const EMCOCharacterDirection& InAttackDirection, ACharacter* InCharacter) const
-{
-	FVector Direction;
-	if (nullptr == InCharacter)
-	{
-		return Direction;
-	}
-	
-	switch (InAttackDirection)
-	{
-	case EMCOCharacterDirection::Front:
-	{
-		Direction = InCharacter->GetActorForwardVector();
-	}
-	break;
-	case EMCOCharacterDirection::Back:
-	{
-		Direction = -InCharacter->GetActorForwardVector();
-	}
-	break;
-	case EMCOCharacterDirection::Right:
-	{
-		Direction = InCharacter->GetActorRightVector();
-	}
-	break;
-	case EMCOCharacterDirection::Left:
-	{
-		Direction = -InCharacter->GetActorRightVector();
-	}
-	break;
-	case EMCOCharacterDirection::Front_Left:
-	{
-		Direction = (InCharacter->GetActorForwardVector() + -InCharacter->GetActorRightVector()).GetSafeNormal();
-	}
-	break;
-	case EMCOCharacterDirection::Front_Right:
-	{
-		Direction = (InCharacter->GetActorForwardVector() + InCharacter->GetActorRightVector()).GetSafeNormal();
-	}
-	break;
-	case EMCOCharacterDirection::Back_Left:
-	{
-		Direction = (-InCharacter->GetActorForwardVector() + -InCharacter->GetActorRightVector()).GetSafeNormal();
-	}
-	break;
-	case EMCOCharacterDirection::Back_Right:
-	{
-		Direction = (-InCharacter->GetActorForwardVector() + InCharacter->GetActorRightVector()).GetSafeNormal();
-	}
-	break;
-	default:
-	{
-		Direction = InCharacter->GetActorForwardVector();
-	}
-	break;
-	}
-
-	return Direction;
 }
 
 void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter)
@@ -313,10 +225,10 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 	
 	DamagedCharacters.Emplace(InAttackedCharacter);
 			
-	CurrentDamagedData.AttackedDegree = CalculateDamagedDegree(
+	CurrentDamagedData.AttackedDegree = CalculateDegree(
 		InAttackedCharacter->GetActorLocation(),
 		InAttackedCharacter->GetActorForwardVector(),
-		-GetDirectionVector(CollisionFragment->AttackDirection, InAttacker)
+		-CollisionFragment->GetAttackDirection(InAttacker)
 	);
 	
 	// CurrentDamagedData.AttackedDegree = CalculateTargetDegree(
@@ -349,7 +261,7 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 	ISTRUE(nullptr != AttackerInterface);
 	const float Radius = AttackerInterface->GetCapsuleRadius();
 
-	const FVector AttackDirection = GetDirectionVector(CollisionFragment->AttackDirection, Attacker);
+	const FVector AttackDirection = CollisionFragment->GetAttackDirection(Attacker);
 	
 	const FVector Start = Attacker->GetActorLocation() +
 		(Attacker->GetActorForwardVector() * Radius) +
@@ -399,7 +311,7 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 		
 		DamagedCharacters.Emplace(AttackedCharacter);
 			
-		CurrentDamagedData.AttackedDegree = CalculateDamagedDegree(
+		CurrentDamagedData.AttackedDegree = CalculateDegree(
 			AttackedCharacter->GetActorLocation(),
 			AttackedCharacter->GetActorForwardVector(),
 			-AttackDirection

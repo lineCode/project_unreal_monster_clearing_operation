@@ -43,10 +43,8 @@ protected:
 // --- Attack
 protected:
 	void ApplyDamageAndStiffness(ACharacter* InAttackedCharacter);
-	float CalculateTargetDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& DestLocation, bool bLog = false) const;
-	float CalculateDamagedDegree(const FVector& TargetLocation, const FVector& TargetForward, const FVector& AttackDirection, bool bLog = false) const;
+	float CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog = false) const;
 	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const;
-	FVector GetDirectionVector(const EMCOCharacterDirection& InAttackDirection, ACharacter* InCharacter) const;
 
 	UFUNCTION()
 	void OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter);

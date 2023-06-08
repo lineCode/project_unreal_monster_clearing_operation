@@ -143,6 +143,11 @@ void AMCOPlayerCharacter::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 
 FVector AMCOPlayerCharacter::GetInputDirection() const
 {
+	if (nullptr == Controller)
+	{
+		return FVector();
+	}
+	
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
 

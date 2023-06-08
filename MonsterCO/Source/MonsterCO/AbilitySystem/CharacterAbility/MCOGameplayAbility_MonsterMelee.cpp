@@ -44,11 +44,16 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 	
 	AActor* Target = Cast<AActor>(MonsterInterface->GetTarget());
 	ISTRUE(Target);
-
-	const float AttackDegree = CalculateTargetDegree(
+	
+	
+	const FVector Source = FVector(Monster->GetActorLocation().X, Monster->GetActorLocation().Y, 0.0f);
+	const FVector Dest = FVector(Target->GetActorLocation().X, Target->GetActorLocation().Y, 0.0f);
+	const FVector LookVector = (Dest - Source).GetSafeNormal();
+	
+	const float AttackDegree = CalculateDegree(
 		Monster->GetActorLocation(),
 		Monster->GetActorForwardVector(),
-		Target->GetActorLocation()
+		LookVector
 	);
 	
 	ensure(nullptr != Data);

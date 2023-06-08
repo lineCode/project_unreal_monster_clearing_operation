@@ -10,6 +10,9 @@ class MONSTERCO_API UMCOActionFragment_Collision : public UMCOActionFragment
 	GENERATED_BODY()
 
 public:
+	FVector GetAttackDirection(const AActor* InActor) const;
+	
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EMCOCharacterDirection AttackDirection = EMCOCharacterDirection::Front;
 	
