@@ -18,8 +18,7 @@ public:
 public:
 	FORCEINLINE AMCOWeapon* GetWeapon() { return CurrentWeaponActor; }
 	FORCEINLINE const EMCOModeType GetModeType() const { return CurrentModeType; }
-
-	FORCEINLINE bool IsEquipped() const { return bIsEquipped; }
+	bool IsEquipped() const;
 	
 	void SpawnWeapon(ACharacter* InOwner);
 	void SetMode(const EMCOModeType InModeType);
@@ -28,7 +27,7 @@ public:
 
 protected:
 	UPROPERTY()
-	uint8 bIsEquipped:1;
+	uint8 bIsToEquip:1;
 
 	UPROPERTY()
 	TObjectPtr<UMCOPlayerModeData> ModeData;

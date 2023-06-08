@@ -24,6 +24,7 @@ protected:
 	
 //--- Equip
 public:
+	bool GetIsEquipped() const { return bIsEquipped; }
 	void SwitchEquipUnequip(bool bInToEquip);
 	void BeginAnimation_Equip();
 	void EndAnimation_Equip();
@@ -31,6 +32,10 @@ public:
 protected:
 	UPROPERTY()
 	uint8 bIsToEquip:1;
+
+	UPROPERTY()
+	uint8 bIsEquipped:1;
+
 	
 //--- Socket
 protected:

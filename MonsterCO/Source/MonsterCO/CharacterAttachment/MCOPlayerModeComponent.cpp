@@ -9,6 +9,12 @@ UMCOPlayerModeComponent::UMCOPlayerModeComponent()
 	GETASSET(ModeData, UMCOPlayerModeData, TEXT("/Game/Data/Player/DA_PlayerModeData.DA_PlayerModeData"));
 }
 
+bool UMCOPlayerModeComponent::IsEquipped() const
+{
+	ISTRUE_F(nullptr != CurrentWeaponActor);
+	return CurrentWeaponActor->GetIsEquipped();
+}
+
 void UMCOPlayerModeComponent::SpawnWeapon(ACharacter* InOwner)
 {
 	ISTRUE(true == ModeData->WeaponClasses.Contains(CurrentModeType));
@@ -17,6 +23,8 @@ void UMCOPlayerModeComponent::SpawnWeapon(ACharacter* InOwner)
 	FTransform transform;
 	CurrentWeaponActor = InOwner->GetWorld()->SpawnActorDeferred<AMCOWeapon>(ModeData->WeaponClasses[CurrentModeType], transform, InOwner);
 	ISTRUE(CurrentWeaponActor);
+
+	bIsToEquip = true;
 
 	UGameplayStatics::FinishSpawningActor(CurrentWeaponActor, transform);
 }
@@ -32,18 +40,17 @@ void UMCOPlayerModeComponent::SetMode(const EMCOModeType InModeType)
 
 void UMCOPlayerModeComponent::SetEquip()
 {
-	ISTRUE(false == bIsEquipped);
+	ISTRUE(true == bIsToEquip);
 
-	bIsEquipped = true;
 	CurrentWeaponActor->SwitchEquipUnequip(true);
 	CurrentWeaponActor->BeginAnimation_Equip();
+	bIsToEquip = false;
 }
 
 void UMCOPlayerModeComponent::SwitchEquipUnequip()
 {
 	ISTRUE(CurrentWeaponActor);
-
-	bIsEquipped = bIsEquipped == false;
-
-	CurrentWeaponActor->SwitchEquipUnequip(bIsEquipped);
+	
+	CurrentWeaponActor->SwitchEquipUnequip(bIsToEquip);
+	bIsToEquip = bIsToEquip == false;
 }

@@ -37,4 +37,6 @@ void AMCOWeapon::EndAnimation_Equip()
 	{
 		AttachActorToSocket(HolsterSocketName);
 	}
+
+	bIsEquipped = bIsToEquip;
 }
