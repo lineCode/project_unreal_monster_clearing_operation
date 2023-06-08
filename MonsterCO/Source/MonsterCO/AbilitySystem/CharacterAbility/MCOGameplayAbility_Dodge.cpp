@@ -20,16 +20,16 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 	UpdateCooldownFragment(Cooldown);
 	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
 	UpdateAttributeFragment(Stamina);
-	
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
 
-	// This can be blocked by these tags
+	// Cancel these
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
-	
-	// Cancel these 
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
 	
 	Strength = 500.0f;
 	Duration = 0.5f;

@@ -45,7 +45,7 @@ void AMCOMonsterSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 	ensure(nullptr != InCharacter);
 
 	FVector SpawnLocation = InCharacter->GetActorLocation();
-	SpawnLocation.Z -= InCharacter->GetDefaultHalfHeight();
+	SpawnLocation.Z = 0;
 		
 	SpawnItem(SpawnLocation);
 }
@@ -56,11 +56,7 @@ void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
 		
 	AMCOItem* Item = Cast<AMCOItem>(ItemActor);
 	ensure(nullptr != Item);
-	
-	FVector RelocationByHeight = Item->GetActorLocation();
-	RelocationByHeight.Z += Item->GetItemHalfHeight();
-	Item->SetActorLocation(RelocationByHeight);
-	
+		
 	Item->OnItemDestroyed.AddUObject(this, &ThisClass::OnItemDestroyed);
 	Items.Add(Item);
 	Item->FinishSpawning(Item->GetTransform());

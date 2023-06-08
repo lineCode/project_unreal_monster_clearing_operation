@@ -12,7 +12,14 @@ UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
 	
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 
-	// Cancel these 
+	// Cancel ALL
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DodgeTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().EquipTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().JumpTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DamagedTag);
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().TakeItemTag);
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 

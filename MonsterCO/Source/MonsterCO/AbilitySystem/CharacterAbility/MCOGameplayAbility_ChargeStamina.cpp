@@ -17,14 +17,13 @@ UMCOGameplayAbility_ChargeStamina::UMCOGameplayAbility_ChargeStamina()
 	SetID(EMCOAbilityID::Idle, Data->ActivationTag);
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag);
 
-	// This can be blocked by these tags
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DeadTag);
 }
 
 bool UMCOGameplayAbility_ChargeStamina::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const

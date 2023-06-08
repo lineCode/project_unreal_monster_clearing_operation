@@ -36,7 +36,7 @@ public:
 	FGameplayTag EffectRemoveOnDeathTag;
 
 	// Player ability
-	FGameplayTag TakeItem;
+	FGameplayTag TakeItemTag;
 	FGameplayTag ChargingTag;
 	FGameplayTag JumpTag;
 	FGameplayTag EquipTag;

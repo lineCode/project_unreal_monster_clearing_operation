@@ -30,6 +30,7 @@ AMCOItem::AMCOItem()
 	SkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	
 	Trigger->SetBoxExtent(FVector(45.0f, 45.0f, 45.0f));
+	Trigger->SetHiddenInGame(false);
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 
 }
@@ -76,6 +77,10 @@ void AMCOItem::PostInitializeComponents()
 	
 	ensure(nullptr != Data);
 	
+	FVector RelocationByHeight = GetActorLocation();
+	RelocationByHeight.Z += GetItemHalfHeight();
+	SetActorLocation(RelocationByHeight);
+	
 	SetActorHiddenInGame(false);
 }
 
@@ -87,7 +92,7 @@ void AMCOItem::BeginPlay()
 
 float AMCOItem::GetItemHalfHeight() const
 {
-	return 45.0f / 2.0f;
+	return 45.0f;
 }
 
 void AMCOItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult)

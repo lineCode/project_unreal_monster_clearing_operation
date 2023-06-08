@@ -7,7 +7,7 @@
 
 UMCOGameplayAbility_TakeItem::UMCOGameplayAbility_TakeItem()
 {
-	SetID(EMCOAbilityID::Idle, FMCOCharacterTags::Get().TakeItem);
+	SetID(EMCOAbilityID::Idle, FMCOCharacterTags::Get().TakeItemTag);
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_TakeItemTag);
 }
 
@@ -45,7 +45,5 @@ void UMCOGameplayAbility_TakeItem::EndAbility(const FGameplayAbilitySpecHandle H
 	IMCOCharacterItemInterface* CharacterItemInterface = Cast<IMCOCharacterItemInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != CharacterItemInterface);
 	CharacterItemInterface->EndTakeItem();
-	
-	ActivateStaminaChargeAbility();
 }
 

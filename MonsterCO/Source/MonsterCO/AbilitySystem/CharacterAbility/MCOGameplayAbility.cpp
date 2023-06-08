@@ -25,14 +25,9 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	
 	ActivationPolicy = EMCOAbilityActivationPolicy::OnInputTriggered;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-	
-	// Tags that can't be cancelled
+		
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DeadTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().StunTag);	
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
-
-	// Cancel these 
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 
 void UMCOGameplayAbility::SetID(const EMCOAbilityID& InAbilityID, const FGameplayTag& InActivationTag)

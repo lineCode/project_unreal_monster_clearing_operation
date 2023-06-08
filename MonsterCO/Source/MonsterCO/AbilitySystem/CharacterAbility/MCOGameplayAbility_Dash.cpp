@@ -19,13 +19,13 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	// Tag required to activate this ability 
 	// ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 
-	// This can be blocked by these tags
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
-	
-	// Cancel these 
+	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+
+	// Cancel these
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
-	
 }
 
 bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const

@@ -21,7 +21,10 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 	// Setting 
 	bIsUsingCollision = false;
 
-	// Cancel these 
+	// Blocked by these
+	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+
+	// Cancel these
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 

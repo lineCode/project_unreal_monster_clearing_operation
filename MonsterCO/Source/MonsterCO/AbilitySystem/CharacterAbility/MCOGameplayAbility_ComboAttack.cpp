@@ -27,7 +27,7 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 	// Cancel these
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
 
-	// This can be blocked by these tags
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);

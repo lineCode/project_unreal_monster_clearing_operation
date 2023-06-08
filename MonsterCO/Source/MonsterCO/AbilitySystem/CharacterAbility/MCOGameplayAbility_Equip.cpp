@@ -12,11 +12,12 @@ UMCOGameplayAbility_Equip::UMCOGameplayAbility_Equip()
 	
 	SetID(EMCOAbilityID::Equip, FMCOCharacterTags::Get().EquipTag);
 
-	// This can be blocked by these tags
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
+	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
 	
 	// Cancel these 
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);

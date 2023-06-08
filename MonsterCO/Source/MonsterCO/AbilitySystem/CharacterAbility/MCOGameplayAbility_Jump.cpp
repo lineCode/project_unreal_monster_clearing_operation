@@ -24,7 +24,7 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 
-	// This can be blocked by these tags
+	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
