@@ -143,10 +143,13 @@ void AMCOPlayerCharacter::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 
 FVector AMCOPlayerCharacter::GetInputDirection() const
 {
-	const FVector ForwardDirection = FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::X) * MovementVector.X;
-	const FVector RightDirection = FRotationMatrix(GetControlRotation()).GetUnitAxis(EAxis::Y) * MovementVector.Y;
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	return ForwardDirection + RightDirection;
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * MovementVector.X;
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * MovementVector.Y;
+
+	return (ForwardDirection + RightDirection).GetSafeNormal();
 }
 
 bool AMCOPlayerCharacter::IsDashForward() const
