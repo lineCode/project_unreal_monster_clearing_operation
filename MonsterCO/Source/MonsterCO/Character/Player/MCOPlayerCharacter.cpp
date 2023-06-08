@@ -365,6 +365,11 @@ void AMCOPlayerCharacter::InitializeHUD()
 
 	// temp
 	HUDWidget->InitializeSkillWidget(
+		FMCOCharacterTags::Get().JumpTag,
+		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().JumpTag)
+	);
+
+	HUDWidget->InitializeSkillWidget(
 		FMCOCharacterTags::Get().DodgeTag,
 		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().DodgeTag)
 	);
@@ -372,7 +377,7 @@ void AMCOPlayerCharacter::InitializeHUD()
 	HUDWidget->InitializeSkillWidget(
 		FMCOCharacterTags::Get().AttackTag,
 		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().AttackTag)
-	);
+	);	
 }
 
 void AMCOPlayerCharacter::ShowMonsterInfo(IMCOCharacterInterface* InCharacter)

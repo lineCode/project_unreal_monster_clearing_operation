@@ -27,6 +27,7 @@ void UMCOSkillWidget::SetSkillWidget(UTexture2D* InTexture, const FText& InKeyTe
 	}
 	Image->SetVisibility(ESlateVisibility::Visible);
 	SkillRadialProgressBar->SetVisibility(ESlateVisibility::Hidden);
+	SetImagePercent(0.0f);
 }
 
 void UMCOSkillWidget::UnSetSkillWidget()

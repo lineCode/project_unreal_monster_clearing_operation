@@ -31,13 +31,16 @@ AMCOItem::AMCOItem()
 	
 	Trigger->SetBoxExtent(FVector(45.0f, 45.0f, 45.0f));
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
-	
+
 }
 
 void AMCOItem::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+	SetActorHiddenInGame(true);
+	SetActorEnableCollision(true);
+	
 	const UAssetManager& Manager = UAssetManager::Get();
 
 	TArray<FPrimaryAssetId> Assets;
@@ -45,6 +48,8 @@ void AMCOItem::PostInitializeComponents()
 	ensure(0 < Assets.Num());
 	
 	const int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
+
+	MCOPRINT(TEXT("Item: %d of %d"), RandomIndex, Assets.Num());
 	
 	const FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
 	if (true == AssetPtr.IsPending())
@@ -70,6 +75,8 @@ void AMCOItem::PostInitializeComponents()
 	SkeletalMesh->SetMaterial(0, Data->Material.Get());
 	
 	ensure(nullptr != Data);
+	
+	SetActorHiddenInGame(false);
 }
 
 void AMCOItem::BeginPlay()

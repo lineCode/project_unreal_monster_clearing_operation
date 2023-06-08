@@ -15,7 +15,7 @@ public:
 	TObjectPtr<UTexture2D> SkillImage = nullptr;
 
 	UPROPERTY()
-	uint8 SlotLocation = 0;
+	int8 SlotLocation = -1;
 	
 	UPROPERTY()
 	FText KeyText = FText();

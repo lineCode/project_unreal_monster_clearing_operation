@@ -55,16 +55,14 @@ void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
 	AActor* ItemActor = GetWorld()->SpawnActorDeferred<AMCOItem>(ItemClass, FTransform(InSpawnLocation));
 		
 	AMCOItem* Item = Cast<AMCOItem>(ItemActor);
-	if (nullptr != Item)
-	{
-		FVector RelocationByHeight = Item->GetActorLocation();
-		RelocationByHeight.Z += Item->GetItemHalfHeight();
-		Item->SetActorLocation(RelocationByHeight);
-		
-		Item->OnItemDestroyed.AddUObject(this, &ThisClass::OnItemDestroyed);
-		Items.Add(Item);
-	}
+	ensure(nullptr != Item);
 	
+	FVector RelocationByHeight = Item->GetActorLocation();
+	RelocationByHeight.Z += Item->GetItemHalfHeight();
+	Item->SetActorLocation(RelocationByHeight);
+	
+	Item->OnItemDestroyed.AddUObject(this, &ThisClass::OnItemDestroyed);
+	Items.Add(Item);
 	Item->FinishSpawning(Item->GetTransform());
 }
 
