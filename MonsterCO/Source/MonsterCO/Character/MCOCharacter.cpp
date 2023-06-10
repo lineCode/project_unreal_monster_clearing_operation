@@ -34,6 +34,8 @@ void AMCOCharacter::SetCharacterData()
 	bAlwaysRelevant = true;
 	CharacterName = CharacterData->CharacterName;
 
+	GetCharacterMovement()->RotationRate = CharacterData->RotationRate;
+
 	// Set these in BP
 	// GetCapsuleComponent()->SetHiddenInGame(false);
 	// GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_MCOCAPSULE);

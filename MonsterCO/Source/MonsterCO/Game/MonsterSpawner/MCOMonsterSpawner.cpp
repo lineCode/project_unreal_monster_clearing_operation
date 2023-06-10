@@ -44,15 +44,29 @@ void AMCOMonsterSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 {
 	ensure(nullptr != InCharacter);
 
-	FVector SpawnLocation = InCharacter->GetActorLocation();
-	SpawnLocation.Z = 0;
-		
-	SpawnItem(SpawnLocation);
+	FHitResult TraceResult;
+	FVector StartLocation = InCharacter->GetActorLocation();
+	FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, -1000.0f); 
+
+	const FCollisionQueryParams Params;
+	
+	if (GetWorld()->LineTraceSingleByChannel(
+		TraceResult,
+		StartLocation,
+		EndLocation,
+		ECC_WorldStatic,
+		Params))
+	{
+		SpawnItem(TraceResult.Location);
+	}
 }
 
 void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
 {
-	AActor* ItemActor = GetWorld()->SpawnActorDeferred<AMCOItem>(ItemClass, FTransform(InSpawnLocation));
+	FTransform Transform;
+	Transform.SetLocation(InSpawnLocation);
+	
+	AActor* ItemActor = GetWorld()->SpawnActorDeferred<AMCOItem>(ItemClass, Transform);
 		
 	AMCOItem* Item = Cast<AMCOItem>(ItemActor);
 	if (nullptr != Item)
@@ -63,7 +77,7 @@ void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
 
 	if (nullptr != ItemActor)
 	{
-		ItemActor->FinishSpawning(ItemActor->GetTransform());
+		ItemActor->FinishSpawning(Transform);
 	}
 }
 
