@@ -1,7 +1,6 @@
 #include "MCOGameplayAbility.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "GeometryTypes.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
@@ -38,6 +37,12 @@ void UMCOGameplayAbility::SetID(const EMCOAbilityID& InAbilityID, const FGamepla
 	ActivationOwnedTags.AddTag(AbilityTag);
 }
 
+void UMCOGameplayAbility::SetCancelOnStaminaEmptyTag()
+{
+	AbilityTags.AddTag(FMCOCharacterTags::Get().CancelOnStaminaEmptyTag);
+	ActivationOwnedTags.AddTag(FMCOCharacterTags::Get().CancelOnStaminaEmptyTag);
+}
+
 void UMCOGameplayAbility::SetTriggerTag(const FGameplayTag& InTag)
 {
 	FAbilityTriggerData TriggerData;
@@ -61,13 +66,7 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 	ISTRUE_F(true == Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 	ISTRUE_F(nullptr != ActorInfo);
 	ISTRUE_F(true == ActorInfo->AvatarActor.IsValid());
-	
-	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(CharacterInterface);
-	if (nullptr != AttributeFragment)
-	{
-		ISTRUE_F(CharacterInterface->CanActionWithStamina(AttributeFragment->GetStaminaAdditiveValue()));
-	}
+	ISTRUE_F(true == CheckCanActivateWithStamina());
 
 	return true;
 }
@@ -195,6 +194,18 @@ void UMCOGameplayAbility::UpdateAttributeFragment(const UMCOActionFragment_Attri
 	AttributeFragment = InAttributeFragment;
 }
 
+bool UMCOGameplayAbility::CheckCanActivateWithStamina() const
+{
+	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE_F(CharacterInterface);
+	if (nullptr != AttributeFragment)
+	{
+		ISTRUE_F(CharacterInterface->GetCurrentStamina() + AttributeFragment->GetStaminaAdditiveValue() >= 0.0f);
+	}
+	
+	return true;
+}
+
 void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	ISTRUE(nullptr != AttributeFragment);
@@ -251,7 +262,7 @@ void UMCOGameplayAbility::StopAttributeEffect()
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag);
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
 	
-	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags 
+	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
 }
 
 void UMCOGameplayAbility::ActivateStaminaChargeAbility()

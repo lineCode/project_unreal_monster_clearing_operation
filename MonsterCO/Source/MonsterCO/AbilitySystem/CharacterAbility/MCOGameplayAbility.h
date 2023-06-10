@@ -23,6 +23,7 @@ public:
 	
 protected:
 	void SetID(const EMCOAbilityID& InAbilityID, const FGameplayTag& InActivationTag);
+	void SetCancelOnStaminaEmptyTag();
 	void SetTriggerTag(const FGameplayTag& InTag);
 
 public:
@@ -64,6 +65,7 @@ private:
 // --- Attribute Effect
 protected:
 	void UpdateAttributeFragment(const UMCOActionFragment_Attribute* InAttributeFragment);
+	bool CheckCanActivateWithStamina() const;
 	void ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
 	
 private:

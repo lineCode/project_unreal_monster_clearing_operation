@@ -77,7 +77,7 @@ protected:
 	FMCOAbilitySet_GrantedHandles AbilitySetHandles;
 	
 public:
-	virtual bool CanActionWithStamina(const float& InAdditiveStamina) const override;
+	virtual float GetCurrentStamina() const override;
 	virtual bool CanChargeStamina() const override;
 	virtual bool CanAttack() const override { return true; }
 	virtual FVector GetSocketLocation(const FName& InSocketName);

@@ -14,6 +14,7 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	UpdateAttributeFragment(Stamina);
 	
 	SetID(EMCOAbilityID::Dash, Data->ActivationTag);
+	SetCancelOnStaminaEmptyTag();
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 
 	// Tag required to activate this ability 

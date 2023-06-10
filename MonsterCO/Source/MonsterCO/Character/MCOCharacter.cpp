@@ -106,9 +106,9 @@ bool AMCOCharacter::IsAlive() const
 	return 0.0f < GetHealth();
 }
 
-bool AMCOCharacter::CanActionWithStamina(const float& InAdditiveStamina) const
+float AMCOCharacter::GetCurrentStamina() const
 {
-	return -InAdditiveStamina <= GetStamina();
+	return GetStamina();
 }
 
 bool AMCOCharacter::CanChargeStamina() const

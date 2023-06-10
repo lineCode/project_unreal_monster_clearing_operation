@@ -29,6 +29,7 @@ FMCOCharacterTags::FMCOCharacterTags()
 	DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),        bErrorIfNotFound);
 	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("State.RemoveOnDeath"), bErrorIfNotFound);
 		
+	CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("State.CancelOnStaminaEmpty"), bErrorIfNotFound);
 	TakeItemTag   = FGameplayTag::RequestGameplayTag(FName("State.TakeItem"), bErrorIfNotFound);
 	ChargingTag   = FGameplayTag::RequestGameplayTag(FName("State.Charging"), bErrorIfNotFound);
 	JumpTag       = FGameplayTag::RequestGameplayTag(FName("State.Jump"),     bErrorIfNotFound);

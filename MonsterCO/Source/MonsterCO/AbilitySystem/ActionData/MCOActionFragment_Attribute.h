@@ -33,6 +33,7 @@ public:
 	float GetStaminaAdditiveValue() const;
 	float GetStiffnessAdditiveValue() const;
 	bool CanApply(const FGameplayTag& InTag) const;
+	bool IsInfinite(const FGameplayTag& InTag) const;
 	bool ApplyAttributeAdditiveValue(const FGameplayEffectSpecHandle& InInstantHandle,const FGameplayEffectSpecHandle& InInfiniteHandle, const FGameplayTag& InTag) const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

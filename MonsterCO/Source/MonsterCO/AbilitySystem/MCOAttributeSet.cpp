@@ -63,6 +63,16 @@ void UMCOAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 // On Effect applied
 bool UMCOAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& Data)
 {
+	if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())
+	{
+		if (GetStamina() + Data.EvaluatedData.Magnitude < 0.0f)
+		{
+			FGameplayTagContainer Tags;
+			Tags.AddTag(FMCOCharacterTags::Get().CancelOnStaminaEmptyTag);
+			GetOwningAbilitySystemComponent()->CancelAbilities(&Tags);
+		}
+	}
+	
 	return Super::PreGameplayEffectExecute(Data);
 }
 

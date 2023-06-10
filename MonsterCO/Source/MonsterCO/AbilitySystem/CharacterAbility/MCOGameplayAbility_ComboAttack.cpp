@@ -170,12 +170,12 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	const UMCOActionFragment_Attribute* CurrentAttributeFragment = MontageFragment->ActionDefinition->GetAttributeFragment();
 	ensure(CurrentAttributeFragment);
 	
-	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
-	if (false == CharacterInterface->CanActionWithStamina(CurrentAttributeFragment->GetStaminaAdditiveValue()))
+	UpdateAttributeFragment(CurrentAttributeFragment);
+	
+	if (false == CheckCanActivateWithStamina())
 	{
 		UpdateAttributeFragment(Data->GetMontageFragment(0)->ActionDefinition->GetAttributeFragment());
-		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
 	
@@ -188,7 +188,6 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
 
-	UpdateAttributeFragment(MontageFragment->ActionDefinition->GetAttributeFragment());
 	ApplyAttributeEffect(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 	
 	SetComboTimer();
