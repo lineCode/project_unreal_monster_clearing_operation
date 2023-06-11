@@ -12,6 +12,9 @@ class MONSTERCO_API AMCOGameModeBase : public AGameModeBase
 public:
 	AMCOGameModeBase();
 
+public:
+	virtual void StartPlay() override;
+	
 	FORCEINLINE int32 GetPhase() const { return CurrentPhase; }
 
 // --- Monster

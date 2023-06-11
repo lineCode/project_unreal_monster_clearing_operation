@@ -65,6 +65,16 @@ ensure(OutResult);
 
 // --- Enum
 UENUM(BlueprintType)
+enum class EMCOGameState : uint8
+{
+	READY,
+	FIGHT,
+	REWARD,
+	NEXT
+};
+
+
+UENUM(BlueprintType)
 enum class EMCOAbilityID : uint8
 {
 	None           UMETA(DisplayName = "None"),
