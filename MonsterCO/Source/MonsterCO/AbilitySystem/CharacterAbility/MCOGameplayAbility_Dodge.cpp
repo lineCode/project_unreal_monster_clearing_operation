@@ -55,8 +55,6 @@ void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle
 	const FVector WorldDirection = PlayerInterface->GetInputWorldDirection();	
 	bIsDodgeForward = PlayerInterface->IsInputForward();
 
-	MCOLOG_C(MCOAbility, TEXT("IsDodgeForward : %d"), bIsDodgeForward);
-
 	UAbilityTask_ApplyRootMotionConstantForce* Task = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce
 	(
 		this,
@@ -80,8 +78,6 @@ void UMCOGameplayAbility_Dodge::OnTaskFinished()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 
-	MCOLOG_C(MCOAbility, TEXT("End : Dodge"));
-	
 	if (true == bIsDodgeForward)
 	{
 		HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);

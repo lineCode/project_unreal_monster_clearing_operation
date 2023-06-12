@@ -395,7 +395,7 @@ void AMCOPlayerCharacter::OnStaminaChanged(float NewStaminaValue)
 	AdditiveStaminaValueForWidget = NewStaminaValue - CurrentStaminaForWidget;
 	ISTRUE(AdditiveStaminaValueForWidget != 0.0f);
 	
-	MCOLOG(TEXT("[Stamina] Start : %f -> %f ( %f per sec)"), CurrentStaminaForWidget, NewStaminaValue, AdditiveStaminaValueForWidget);
+	//MCOLOG(TEXT("[Stamina] Start : %f -> %f ( %f per sec)"), CurrentStaminaForWidget, NewStaminaValue, AdditiveStaminaValueForWidget);
 		
 	if (bIsStaminaTimerTicking == false)
 	{
@@ -426,7 +426,7 @@ void AMCOPlayerCharacter::UpdateStaminaWidget()
 
 	// MCOLOG(TEXT("[Stamina] Updating : %f / %f => %f"), CurrentStaminaForWidget, GetMaxStamina(), GetStamina());
 	
-	if (FMath::IsNearlyEqual(CurrentStaminaForWidget, GetStamina(), 0.5f))
+	if (FMath::IsNearlyEqual(CurrentStaminaForWidget, GetStamina(), 0.1f))
 	{
 		MCOLOG(TEXT("[Stamina] Finish : %f / %f"), CurrentStaminaForWidget, GetMaxStamina());
 		StopStaminaTimer();

@@ -66,7 +66,7 @@ void AMCOPlayerState::RegisterAttributeChangedDelegate(const FGameplayAttribute&
 
 void AMCOPlayerState::OnAttributeChanged(const FOnAttributeChangeData& Data)
 {
-    MCOPRINT(TEXT("Attribute changed : [%s] -> [%f]"), *Data.Attribute.GetName(), Data.NewValue);
+    //MCOPRINT(TEXT("Attribute changed : [%s] -> [%f]"), *Data.Attribute.GetName(), Data.NewValue);
     
     FName CurName = *Data.Attribute.GetName();
     ISTRUE(true == OnAttributeChangedDelegate.Contains(CurName));
