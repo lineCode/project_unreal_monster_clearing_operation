@@ -16,7 +16,13 @@ public:
 	virtual void StartPlay() override;
 	
 	FORCEINLINE int32 GetPhase() const { return CurrentPhase; }
+	FORCEINLINE EMCOGameState GetGameState() const { return CurrentGameState; }
 
+// --- Game
+protected:
+	UPROPERTY()
+	EMCOGameState CurrentGameState;
+	
 // --- Monster
 protected:
 	UPROPERTY()

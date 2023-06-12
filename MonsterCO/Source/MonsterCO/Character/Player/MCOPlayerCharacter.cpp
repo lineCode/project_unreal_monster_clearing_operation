@@ -220,7 +220,6 @@ bool AMCOPlayerCharacter::CanMoveCharacter() const
 	ISTRUE_F(true == CheckCanMoveWithTags());
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 
 	return true;
@@ -231,7 +230,6 @@ bool AMCOPlayerCharacter::CanJumpAction() const
 	ISTRUE_F(true == CanJump());
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 
 	return true;
@@ -241,7 +239,6 @@ bool AMCOPlayerCharacter::CanEquipAction() const
 {
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 
 	return true;
@@ -251,7 +248,6 @@ bool AMCOPlayerCharacter::CanDodgeAction() const
 {
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
 
@@ -265,7 +261,6 @@ bool AMCOPlayerCharacter::CanDashAction() const
 {
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
 	ISTRUE_F(UGameplayStatics::GetPlayerController(GetWorld(), 0)->IsInputKeyDown(
@@ -281,7 +276,6 @@ bool AMCOPlayerCharacter::CanAttack() const
 	
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
 

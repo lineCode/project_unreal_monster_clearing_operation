@@ -114,7 +114,6 @@ float AMCOCharacter::GetCurrentStamina() const
 bool AMCOCharacter::CanChargeStamina() const
 {
 	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(GetStamina() < GetMaxStamina());
 

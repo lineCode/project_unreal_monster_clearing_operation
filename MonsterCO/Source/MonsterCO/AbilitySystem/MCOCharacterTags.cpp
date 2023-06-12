@@ -24,14 +24,15 @@ FMCOCharacterTags::FMCOCharacterTags()
 	GameplayEvent_DeadTag          = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Dead"),          bErrorIfNotFound);
 	GameplayEvent_DamagedTag       = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Damaged"),       bErrorIfNotFound);
 	
+	EffectRemoveOnDeathTag  = FGameplayTag::RequestGameplayTag(FName("Ability.RemoveOnDeath"), bErrorIfNotFound);
+	CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("Ability.CancelOnStaminaEmpty"), bErrorIfNotFound);
+
 	DamagedTag    = FGameplayTag::RequestGameplayTag(FName("State.Damaged"),     bErrorIfNotFound);
-	StunTag       = FGameplayTag::RequestGameplayTag(FName("State.Debuff.Stun"), bErrorIfNotFound);
 	DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),        bErrorIfNotFound);
-	EffectRemoveOnDeathTag = FGameplayTag::RequestGameplayTag(FName("State.RemoveOnDeath"), bErrorIfNotFound);
-		
-	CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("State.CancelOnStaminaEmpty"), bErrorIfNotFound);
+	
 	TakeItemTag   = FGameplayTag::RequestGameplayTag(FName("State.TakeItem"), bErrorIfNotFound);
 	ChargingTag   = FGameplayTag::RequestGameplayTag(FName("State.Charging"), bErrorIfNotFound);
+	
 	JumpTag       = FGameplayTag::RequestGameplayTag(FName("State.Jump"),     bErrorIfNotFound);
 	EquipTag      = FGameplayTag::RequestGameplayTag(FName("State.Equip"),    bErrorIfNotFound);
 	DodgeTag      = FGameplayTag::RequestGameplayTag(FName("State.Dodge"),    bErrorIfNotFound);

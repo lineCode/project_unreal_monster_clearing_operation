@@ -29,16 +29,22 @@ public:
 	FGameplayTag GameplayEvent_DamagedTag;
 	FGameplayTag GameplayEvent_DeadTag;
 
+	// Cue
+	
+
+	// Ability 
+	FGameplayTag EffectRemoveOnDeathTag;
+	FGameplayTag CancelOnStaminaEmptyTag;
+	
 	// Debuff
 	FGameplayTag DamagedTag;
-	FGameplayTag StunTag;
 	FGameplayTag DeadTag;
-	FGameplayTag EffectRemoveOnDeathTag;
 
-	// Player ability
-	FGameplayTag CancelOnStaminaEmptyTag;
+	// Action
 	FGameplayTag TakeItemTag;
 	FGameplayTag ChargingTag;
+	
+	// State
 	FGameplayTag JumpTag;
 	FGameplayTag EquipTag;
 	FGameplayTag DodgeTag;

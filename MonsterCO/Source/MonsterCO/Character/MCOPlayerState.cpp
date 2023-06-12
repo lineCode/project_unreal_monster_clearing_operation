@@ -29,7 +29,7 @@ void AMCOPlayerState::InitializeAbilityDelegates()
     RegisterAttributeChangedDelegate(AttributeSet->GetStiffnessAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxStiffnessAttribute());
 
-    AbilitySystemComponent->RegisterGameplayTagEvent(FMCOCharacterTags::Get().StunTag).AddUObject(this, &ThisClass::StunTagChanged);
+    // AbilitySystemComponent->RegisterGameplayTagEvent(FMCOCharacterTags::Get().StunTag).AddUObject(this, &ThisClass::StunTagChanged);
 }
 
 void AMCOPlayerState::BeginPlay()

@@ -1,5 +1,4 @@
 #include "MCOGameModeBase.h"
-#include "Sound/MCOGameSingleton.h"
 
 
 AMCOGameModeBase::AMCOGameModeBase()
@@ -9,11 +8,11 @@ AMCOGameModeBase::AMCOGameModeBase()
 	// PlayerStateClass      = AMCOPlayerState::StaticClass();
 
 	CurrentPhase = 0;
+	CurrentGameState = EMCOGameState::READY;
 }
 
 void AMCOGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 	
-	UMCOGameSingleton::Get().PlaySoundByGameState(GetWorld(), EMCOGameState::READY);
 }
