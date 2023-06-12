@@ -43,3 +43,20 @@ FText UMCOInputConfig::GetActionKeyName(const FGameplayTag& InTag) const
 
 	return FText();
 }
+
+FKey UMCOInputConfig::GetActionKey(const FGameplayTag& InTag) const
+{
+	const UInputAction* Action = FindAbilityInputActionForTag(InTag);
+	
+	for (const FEnhancedActionKeyMapping& Mapping : InputMappingContext->GetMappings())
+	{
+		if (Mapping.Action != Action)
+		{
+			continue;
+		}
+
+		return Mapping.Key;
+	}
+
+	return FKey();
+}

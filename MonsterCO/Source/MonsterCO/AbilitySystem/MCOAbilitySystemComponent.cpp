@@ -35,7 +35,6 @@ void UMCOAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inpu
 	{
 		if (AbilitySpec.Ability == nullptr) continue;
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) == false) continue;
-		if (InputTag == FMCOCharacterTags::Get().DashTag == true) continue; // Ignore dash pressed event
 
 		// MCOLOG_C(MCOAbility, TEXT("[%s] is pressed"), *InputTag.GetTagName().ToString());
 

@@ -75,15 +75,10 @@ public:
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const override; 
 	virtual void StopCharacter(bool bToStop) override;
 	
-	virtual FVector GetInputDirection() const override;
-	virtual bool IsDashForward() const override;
+	virtual FVector GetInputWorldDirection() const override;
+	virtual bool IsInputForward() const override;
 	
 	bool bGetInput;
-	
-protected:
-	UPROPERTY()
-	FVector2D MovementVector;
-
 	
 // --- Mode & Weapon 
 public:

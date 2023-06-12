@@ -105,8 +105,8 @@ void AMCOPlayerCharacter::Initialize()
 	bGetInput = true;
 	bIsMonsterInfoShowed = false;
 	bIsStaminaTimerTicking = false;
-	SetSpeed(EMCOCharacterSpeed::Normal);
 	CurrentStaminaForWidget = GetStamina();
+	SetSpeed(EMCOCharacterSpeed::Normal);
 }
 
 void AMCOPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -141,25 +141,14 @@ void AMCOPlayerCharacter::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 	GetMCOAbilitySystemComponent()->AbilityInputTagReleased(InputTag);
 }
 
-FVector AMCOPlayerCharacter::GetInputDirection() const
+FVector AMCOPlayerCharacter::GetInputWorldDirection() const
 {
-	if (nullptr == Controller)
-	{
-		return FVector();
-	}
-	
-	const FRotator Rotation = Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * MovementVector.X;
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * MovementVector.Y;
-
-	return (ForwardDirection + RightDirection).GetSafeNormal();
+	return GetCharacterMovement()->GetLastInputVector();
 }
 
-bool AMCOPlayerCharacter::IsDashForward() const
+bool AMCOPlayerCharacter::IsInputForward() const
 {
-	return (MovementVector.X > KINDA_SMALL_NUMBER) && (FMath::IsNearlyZero(MovementVector.Y) == true);
+	return GetCharacterMovement()->GetLastInputVector().Equals(GetActorForwardVector(), 0.05f);
 }
 
 EMCOModeType AMCOPlayerCharacter::GetModeType() const
@@ -211,10 +200,9 @@ void AMCOPlayerCharacter::EndAnimation_Equip()
 bool AMCOPlayerCharacter::CheckCanMoveWithTags() const
 {
 	FGameplayTagContainer TagsThatPlayerCanNotMoveWith;
-	TagsThatPlayerCanNotMoveWith.AddTag(FMCOCharacterTags::Get().EquipTag);
-	TagsThatPlayerCanNotMoveWith.AddTag(FMCOCharacterTags::Get().AttackTag);
+	// TagsThatPlayerCanNotMoveWith.AddTag(FMCOCharacterTags::Get().EquipTag);
+	// TagsThatPlayerCanNotMoveWith.AddTag(FMCOCharacterTags::Get().AttackTag);
 	TagsThatPlayerCanNotMoveWith.AddTag(FMCOCharacterTags::Get().DodgeTag);
-	//TagsThatPlayerCanNotMoveWith.AddTag(FMCOPlayerTags::Get().DashTag);
 
 	return GetAbilitySystemComponent()->HasAnyMatchingGameplayTags(TagsThatPlayerCanNotMoveWith) == false;
 }
@@ -266,7 +254,9 @@ bool AMCOPlayerCharacter::CanDodgeAction() const
 	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
-	ISTRUE_F((FMath::IsNearlyZero(MovementVector.X) == false || FMath::IsNearlyZero(MovementVector.Y) == false));
+
+	const FVector InputVector = GetCharacterMovement()->GetLastInputVector();
+	ISTRUE_F(false == InputVector.IsNearlyZero());
 
 	return true;
 }
@@ -278,8 +268,10 @@ bool AMCOPlayerCharacter::CanDashAction() const
 	ISTRUE_F(HasTag(FMCOCharacterTags::Get().StunTag) == false);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
-	ISTRUE_F(UGameplayStatics::GetPlayerController(GetWorld(), 0)->IsInputKeyDown(EKeys::W));
-
+	ISTRUE_F(UGameplayStatics::GetPlayerController(GetWorld(), 0)->IsInputKeyDown(
+		InputConfig->GetActionKey(FMCOCharacterTags::Get().DashTag)
+	));
+	
 	return true;
 }
 
@@ -295,15 +287,6 @@ bool AMCOPlayerCharacter::CanAttack() const
 
 	return true;
 }
-
-// void AMCOPlayerCharacter::CancelDash() const
-// {
-// 	ISTRUE(nullptr != AbilitySystemComponent);
-//
-// 	FGameplayTagContainer EffectsTagToRemove;
-// 	EffectsTagToRemove.AddTag(FMCOCharacterTags::Get().DashTag);
-// 	AbilitySystemComponent->CancelAbilities(&EffectsTagToRemove);
-// }
 
 void AMCOPlayerCharacter::SetSpeed(const EMCOCharacterSpeed& InSpeed) const
 {
@@ -321,7 +304,7 @@ void AMCOPlayerCharacter::StopCharacter(bool bToStop)
 
 void AMCOPlayerCharacter::Move(const FInputActionValue& Value)
 {
-	MovementVector = Value.Get<FVector2D>();
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -335,13 +318,6 @@ void AMCOPlayerCharacter::Move(const FInputActionValue& Value)
 	{
 		AddMovementInput(ForwardDirection, 1.0f);
 		return;
-		
-		//if (UGameplayStatics::GetPlayerController(GetWorld(), 0)->IsInputKeyDown(EKeys::W))
-		//{
-		//	AddMovementInput(ForwardDirection, 1.0f);
-		//	return;
-		//}
-		//CancelDash();
 	}
 	
 	AddMovementInput(ForwardDirection, MovementVector.X);

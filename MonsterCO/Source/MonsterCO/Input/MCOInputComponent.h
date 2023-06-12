@@ -43,12 +43,12 @@ void UMCOInputComponent::BindAbilityActions(const UMCOInputConfig* InputConfig, 
 	{
 		if (Action.InputAction == nullptr || Action.InputTag.IsValid() == false) continue;
 		
-		if (PressedFunc != nullptr)
+		if (PressedFunc != nullptr && Action.WantedTriggerEvents.Contains(ETriggerEvent::Triggered))
 		{
 			BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, PressedFunc, Action.InputTag);
 		}
 
-		if (ReleasedFunc != nullptr)
+		if (ReleasedFunc != nullptr && Action.WantedTriggerEvents.Contains(ETriggerEvent::Completed))
 		{
 			BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ReleasedFunc, Action.InputTag);
 		}

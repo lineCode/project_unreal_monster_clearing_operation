@@ -3,6 +3,8 @@
 #include "MonsterCO.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "InputTriggers.h"
+#include "InputCoreTypes.h"
 #include "MCOInputConfig.generated.h"
 
 
@@ -21,6 +23,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input)
 	FGameplayTag InputTag;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Input)
+	TSet<ETriggerEvent> WantedTriggerEvents;
 };
 
 UCLASS()
@@ -32,6 +37,7 @@ public:
 	const UInputAction* FindNativeInputActionForTag(const FGameplayTag& InputTag) const;
 	const UInputAction* FindAbilityInputActionForTag(const FGameplayTag& InputTag) const;
 	FText GetActionKeyName(const FGameplayTag& InTag) const;
+	FKey GetActionKey(const FGameplayTag& InTag) const;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
 	TObjectPtr<UInputMappingContext> InputMappingContext;

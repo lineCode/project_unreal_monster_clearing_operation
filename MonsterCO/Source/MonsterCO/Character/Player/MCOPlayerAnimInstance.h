@@ -1,58 +1,30 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "Animation/AnimInstance.h"
+#include "Character/MCOCharacterAnimInstance.h"
+#include "Interface/MCOPlayerInterface.h"
 #include "MCOPlayerAnimInstance.generated.h"
-
-class AMCOPlayerCharacter;
-class UCharacterMovementComponent;
 
 
 UCLASS()
-class MONSTERCO_API UMCOPlayerAnimInstance : public UAnimInstance
+class MONSTERCO_API UMCOPlayerAnimInstance : public UMCOCharacterAnimInstance
 {
 	GENERATED_BODY()
 
 public:
-	UMCOPlayerAnimInstance();
-
-private:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
-	TObjectPtr<AMCOPlayerCharacter> Owner;
+	virtual void SetPawnSpeed(const FVector& InVelocity, const float& InDeltaSeconds) override;
+	virtual void SetPawnDirection(const FVector& InVelocity, const FRotator& InActorRotation) override;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character)
-	TObjectPtr<UCharacterMovementComponent> MovementComponent;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
+	TObjectPtr<IMCOPlayerInterface> PlayerInterface;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	EMCOModeType ModeType; 
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	FVector Velocity;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float CurrentPawnDirection;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float CurrentPawnSpeed;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	uint32 bIsIdle : 1;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float MovingThreshould;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	uint32 bIsFalling:1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	uint32 bIsJumping : 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	float JumpingThreshould;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	uint32 bIsDodging:1;

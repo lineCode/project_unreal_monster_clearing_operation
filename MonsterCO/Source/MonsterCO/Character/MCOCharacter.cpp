@@ -198,6 +198,8 @@ bool AMCOCharacter::HasTag(const FGameplayTag& InTag) const
 
 int32 AMCOCharacter::GetTagCount(const FGameplayTag& InTag) const
 {
+	ISTRUE_Z(nullptr != GetAbilitySystemComponent());
+	
 	return GetAbilitySystemComponent()->GetTagCount(InTag);
 }
 

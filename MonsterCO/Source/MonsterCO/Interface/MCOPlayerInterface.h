@@ -24,11 +24,12 @@ public:
 	virtual bool CanDashAction() const = 0;
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const = 0;
 	
-	virtual FVector GetInputDirection() const = 0;
-	virtual bool IsDashForward() const = 0;
+	virtual FVector GetInputWorldDirection() const = 0;
+	virtual bool IsInputForward() const = 0;
 	
 // --- Weapon
 public:
+	virtual EMCOModeType GetModeType() const = 0;
 	virtual bool IsEquipped() = 0;
 	virtual void SetEquippedWithoutAnimation() = 0;
 	virtual void SwitchEquipUnequip() = 0;

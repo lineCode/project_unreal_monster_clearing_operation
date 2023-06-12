@@ -17,9 +17,6 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	SetCancelOnStaminaEmptyTag();
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
 
-	// Tag required to activate this ability 
-	// ActivationRequiredTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
-
 	// Blocked by these
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
@@ -55,7 +52,7 @@ void UMCOGameplayAbility_Dash::ActivateAbility(const FGameplayAbilitySpecHandle 
 
 void UMCOGameplayAbility_Dash::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	MCOLOG_C(MCOAbility, TEXT("InputReleased : Dash"));
+	MCOLOG_C(MCOAbility, TEXT("InputReleased!!!!!!!!!!!!!!!!!!!!!!!!! : Dash"));
 	
 	ISTRUE(ActorInfo != nullptr);
 	ISTRUE(ActorInfo->AvatarActor != nullptr);

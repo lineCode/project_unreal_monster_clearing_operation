@@ -25,6 +25,7 @@ UMCOGameSingleton& UMCOGameSingleton::Get()
 void UMCOGameSingleton::PlaySoundByGameState(const UWorld* InWorld, const EMCOGameState& InState)
 {
 	ISTRUE(nullptr != SoundData->GetSoundCue(InState));
+	ISTRUE(nullptr != InWorld);
 	
 	PlaySound(InWorld, SoundData->GetSoundCue(InState));
 }
@@ -32,6 +33,7 @@ void UMCOGameSingleton::PlaySoundByGameState(const UWorld* InWorld, const EMCOGa
 void UMCOGameSingleton::PlaySound(const UWorld* InWorld, USoundCue* SoundCue) const
 {
 	ISTRUE(nullptr != SoundCue);
+	ISTRUE(nullptr != InWorld);
 
 	UGameplayStatics::PlaySound2D(InWorld, SoundCue);
 }

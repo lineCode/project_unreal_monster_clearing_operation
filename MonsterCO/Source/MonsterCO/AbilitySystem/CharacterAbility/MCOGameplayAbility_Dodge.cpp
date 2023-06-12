@@ -52,8 +52,10 @@ void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ensure(nullptr != PlayerInterface);
-	const FVector WorldDirection = PlayerInterface->GetInputDirection();	
-	bIsDodgeForward = PlayerInterface->IsDashForward();
+	const FVector WorldDirection = PlayerInterface->GetInputWorldDirection();	
+	bIsDodgeForward = PlayerInterface->IsInputForward();
+
+	MCOLOG_C(MCOAbility, TEXT("IsDodgeForward : %d"), bIsDodgeForward);
 
 	UAbilityTask_ApplyRootMotionConstantForce* Task = UAbilityTask_ApplyRootMotionConstantForce::ApplyRootMotionConstantForce
 	(

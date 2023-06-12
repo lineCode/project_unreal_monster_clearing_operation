@@ -1,61 +1,59 @@
 #include "MCOPlayerAnimInstance.h"
 #include "KismetAnimationLibrary.h"
-#include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "MCOPlayerCharacter.h"
 #include "AbilitySystem/MCOCharacterTags.h"
+#include "Character/MCOCharacter.h"
 
-
-UMCOPlayerAnimInstance::UMCOPlayerAnimInstance()
-{
-    MovingThreshould = 3.0f;
-    JumpingThreshould = 100.0f;
-}
 
 void UMCOPlayerAnimInstance::NativeInitializeAnimation()
 {
     Super::NativeInitializeAnimation();
 
-    Owner = Cast<AMCOPlayerCharacter>(GetOwningActor());
-    ISTRUE(Owner != nullptr);
-    MovementComponent = Owner->GetCharacterMovement();
+    PlayerInterface = Cast<IMCOPlayerInterface>(GetOwningActor());
 }
 
 void UMCOPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
+
+    // --- Mode
+    ISTRUE(nullptr != Owner);
+    ISTRUE(nullptr != PlayerInterface);
     
-    ISTRUE(Owner != nullptr);
-    ISTRUE(MovementComponent != nullptr);
+    ModeType = PlayerInterface->GetModeType();
+    bIsEquipped = PlayerInterface->IsEquipped();
+
+    // --- Ability
+    bIsDodging = Owner->HasTag(FMCOCharacterTags::Get().DodgeTag);
+}
+
+void UMCOPlayerAnimInstance::SetPawnSpeed(const FVector& InVelocity, const float& InDeltaSeconds)
+{
+    ISTRUE(nullptr != MovementComponent);
     
-    bool bIsAccelerate = MovementComponent->GetCurrentAcceleration().Length() > 0.0f;
-    float MaxSpeed = MovementComponent->GetMaxSpeed();
+    const bool bIsAccelerate = MovementComponent->GetCurrentAcceleration().Length() > 0.0f;
+    const float MaxSpeed = MovementComponent->GetMaxSpeed();
 
     CurrentPawnSpeed = FMath::FInterpTo(
         CurrentPawnSpeed,
         bIsAccelerate == true ? MaxSpeed : 0.0f,
-        DeltaSeconds,
+        InDeltaSeconds,
         10.0f
     );
+}
 
-    Velocity = MovementComponent->Velocity;
-    bIsIdle = CurrentPawnSpeed < MovingThreshould;
-    bIsFalling = MovementComponent->IsFalling();
-	bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+void UMCOPlayerAnimInstance::SetPawnDirection(const FVector& InVelocity, const FRotator& InActorRotation)
+{
+    ISTRUE(nullptr != Owner);
+    ISTRUE(nullptr != PlayerInterface);
     
-    ModeType = Owner->GetModeType();
-    bIsEquipped = Owner->IsEquipped();
+    if (false == Owner->HasTag(FMCOCharacterTags::Get().DodgeTag)) // Stay the same direction on dodging
+    {
+        CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(PlayerInterface->GetInputWorldDirection(), InActorRotation);
+    }
+    if (true == Owner->HasTag(FMCOCharacterTags::Get().DashTag)) // Stay forward direction on dashing
+    {
+        CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(InVelocity, InActorRotation);
+    }
 
-    // --- Ability
-    ISTRUE(Owner->GetAbilitySystemComponent() != nullptr);
-    
-    bIsDodging = Owner->HasTag(FMCOCharacterTags::Get().DodgeTag);
-    if (false == bIsDodging)
-    {
-        CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(Owner->GetInputDirection(), Owner->GetActorRotation());
-    }
-    if (true == Owner->HasTag(FMCOCharacterTags::Get().DashTag))
-    {
-        CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(Velocity, Owner->GetActorRotation());
-    }
 }
