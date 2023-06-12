@@ -71,7 +71,7 @@ void UMCOGameplayAbility_CommonAttack::BeginDamaging()
 {
 	StartDamageEndTimer();
 
-	if (bIsUsingCollision)
+	if (true == bIsUsingCollision)
 	{
 		BeginDamaging_Collision();
 	}
@@ -83,10 +83,11 @@ void UMCOGameplayAbility_CommonAttack::BeginDamaging()
 
 void UMCOGameplayAbility_CommonAttack::EndDamaging()
 {
+	CurrentDamageTimingIdx++;
 	DamagedCharacters.Reset();
 	StartDamageBeginTimer();
 	
-	if (bIsUsingCollision)
+	if (true == bIsUsingCollision)
 	{
 		EndDamaging_Collision();
 	}
@@ -212,34 +213,24 @@ void UMCOGameplayAbility_CommonAttack::SendDamagedDataToTarget(ACharacter* InAtt
 	CharacterInterface->SetDamagedData(CurrentDamagedData);
 }
 
-void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter)
+void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult)
 {
 	ISTRUE(nullptr != InAttacker);
 	ISTRUE(nullptr != InAttackCauser);
 	ISTRUE(nullptr != InAttackedCharacter);
 	
 	ISTRUE(false == DamagedCharacters.Contains(InAttackedCharacter));
-
-	IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(InAttackedCharacter);
-	ISTRUE(nullptr != AttackedInterface);  // need to add attachments.....
 	
 	DamagedCharacters.Emplace(InAttackedCharacter);
 			
-	CurrentDamagedData.AttackedDegree = CalculateDegree(
+	CurrentDamagedData.DamagedDegree = CalculateDegree(
 		InAttackedCharacter->GetActorLocation(),
 		InAttackedCharacter->GetActorForwardVector(),
 		-CollisionFragment->GetAttackDirection(InAttacker)
 	);
-	
-	// CurrentDamagedData.AttackedDegree = CalculateTargetDegree(
-	// 	InAttackedCharacter->GetActorLocation(),
-	// 	InAttackedCharacter->GetActorForwardVector(),
-	// 	InAttackCauser->GetActorLocation()
-	// );
-	// CurrentDamagedData.AttackedDirection = CalculateLookVector(
-	// InAttackCauser->GetActorLocation(),
-	// InAttackedCharacter->GetActorLocation()
-	// );
+
+	CurrentDamagedData.DamagedLocation = SweepResult.ImpactPoint;
+	CurrentDamagedData.DamagedNiagara = TimerFragment->GetDamageNiagara(CurrentDamageTimingIdx);
 	
 	SendDamagedDataToTarget(InAttackedCharacter);
 	ApplyDamageAndStiffness(InAttackedCharacter);
@@ -311,23 +302,15 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 		
 		DamagedCharacters.Emplace(AttackedCharacter);
 			
-		CurrentDamagedData.AttackedDegree = CalculateDegree(
+		CurrentDamagedData.DamagedDegree = CalculateDegree(
 			AttackedCharacter->GetActorLocation(),
 			AttackedCharacter->GetActorForwardVector(),
 			-AttackDirection
 		);
 
-		// CurrentDamagedData.AttackedDegree = CalculateDegree(
-		// 	AttackedCharacter->GetActorLocation(),
-		// 	AttackedCharacter->GetActorForwardVector(),
-		// 	End,
-		// 	true
-		// );
-		// CurrentDamagedData.AttackedDirection = CalculateLookVector(
-		// End,
-		// AttackedCharacter->GetActorLocation()
-		// );
-			
+		CurrentDamagedData.DamagedLocation = Result.ImpactPoint;
+		CurrentDamagedData.DamagedNiagara = TimerFragment->GetDamageNiagara(CurrentDamageTimingIdx);
+		
 		SendDamagedDataToTarget(AttackedCharacter);
 		ApplyDamageAndStiffness(AttackedCharacter);
 	}
@@ -427,8 +410,6 @@ void UMCOGameplayAbility_CommonAttack::StartDamageEndTimer()
 		FrameCount,
 		false
 	);
-	
-	CurrentDamageTimingIdx++;
 }
 //virtual FActiveGameplayEffectHandle UAbilitySystemComponent::ApplyGameplayEffectSpecToTarget(const FGameplayEffectSpec& GameplayEffect, FPredictionKey PredictionKey = FPredictionKey());
 //virtual FActiveGameplayEffectHandle UAbilitySystemComponent::ApplyGameplayEffectSpecToSelf(const FGameplayEffectSpec& GameplayEffect,	FPredictionKey PredictionKey = FPredictionKey());

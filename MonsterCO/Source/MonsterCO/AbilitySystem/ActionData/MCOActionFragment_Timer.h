@@ -5,6 +5,9 @@
 #include "MCOActionFragment_Timer.generated.h"
 
 
+class UNiagaraSystem;
+
+
 USTRUCT(BlueprintType)
 struct FMCOFrameCount
 {
@@ -16,9 +19,10 @@ public:
 		
 	UPROPERTY(EditAnywhere)
 	float End = 0.0f;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
 };
-
-
 
 
 UCLASS()
@@ -40,6 +44,7 @@ public:
 	float GetDamageBeginTimeAfterPrevEndTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
 	float GetDamageExistTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
 	float GetComboCheckTime(float SpeedRate = 1.0f) const;
+	UNiagaraSystem* GetDamageNiagara(uint8 InDamageIdx) const;
 
 protected:
 	float CalculateTime(float FrameCount, float SpeedRate = 1.0f) const;

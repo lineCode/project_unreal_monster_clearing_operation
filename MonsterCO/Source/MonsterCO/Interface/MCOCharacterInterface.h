@@ -4,8 +4,13 @@
 #include "UObject/Interface.h"
 #include "MCOCharacterInterface.generated.h"
 
+
+
 class UMCOHpWidget;
 class UMCOAttributeWidget;
+class UNiagaraSystem;
+
+
 
 USTRUCT()
 struct FMCODamagedData
@@ -14,11 +19,14 @@ struct FMCODamagedData
 
 public:
 	UPROPERTY()
-	float AttackedDegree = 0.0f;
+	float DamagedDegree = 0.0f;
+
+	UPROPERTY()
+	FVector DamagedLocation = FVector(0.0f, 0.0f, 0.0f);
+
+	UPROPERTY()
+	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
 };
-
-
-// DECLARE_DELEGATE(FOnDamagedDelegate);
 
 
 UINTERFACE(MinimalAPI)
@@ -42,9 +50,6 @@ public:
 
 // --- Damaged
 public:
-	// FOnDamagedDelegate OnDamagedBegin;
-	// FOnDamagedDelegate OnDamagedEnd;
-
 	virtual const FMCODamagedData GetDamagedData() = 0;
 	virtual void SetDamagedData(const FMCODamagedData& InDegree) = 0;
 

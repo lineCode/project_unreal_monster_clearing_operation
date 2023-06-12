@@ -4,6 +4,11 @@
 #include "GameplayCueNotify_Actor.h"
 #include "MCOGameplayCue_Damaged.generated.h"
 
+
+class UNiagaraComponent;
+
+
+
 UCLASS()
 class MONSTERCO_API AMCOGameplayCue_Damaged : public AGameplayCueNotify_Actor
 {
@@ -16,6 +21,6 @@ protected:
 	virtual void HandleGameplayCue(AActor* MyTarget, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters) override;
 
 protected:
-
-	
+	UPROPERTY()
+	TObjectPtr<UNiagaraComponent> NiagaraComponent;	
 };

@@ -47,7 +47,7 @@ protected:
 	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const;
 
 	UFUNCTION()
-	void OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter);
+	void OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult);
 
 	void AttackHitCheckByChannel();
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;

@@ -2,15 +2,17 @@
 
 #include "MonsterCO.h"
 #include "GameFramework/Actor.h"
+#include "Engine/EngineTypes.h"
 #include "MCOAttachment.generated.h"
 
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttachmentBeginOverlapDelegate,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAttachmentBeginOverlapDelegate,
 												class ACharacter*, InAttacker,
 												class AActor*, InAttackCauser,
-												class ACharacter*, InOtherCharacter);
+												class ACharacter*, InOtherCharacter,
+												const FHitResult&, SweepResult);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttachmentEndOverlapDelegate,
 												class ACharacter*, InAttacker,

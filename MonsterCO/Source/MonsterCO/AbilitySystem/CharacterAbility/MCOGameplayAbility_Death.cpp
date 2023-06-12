@@ -32,7 +32,7 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 	CharacterInterface->Die();
 	
 	CancelAllAbility();
-	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().AttackedDegree));
+	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().DamagedDegree));
 }
 
 void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

@@ -56,7 +56,7 @@ void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedCom
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
 	ISTRUE(true == OnAttachmentBeginOverlapDelegate.IsBound());
 	
-	OnAttachmentBeginOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(OtherActor));
+	OnAttachmentBeginOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(OtherActor), SweepResult);
 }
 
 void AMCOAttachment::OnAttachmentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)

@@ -28,6 +28,13 @@ float UMCOActionFragment_Timer::GetComboCheckTime(float SpeedRate) const
 	return CalculateTime(NextComboFrameCount, SpeedRate);
 }
 
+UNiagaraSystem* UMCOActionFragment_Timer::GetDamageNiagara(uint8 InDamageIdx) const
+{
+	ensure(DamageTimings.IsValidIndex(InDamageIdx));
+	
+	return DamageTimings[InDamageIdx].DamagedNiagara;
+}
+
 float UMCOActionFragment_Timer::CalculateTime(float FrameCount, float SpeedRate) const
 {
 	return (FrameCount / MontageFrameRate) / SpeedRate;
