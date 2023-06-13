@@ -43,10 +43,12 @@ void AMCOPlayerController::OnGameStateChanged(const EMCOGameState& InState)
 	if (InState == EMCOGameState::LOBBY)
 	{
 		SetInputMode(FInputModeUIOnly());
+		SetShowMouseCursor(true);
 	}
 	else if (InState == EMCOGameState::FIGHT)
 	{
 		SetInputMode(FInputModeGameOnly());
+		SetShowMouseCursor(false);
 	}
 	else if (InState == EMCOGameState::REWARD)
 	{
@@ -54,6 +56,7 @@ void AMCOPlayerController::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::RESULT)
 	{
 		SetInputMode(FInputModeUIOnly());
+		SetShowMouseCursor(true);
 	}
 }
 
