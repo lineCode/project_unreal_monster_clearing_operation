@@ -6,6 +6,7 @@
 #include "MCOGameModeBase.generated.h"
 
 
+class AMCOPlayerCharacter;
 
 UCLASS()
 class MONSTERCO_API AMCOGameModeBase : public AGameModeBase, public IMCOGameModeInterface
@@ -18,22 +19,25 @@ public:
 public:
 	virtual void StartPlay() override;
 	
-	virtual const int32& GetPhase() const override { return CurrentPhase; }
+	virtual const int32& GetPhase() const override { return CurrentStage; }
 	virtual const EMCOGameState& GetGameState() const override { return CurrentGameState; }
-	virtual FOnGameStateChanged& GetOnGameStateChangedDelegate() override { return OnGameStateChangedDelegate; }
-	virtual FOnGameResult& GetOnGameResultDelegate() override { return OnGameResultDelegate; }
+	virtual FOnGameStateChangedDelegate& GetOnGameStateChangedDelegate() override { return OnGameStateChangedDelegate; }
+	virtual FOnGameResultDelegate& GetOnGameResultDelegate() override { return OnGameResultDelegate; }
+	virtual FOnRestartStageDelegate& GetOnRestartStageDelegate() override { return OnRestartStageDelegate; }
 
+	virtual void OnRestartStage() override;
 	virtual void OnChangeGameState(const EMCOGameState& InState) override;
 	virtual void OnGameResult(const bool bWin) override;
 	
 // --- State
 protected:
-	FOnGameStateChanged OnGameStateChangedDelegate;
-	FOnGameResult OnGameResultDelegate;
+	FOnRestartStageDelegate OnRestartStageDelegate;
+	FOnGameStateChangedDelegate OnGameStateChangedDelegate;
+	FOnGameResultDelegate OnGameResultDelegate;
 
 	UPROPERTY()
 	EMCOGameState CurrentGameState;
 	
 	UPROPERTY()
-	int32 CurrentPhase;
+	int32 CurrentStage;
 };

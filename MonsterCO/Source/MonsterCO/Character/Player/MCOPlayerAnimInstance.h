@@ -21,9 +21,6 @@ protected:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	TObjectPtr<IMCOPlayerInterface> PlayerInterface;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	EMCOModeType ModeType; 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)

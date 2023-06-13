@@ -84,15 +84,22 @@ void AMCOCharacter::Initialize()
 	ISTRUE(nullptr != AbilitySystemComponent);
 	AbilitySystemComponent->InitAbilityActorInfo(MCOPlayerState, this);
 	AbilitySystemComponent->SetTagMapCount(FMCOCharacterTags::Get().DeadTag, 0);
-	AbilitySystemComponent->OnDamagedReceived.AddDynamic(this, &AMCOCharacter::ReceiveDamage);
+	AbilitySystemComponent->OnDamagedReceived.AddUniqueDynamic(this, &AMCOCharacter::ReceiveDamage);
 	
 	// give ability set
 	ISTRUE(GetLocalRole() == ROLE_Authority);
-	ISTRUE(false == AbilitySystemComponent->bCharacterAbilitySetGiven);
-	ISTRUE(nullptr != CharacterData)
-	ISTRUE(nullptr != CharacterData->AbilitySet)
-	CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-
+	if (nullptr != CharacterData && nullptr != CharacterData->AbilitySet)
+	{
+		if (false == AbilitySystemComponent->bCharacterAbilitySetGiven)
+		{	
+			CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+		}
+		else
+		{
+			CharacterData->AbilitySet->AddStartupEffects(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+		}
+	}	
+	
 	// set delegates
 	MCOPlayerState->InitializeAbilityDelegates();
 	AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
@@ -216,6 +223,14 @@ void AMCOCharacter::SetDamagedData(const FMCODamagedData& InDamagedData)
 	CurrentDamagedData = InDamagedData;
 }
 
+void AMCOCharacter::OffAllCollision()
+{
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+	ensure(nullptr != CapsuleComp);
+	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+}
+
 float AMCOCharacter::GetCapsuleRadius() const
 {
 	UCapsuleComponent* Capsule = GetCapsuleComponent();
@@ -227,32 +242,23 @@ void AMCOCharacter::Die()
 {
 	MCOLOG(TEXT("%s : Died"), *CharacterName.ToString());
 
+	OffAllCollision();	
+	
 	if (nullptr != Controller)
 	{
 		Controller->SetIgnoreMoveInput(true);
 	}
 
 	StopCharacter(true);
-
-	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
-	ensure(nullptr != CapsuleComp);
-	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-
 	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
 	ensure(nullptr != MovementComp);
 	MovementComp->StopMovementImmediately();
 	MovementComp->DisableMovement();
-
-	
-	
-	// AbilitySetHandles.TakeFromAbilitySystem(GetMCOAbilitySystemComponent());
 	
 	// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// GetCharacterMovement()->GravityScale = 0;
 	// GetCharacterMovement()->Velocity = FVector(0);
-	
-	
+		
 	// if (true == AbilitySystemComponent.IsValid())
 	// {
 	// 	AbilitySystemComponent->CancelAbilities();
@@ -280,11 +286,10 @@ void AMCOCharacter::FinishDying()
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		DetachFromControllerPendingDestroy();
+		SetActorHiddenInGame(true);
+		DestroyAllAttachedActors();
 		SetLifeSpan(0.1f);
 	}
-	
-	SetActorHiddenInGame(true);
-	DestroyAllAttachedActors();
 
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);

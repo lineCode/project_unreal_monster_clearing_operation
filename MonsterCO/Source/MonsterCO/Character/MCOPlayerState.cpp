@@ -18,6 +18,8 @@ void AMCOPlayerState::InitializeAbilityDelegates()
 {
     ISTRUE(nullptr != AbilitySystemComponent);
 
+    OnAttributeChangedDelegate.Empty();
+    
     AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
     AttributeSet->OnHandleAttributeEventDelegate.AddUObject(this, &ThisClass::HandleEventWithTag);
     AbilitySystemComponent->AttributeSet = AttributeSet;

@@ -9,7 +9,6 @@ void UMCOPlayerAnimInstance::NativeInitializeAnimation()
 {
     Super::NativeInitializeAnimation();
 
-    PlayerInterface = Cast<IMCOPlayerInterface>(GetOwningActor());
 }
 
 void UMCOPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -18,6 +17,8 @@ void UMCOPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
     // --- Mode
     ISTRUE(nullptr != Owner);
+    
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(GetOwningActor());
     ISTRUE(nullptr != PlayerInterface);
     
     ModeType = PlayerInterface->GetModeType();
@@ -45,6 +46,7 @@ void UMCOPlayerAnimInstance::SetPawnSpeed(const FVector& InVelocity, const float
 void UMCOPlayerAnimInstance::SetPawnDirection(const FVector& InVelocity, const FRotator& InActorRotation)
 {
     ISTRUE(nullptr != Owner);
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(GetOwningActor());
     ISTRUE(nullptr != PlayerInterface);
     
     if (false == Owner->HasTag(FMCOCharacterTags::Get().DodgeTag)) // Stay the same direction on dodging

@@ -25,6 +25,7 @@ UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
 
 void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	MCOLOG(TEXT("--------------------------ActivateAbility : Death"));
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
@@ -37,6 +38,7 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 
 void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {	
+	MCOLOG(TEXT("--------------------------EndAbility : Death"));
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != CharacterInterface);
 	CharacterInterface->FinishDying();

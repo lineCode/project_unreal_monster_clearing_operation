@@ -46,7 +46,7 @@ void AMCOAttachment::TurnOffAllCollision()
 {
 	for (UShapeComponent* Shape : ShapeComponents)
 	{
-		// Shape->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Shape->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 

@@ -23,7 +23,8 @@ void UMCOStaminaWidget::NativeConstruct()
 	// OnGameStateChanged
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::OnGameStateChanged);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
+	GameModeInterface->GetOnRestartStageDelegate().AddUniqueDynamic(this, &ThisClass::OnRestartStage);
 	
 	SetVisibility(ESlateVisibility::Hidden);
 }
@@ -44,6 +45,15 @@ void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::RESULT)
 	{
 		SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UMCOStaminaWidget::OnRestartStage()
+{
+	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(OwningActor);
+	if (nullptr != HUDInterface)
+	{
+		HUDInterface->SetupStaminaWidget(this);
 	}
 }
 

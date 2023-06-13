@@ -34,8 +34,8 @@ void AMCOPlayerController::BeginPlay()
 	// OnGameStateChanged
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(HUDWidget, &UMCOHUDWidget::OnGameStateChanged);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::OnGameStateChanged);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(HUDWidget, &UMCOHUDWidget::OnGameStateChanged);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
 }
 
 void AMCOPlayerController::OnGameStateChanged(const EMCOGameState& InState)

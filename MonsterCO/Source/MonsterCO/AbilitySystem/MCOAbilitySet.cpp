@@ -36,25 +36,40 @@ void FMCOAbilitySet_GrantedHandles::TakeFromAbilitySystem(UMCOAbilitySystemCompo
 		return;
 	}
 
-	for (const FGameplayAbilitySpecHandle& Handle : AbilitySpecHandles)
+	for (int32 i = AbilitySpecHandles.Num() - 1; i >= 0; i--)
 	{
-		if (Handle.IsValid())
+		if (AbilitySpecHandles.Num() <= i)
 		{
-			MCOASC->ClearAbility(Handle);
+			break;
+		}
+		
+		if (AbilitySpecHandles[i].IsValid())
+		{
+			MCOASC->ClearAbility(AbilitySpecHandles[i]);
 		}
 	}
 
-	for (const FActiveGameplayEffectHandle& Handle : GameplayEffectHandles)
+	for (int32 i = GameplayEffectHandles.Num() - 1; i >= 0; i--)
 	{
-		if (Handle.IsValid())
+		if (GameplayEffectHandles.Num() <= i)
 		{
-			MCOASC->RemoveActiveGameplayEffect(Handle);
+			break;
+		}
+		
+		if (GameplayEffectHandles[i].IsValid())
+		{
+			MCOASC->RemoveActiveGameplayEffect(GameplayEffectHandles[i]);
 		}
 	}
 
-	for (UAttributeSet* Set : GrantedAttributeSets)
+	for (int32 i = GrantedAttributeSets.Num() - 1; i >= 0; i--)
 	{
-		MCOASC->RemoveSpawnedAttribute(Set);
+		if (GrantedAttributeSets.Num() <= i)
+		{
+			break;
+		}
+		
+		MCOASC->RemoveSpawnedAttribute(GrantedAttributeSets[i]);
 	}
 
 	AbilitySpecHandles.Reset();
@@ -127,6 +142,13 @@ void UMCOAbilitySet::GiveToAbilitySystem(UMCOAbilitySystemComponent* MCOASC, FMC
 		}
 	}
 	
+	AddStartupEffects(MCOASC, OutGrantedHandles, SourceObject);
+	
+	MCOASC->bCharacterAbilitySetGiven = true;
+}
+
+void UMCOAbilitySet::AddStartupEffects(UMCOAbilitySystemComponent* MCOASC, FMCOAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject) const
+{
 	// Grant the gameplay effects.
 	for (int32 EffectIndex = 0; EffectIndex < GrantedGameplayEffects.Num(); ++EffectIndex)
 	{
@@ -151,6 +173,4 @@ void UMCOAbilitySet::GiveToAbilitySystem(UMCOAbilitySystemComponent* MCOASC, FMC
 			OutGrantedHandles->AddGameplayEffectHandle(GameplayEffectHandle);
 		}
 	}
-	
-	MCOASC->bCharacterAbilitySetGiven = true;
 }

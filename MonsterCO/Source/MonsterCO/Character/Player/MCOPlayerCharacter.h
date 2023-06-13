@@ -36,6 +36,10 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
 	
+public:
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
+	
 // --- Ability System
 protected:
 	virtual void OnRep_PlayerState() override;

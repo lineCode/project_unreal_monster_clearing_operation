@@ -9,6 +9,9 @@ UMCOGameplayAbility_TakeItem::UMCOGameplayAbility_TakeItem()
 {
 	SetID(EMCOAbilityID::Idle, FMCOCharacterTags::Get().TakeItemTag);
 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_TakeItemTag);
+	
+	// Cancel these
+	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
 
 bool UMCOGameplayAbility_TakeItem::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -29,7 +32,7 @@ void UMCOGameplayAbility_TakeItem::ActivateAbility(const FGameplayAbilitySpecHan
 	
 	UpdateAttributeFragment(CharacterItemInterface->GetItemAttributeFragment());
 	
-	MCOPRINT(TEXT("[Item Picked up] Health:[%.1f], Stamina:[%.1f], Stiffness:[%.1f]"),
+	MCOLOG(TEXT("[Item Picked up] Health:[%.1f], Stamina:[%.1f], Stiffness:[%.1f]"),
 		CharacterItemInterface->GetItemAttributeFragment()->GetHealthAdditiveValue(),
 		CharacterItemInterface->GetItemAttributeFragment()->GetStaminaAdditiveValue(),
 		CharacterItemInterface->GetItemAttributeFragment()->GetStiffnessAdditiveValue()
@@ -45,5 +48,8 @@ void UMCOGameplayAbility_TakeItem::EndAbility(const FGameplayAbilitySpecHandle H
 	IMCOCharacterItemInterface* CharacterItemInterface = Cast<IMCOCharacterItemInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != CharacterItemInterface);
 	CharacterItemInterface->EndTakeItem();
+
+	// !!!!!!!!!!!!!!!!!!!!!!
+	//ActivateStaminaChargeAbility();
 }
 

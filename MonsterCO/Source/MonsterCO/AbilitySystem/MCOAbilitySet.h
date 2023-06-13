@@ -85,6 +85,7 @@ class MONSTERCO_API UMCOAbilitySet : public UPrimaryDataAsset
 public:
 	UMCOAbilitySet(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	void GiveToAbilitySystem(UMCOAbilitySystemComponent* MCOASC, FMCOAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
+	void AddStartupEffects(UMCOAbilitySystemComponent* MCOASC, FMCOAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject = nullptr) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Gameplay Abilities", meta=(TitleProperty=Ability))

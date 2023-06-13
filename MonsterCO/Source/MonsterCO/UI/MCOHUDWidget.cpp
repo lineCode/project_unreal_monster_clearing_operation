@@ -15,16 +15,14 @@ UMCOHUDWidget::UMCOHUDWidget(const FObjectInitializer& ObjectInitializer) : Supe
 {
 	// GETASSET(SkillWidgetData, UMCOSkillWidgetData, TEXT("/Game/Data/Player/DA_SkillWidgetData.DA_SkillWidgetData"));
 
-	PlayerName = FName("Player");
-	MonsterName = FName("Monster");
 }
 
 void UMCOHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SetInGameWidget(PlayerName);
-	SetInGameWidget(MonsterName);
+	SetInGameWidget(GetCharacterName(true));
+	SetInGameWidget(GetCharacterName(false));
 
 	TitleWidget = GetWidgetFromName(TEXT("WBP_Title")); 
 	ensure(nullptr != TitleWidget);
@@ -44,8 +42,8 @@ void UMCOHUDWidget::NativeConstruct()
 
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameResultDelegate().AddDynamic(ResultWidget, &UMCOResultWidget::SetResultWidget);
-	
+	GameModeInterface->GetOnGameResultDelegate().AddUniqueDynamic(ResultWidget, &UMCOResultWidget::SetResultWidget);
+	GameModeInterface->GetOnRestartStageDelegate().AddUniqueDynamic(this, &ThisClass::OnRestartStage);
 	
 	IMCOHUDInterface* HUDPawn = Cast<IMCOHUDInterface>(GetOwningPlayerPawn());
 	ensure(nullptr != HUDPawn);
@@ -54,6 +52,9 @@ void UMCOHUDWidget::NativeConstruct()
 
 void UMCOHUDWidget::OnGameStateChanged(const EMCOGameState& InState)
 {
+	FString PlayerName = GetCharacterName(true);
+	FString MonsterName = GetCharacterName(false);
+	
 	if (InState == EMCOGameState::LOBBY)
 	{
 		ShowTitleWidget(true);
@@ -64,6 +65,7 @@ void UMCOHUDWidget::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::FIGHT)
 	{
 		ShowInGameWidget(PlayerName, true);
+		ShowResultWidget(false);
 	}
 	else if (InState == EMCOGameState::REWARD)
 	{
@@ -74,22 +76,29 @@ void UMCOHUDWidget::OnGameStateChanged(const EMCOGameState& InState)
 	{
 		ShowInGameWidget(PlayerName, false);
 		ShowInGameWidget(MonsterName, false);
-		ShowResultWidget(true);
 	}
+}
+
+void UMCOHUDWidget::OnRestartStage()
+{
+	IMCOHUDInterface* HUDPawn = Cast<IMCOHUDInterface>(GetOwningPlayerPawn());
+	ensure(nullptr != HUDPawn);
+	HUDPawn->InitializeHUD(this);
 }
 
 void UMCOHUDWidget::OnMonsterFirstHit()
 {
+	FString MonsterName = GetCharacterName(false);
 	ShowInGameWidget(MonsterName, true);
 }
 
-void UMCOHUDWidget::SetInGameWidget(const FName& InName)
+void UMCOHUDWidget::SetInGameWidget(const FString& InName)
 {
-	UWidget* HpWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sHpBar"), *InName.ToString()));
+	UWidget* HpWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sHpBar"), *InName));
 	ensure(nullptr != HpWidget);
 	HpWidgets.Emplace(InName, Cast<UMCOHpWidget>(HpWidget));
 	
-	UWidget* AttributeWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sAttribute"), *InName.ToString()));
+	UWidget* AttributeWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sAttribute"), *InName));
 	ensure(nullptr != AttributeWidget);
 	AttributeWidgets.Emplace(InName, Cast<UMCOAttributeWidget>(AttributeWidget));
 }
@@ -108,7 +117,12 @@ void UMCOHUDWidget::ShowResultWidget(const bool bShow)
 	ResultWidget->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
-void UMCOHUDWidget::ShowInGameWidget(const FName& InName, bool bShow)
+FString UMCOHUDWidget::GetCharacterName(const bool bIsPlayer)
+{
+	return (true == bIsPlayer) ? TEXT("Player") : TEXT("Monster");
+}
+
+void UMCOHUDWidget::ShowInGameWidget(const FString& InName, bool bShow)
 {
 	ISTRUE(true == HpWidgets.Contains(InName));
 	ISTRUE(nullptr != HpWidgets[InName]);
@@ -119,16 +133,16 @@ void UMCOHUDWidget::ShowInGameWidget(const FName& InName, bool bShow)
 	AttributeWidgets[InName]->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
-UMCOHpWidget* UMCOHUDWidget::GetHpWidget(bool bIsPlayer)
+UMCOHpWidget* UMCOHUDWidget::GetHpWidget(const bool bIsPlayer)
 {
-	const FName& CurName = (true == bIsPlayer) ? PlayerName : MonsterName;
+	const FString& CurName = GetCharacterName(bIsPlayer);
 	ISTRUE_N(true == HpWidgets.Contains(CurName));
 	return HpWidgets[CurName];
 }
 
-UMCOAttributeWidget* UMCOHUDWidget::GetAttributeWidget(bool bIsPlayer)
+UMCOAttributeWidget* UMCOHUDWidget::GetAttributeWidget(const bool bIsPlayer)
 {
-	const FName& CurName = (true == bIsPlayer) ? PlayerName : MonsterName;
+	const FString& CurName = GetCharacterName(bIsPlayer);
 	ISTRUE_N(true == AttributeWidgets.Contains(CurName));
 	return AttributeWidgets[CurName];
 }

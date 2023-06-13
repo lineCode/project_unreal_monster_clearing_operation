@@ -17,6 +17,9 @@ protected:
 public:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
+
+	UFUNCTION()
+	void OnRestartStage();
 	
 public:
 	void SetPercent(const float& InPercent);

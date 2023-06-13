@@ -1,5 +1,6 @@
 #include "MCOGameModeBase.h"
-#include "Character/Player/MCOPlayerController.h"
+#include "Character/Player/MCOPlayerCharacter.h"
+#include "GameFramework/PlayerStart.h"
 
 
 AMCOGameModeBase::AMCOGameModeBase()
@@ -8,7 +9,7 @@ AMCOGameModeBase::AMCOGameModeBase()
 	// PlayerControllerClass = AMCOPlayerController::StaticClass();
 	// PlayerStateClass      = AMCOPlayerState::StaticClass();
 
-	CurrentPhase = 0;
+	CurrentStage = 0;
 	CurrentGameState = EMCOGameState::LOBBY;
 }
 
@@ -17,6 +18,32 @@ void AMCOGameModeBase::StartPlay()
 	Super::StartPlay();
 	
 	OnChangeGameState(EMCOGameState::LOBBY);
+}
+
+void AMCOGameModeBase::OnRestartStage()
+{
+	TArray<AActor*> PlayerStarts;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStarts);
+
+	if (0 < PlayerStarts.Num() && nullptr != DefaultPawnClass)
+	{
+		AMCOPlayerCharacter* Player = GetWorld()->SpawnActor<AMCOPlayerCharacter>(
+			DefaultPawnClass,
+			PlayerStarts[0]->GetActorLocation(),
+			PlayerStarts[0]->GetActorRotation()
+		);
+		
+		APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (nullptr != PlayerController)
+		{
+			PlayerController->Possess(Player);
+		}
+	}
+
+	OnChangeGameState(EMCOGameState::FIGHT);
+
+	ISTRUE(true == OnRestartStageDelegate.IsBound());
+	OnRestartStageDelegate.Broadcast();
 }
 
 void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)

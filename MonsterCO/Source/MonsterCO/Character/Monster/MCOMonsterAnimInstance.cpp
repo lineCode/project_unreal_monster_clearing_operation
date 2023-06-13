@@ -6,12 +6,14 @@ void UMCOMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	
-	MonsterAIInterface = Cast<IMCOMonsterAIInterface>(GetOwningActor());
+	
 }
 
 void UMCOMonsterAnimInstance::SetPawnDirection(const FVector& InVelocity, const FRotator& InActorRotation)
 {
 	ISTRUE(nullptr != Owner);
+
+	IMCOMonsterAIInterface* MonsterAIInterface = Cast<IMCOMonsterAIInterface>(GetOwningActor());
 	ISTRUE(nullptr != MonsterAIInterface);
 	
 	// Turn in place

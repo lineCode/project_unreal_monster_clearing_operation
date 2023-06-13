@@ -21,7 +21,7 @@ void AMCOSoundManager::BeginPlay()
 
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::PlaySoundByGameState);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::PlaySoundByGameState);
 }
 
 void AMCOSoundManager::PlaySoundByGameState(const EMCOGameState& InState)

@@ -16,8 +16,4 @@ public:
 
 protected:
 	virtual void SetPawnDirection(const FVector& InVelocity, const FRotator& InActorRotation) override;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	TObjectPtr<IMCOMonsterAIInterface> MonsterAIInterface;
 };

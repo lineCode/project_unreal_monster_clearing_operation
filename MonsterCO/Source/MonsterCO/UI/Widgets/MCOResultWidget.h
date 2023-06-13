@@ -25,8 +25,14 @@ public:
 	void SetResultWidget(const bool bWin);
 	
 protected:
-	void OnSuccess();
-	void OnFail();
+	void SetSuccessUI();
+	void SetFailUI();
+
+	UFUNCTION()
+	void BackToTitle();
+	
+	UFUNCTION()
+	void RestartStage();
 	
 protected:
 	UPROPERTY()

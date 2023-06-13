@@ -6,11 +6,11 @@
 
 UMCOAttributeSet::UMCOAttributeSet()
 	: Health(0.0f)
-	, MaxHealth(0.0f)
+	, MaxHealth(100.0f)
 	, Stamina(0.0f)
-	, MaxStamina(0.0f)
+	, MaxStamina(100.0f)
 	, Stiffness(0.0f)
-	, MaxStiffness(0.0f)
+	, MaxStiffness(100.0f)
 	, AdditiveHealth(0.0f)
 	, AdditiveStamina(0.0f)
 	, AdditiveStiffness(0.0f)
@@ -119,16 +119,22 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	else if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())
 	{
 		const float NewStamina = FMath::Clamp(GetStamina() + GetAdditiveStamina(), 0.0f, GetMaxStamina());
-		SetStamina(NewStamina);
-		
-		if (GetMaxStamina() <= GetStamina())
+		if (NewStamina != GetStamina())
 		{
-			MCOLOG(TEXT("--------------------------Cancel stamina charging ability with tag because stamina is full"));
+			MCOLOG(TEXT("---------------------------------NEW STAMINA!!!!!!!!!!!!!!!!!!!!!! "))
+			
+			SetStamina(NewStamina);
+
+			if (GetMaxStamina() <= GetStamina())
+			{
+				MCOLOG(TEXT("--------------------------Cancel stamina charging ability with tag because stamina is full"));
 		
-			FGameplayTagContainer Tags;
-			Tags.AddTag(FMCOCharacterTags::Get().ChargingTag);
-			GetOwningAbilitySystemComponent()->CancelAbilities(&Tags);
+				FGameplayTagContainer Tags;
+				Tags.AddTag(FMCOCharacterTags::Get().ChargingTag);
+				GetOwningAbilitySystemComponent()->CancelAbilities(&Tags);
+			}
 		}
+				
 		// else if (GetAdditiveStamina() < 0.0f) 
 		// {
 		// 	HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag, Data);

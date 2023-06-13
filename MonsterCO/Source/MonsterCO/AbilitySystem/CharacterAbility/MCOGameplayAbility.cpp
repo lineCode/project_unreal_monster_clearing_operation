@@ -261,7 +261,7 @@ void UMCOGameplayAbility::StopAttributeEffect()
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_HealthTag);
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag);
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
-	
+
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
 }
 

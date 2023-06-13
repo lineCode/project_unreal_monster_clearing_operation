@@ -7,8 +7,9 @@
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameStateChanged, const EMCOGameState&, InState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameResult, const bool, bWin);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedDelegate, const EMCOGameState&, InState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameResultDelegate, const bool, bWin);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRestartStageDelegate);
 
 
 
@@ -27,11 +28,15 @@ public:
 	virtual const EMCOGameState& GetGameState() const = 0;
 
 	UFUNCTION()
-	virtual FOnGameStateChanged& GetOnGameStateChangedDelegate() = 0;
+	virtual FOnGameStateChangedDelegate& GetOnGameStateChangedDelegate() = 0;
 	
 	UFUNCTION()
-	virtual FOnGameResult& GetOnGameResultDelegate() = 0;
+	virtual FOnGameResultDelegate& GetOnGameResultDelegate() = 0;
+	
+	UFUNCTION()
+	virtual FOnRestartStageDelegate& GetOnRestartStageDelegate() = 0;
 
+	virtual void OnRestartStage() = 0;
 	virtual void OnChangeGameState(const EMCOGameState& InState) = 0;
 	virtual void OnGameResult(const bool bWin) = 0;
 };

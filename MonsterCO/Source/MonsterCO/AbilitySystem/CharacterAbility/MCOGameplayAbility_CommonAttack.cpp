@@ -33,6 +33,7 @@ void UMCOGameplayAbility_CommonAttack::EndAbility(const FGameplayAbilitySpecHand
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
 	ActivateStaminaChargeAbility();
+	MakeCharacterMove();
 }
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
@@ -51,6 +52,10 @@ void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage
 
 	// Damage Timer
 	SetDamageTimer();
+
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
+	ISTRUE(nullptr != CharacterInterface);
+	CharacterInterface->StopCharacter(true);
 }
 
 void UMCOGameplayAbility_CommonAttack::OnTaskCompleted()

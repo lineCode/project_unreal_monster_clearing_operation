@@ -37,7 +37,7 @@ void AMCOMonsterAIController::BeginPlay()
 	
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::OnChangeGameState);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnChangeGameState);
 }
 
 void AMCOMonsterAIController::OnChangeGameState(const EMCOGameState& InState)

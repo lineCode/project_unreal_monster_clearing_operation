@@ -30,11 +30,11 @@ void AMCOMonsterSpawner::BeginPlay()
 	SpawnMonster(GameModeInterface->GetPhase());
 }
 
-void AMCOMonsterSpawner::SpawnMonster(const int32& InPhase)
+void AMCOMonsterSpawner::SpawnMonster(const int32& InStage)
 {
-	ISTRUE(InPhase < MonstersData->Monsters.Num());
+	ISTRUE(InStage < MonstersData->Monsters.Num());
 	
-	SpawnedMonster = GetWorld()->SpawnActorDeferred<AMCOMonsterCharacter>(MonstersData->Monsters[InPhase], GetTransform());
+	SpawnedMonster = GetWorld()->SpawnActorDeferred<AMCOMonsterCharacter>(MonstersData->Monsters[InStage], GetTransform());
 	ISTRUE(nullptr != SpawnedMonster);
 
 	SpawnedMonster->OnCharacterDeathFinished.AddUniqueDynamic(this, &ThisClass::OnMonsterDied);

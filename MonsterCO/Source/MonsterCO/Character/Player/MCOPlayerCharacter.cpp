@@ -22,6 +22,8 @@
 #include "UI/MCOHUDWidget.h"
 #include "UI/MCOWidgetComponent.h"
 #include "UI/Widgets/MCOStaminaWidget.h"
+#include "Interface/MCOGameModeInterface.h"
+#include "GameFramework/GameModeBase.h"
 
 
 
@@ -87,9 +89,39 @@ void AMCOPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
+	
 	ModeComponent->SpawnWeapon(this);
 	ModeComponent->SetMode(EMCOModeType::TwoHand);
-	//InitializeHUD();
+}
+
+void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
+{
+	if (InState == EMCOGameState::FIGHT)
+	{
+		StopCharacter(false);
+	}
+	else if (InState == EMCOGameState::RESULT)
+	{
+		if (nullptr != AbilitySystemComponent && true == IsAlive())
+		{
+			if (nullptr != Controller)
+			{
+				Controller->SetIgnoreMoveInput(true);
+			}
+			
+			StopCharacter(true);
+			UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+			ensure(nullptr != MovementComp);
+			MovementComp->StopMovementImmediately();
+			MovementComp->DisableMovement();
+			
+			AbilitySystemComponent->CancelAbilities();
+			StopStaminaTimer();	
+		}
+	}
 }
 
 void AMCOPlayerCharacter::OnRep_PlayerState()
@@ -161,7 +193,7 @@ void AMCOPlayerCharacter::OffAllCollision()
 {
 	Super::OffAllCollision();
 
-	
+	ModeComponent->GetWeapon()->TurnOnAllCollision();
 }
 
 bool AMCOPlayerCharacter::IsEquipped()
@@ -400,6 +432,7 @@ void AMCOPlayerCharacter::OnStaminaChanged(float NewStaminaValue)
 		
 	if (bIsStaminaTimerTicking == false)
 	{
+		MCOLOG(TEXT("[Stamina] StartTimer : %f -> %f ( %f per sec)"), CurrentStaminaForWidget, NewStaminaValue, AdditiveStaminaValueForWidget);
 		StartStaminaTimer();
 	}
 }
@@ -427,7 +460,7 @@ void AMCOPlayerCharacter::UpdateStaminaWidget()
 
 	// MCOLOG(TEXT("[Stamina] Updating : %f / %f => %f"), CurrentStaminaForWidget, GetMaxStamina(), GetStamina());
 	
-	if (FMath::IsNearlyEqual(CurrentStaminaForWidget, GetStamina(), 0.1f))
+	if (FMath::IsNearlyEqual(CurrentStaminaForWidget, GetStamina(), 0.5f))
 	{
 		MCOLOG(TEXT("[Stamina] Finish : %f / %f"), CurrentStaminaForWidget, GetMaxStamina());
 		StopStaminaTimer();

@@ -126,7 +126,7 @@ public:
 	virtual const FMCODamagedData GetDamagedData() override  { return CurrentDamagedData; }
 	virtual void SetDamagedData(const FMCODamagedData&  InDamagedData) override;
 
-	virtual void OffAllCollision() override {}
+	virtual void OffAllCollision() override;
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;

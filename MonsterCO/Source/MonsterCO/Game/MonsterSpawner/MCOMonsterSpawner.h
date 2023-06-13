@@ -25,7 +25,7 @@ protected:
 	
 // --- Monster
 public:
-	void SpawnMonster(const int32& InPhase);
+	void SpawnMonster(const int32& InStage);
 
 	UFUNCTION()
 	void OnMonsterDied(const AMCOCharacter* InCharacter);

@@ -83,9 +83,6 @@ void AMCOItem::PostInitializeComponents()
 	RelocationByHeight.Z += GetItemHalfHeight();
 	SetActorLocation(RelocationByHeight);
 
-
-
-	
 	SetActorHiddenInGame(false);
 }
 

@@ -27,39 +27,37 @@ protected:
 public:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
+	
+	UFUNCTION()
+	void OnRestartStage();
 
 	void OnMonsterFirstHit();
-	void ShowInGameWidget(const FName& InName, bool bShow);
-
+	void ShowInGameWidget(const FString& InName, bool bShow);
+	
 protected:
-	void SetInGameWidget(const FName& InName);
+	void SetInGameWidget(const FString& InName);
 	void ShowTitleWidget(const bool bShow);
 	void ShowResultWidget(const bool bShow);
 
 protected:
-	UPROPERTY()
-	FName PlayerName;
-	
-	UPROPERTY()
-	FName MonsterName;
-
+	FString GetCharacterName(const bool bIsPlayer);
 	
 // --- HP Widget
 public:
-	UMCOHpWidget* GetHpWidget(bool bIsPlayer);
+	UMCOHpWidget* GetHpWidget(const bool bIsPlayer);
 	
 protected:
 	UPROPERTY()
-	TMap<FName, TObjectPtr<UMCOHpWidget>> HpWidgets;
+	TMap<FString, TObjectPtr<UMCOHpWidget>> HpWidgets;
 	
 
 // --- Attribute Widget
 public:
-	UMCOAttributeWidget* GetAttributeWidget(bool bIsPlayer);
+	UMCOAttributeWidget* GetAttributeWidget(const bool bIsPlayer);
 	
 protected:
 	UPROPERTY()
-	TMap<FName, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
+	TMap<FString, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
 
 	
 // --- Title
