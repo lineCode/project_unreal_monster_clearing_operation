@@ -20,7 +20,7 @@ class UWidgetComponent;
 
 DECLARE_DELEGATE_OneParam(FOnStaminaStoppedDelegate, const float& /*InCurrentValue*/);
 DECLARE_DELEGATE_OneParam(FOnStaminaChangedDelegate, const float& /*InPercent*/);
-
+DECLARE_MULTICAST_DELEGATE(FOnMonsterFirstHit);
 
 
 
@@ -105,12 +105,14 @@ protected:
 
 // --- Widget
 public:
-	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) override;
-	void InitializeHUD();
-	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;
-	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const override;
-	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) override;
+	void InitializeHUD(UMCOHUDWidget* InHUDWidget);
+	// virtual void SetHUD(UMCOHUDWidget* InHUDWidget) override;
+	// virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const override;
 
+// --- Widget/Stamina
+public:
+	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) override;
+	
 protected:
 	void OnStaminaChanged(float NewStaminaValue);
 	void StartStaminaTimer();
@@ -125,15 +127,21 @@ protected:
 	float AdditiveStaminaValueForWidget;
 	float CurrentStaminaForWidget;
 	
-protected:	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UWidgetComponent> WidgetComponent;
+	
+	FTimerHandle StaminaTimerHandle;
+
+// --- Widget/Monster
+protected:
+	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;
+
+protected:
+	FOnMonsterFirstHit OnMonsterFirstHit;
+	
 	UPROPERTY()
 	uint8 bIsMonsterInfoShowed : 1;
 
 	UPROPERTY()
 	TWeakObjectPtr<UMCOHUDWidget> HUDWidget;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Widget, Meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UWidgetComponent> WidgetComponent;
-	
-	FTimerHandle StaminaTimerHandle;
 };

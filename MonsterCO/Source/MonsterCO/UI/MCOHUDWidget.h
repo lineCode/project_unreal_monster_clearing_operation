@@ -5,10 +5,12 @@
 #include "AbilitySystem/CharacterAbility/MCOCommonMontageData.h"
 #include "MCOHUDWidget.generated.h"
 
+
 class UMCOHpWidget;
 class UMCOAttributeWidget;
 class UMCOSkillWidget;
 class UMCOSkillWidgetData;
+class UMCOResultWidget;
 
 
 UCLASS()
@@ -23,9 +25,25 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-	void InitializeHUDWidget(bool bIsPlayer);
-	void ShowWidget(bool bIsPlayer, bool bIsToShow);
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
 
+	void OnMonsterFirstHit();
+	void ShowInGameWidget(const FName& InName, bool bShow);
+
+protected:
+	void SetInGameWidget(const FName& InName);
+	void ShowTitleWidget(const bool bShow);
+	void ShowResultWidget(const bool bShow);
+
+protected:
+	UPROPERTY()
+	FName PlayerName;
+	
+	UPROPERTY()
+	FName MonsterName;
+
+	
 // --- HP Widget
 public:
 	UMCOHpWidget* GetHpWidget(bool bIsPlayer);
@@ -40,22 +58,33 @@ public:
 	UMCOAttributeWidget* GetAttributeWidget(bool bIsPlayer);
 	
 protected:
-	const FName GetName(bool bIsPlayer) const;
-	
-protected:
 	UPROPERTY()
 	TMap<FName, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
 
-
-// --- Skill Widget
-public:
-	void InitializeSkillWidget(const FGameplayTag& InTag, const FText& InKeyText);
-	void StartSkillWidget(const FGameplayTag& InTag, const float& InCooldownTime);
-
+	
+// --- Title
 protected:
 	UPROPERTY()
-	TArray<TObjectPtr<UMCOSkillWidget>> SkillWidgets;
+	TObjectPtr<UWidget> TitleWidget;
 
+	
+// --- Result Widget
+protected:
 	UPROPERTY()
-	TObjectPtr<UMCOSkillWidgetData> SkillWidgetData;
+	TObjectPtr<UMCOResultWidget> ResultWidget;
+
+	
+// --- Skill Widget
+// public:
+// 	void InitializeSkillWidget(const FGameplayTag& InTag, const FText& InKeyText);
+// 	void StartSkillWidget(const FGameplayTag& InTag, const float& InCooldownTime);
+//
+// protected:
+// 	UPROPERTY()
+// 	TArray<TObjectPtr<UMCOSkillWidget>> SkillWidgets;
+//
+// 	UPROPERTY()
+// 	TObjectPtr<UMCOSkillWidgetData> SkillWidgetData;
+
+	
 };

@@ -1,6 +1,8 @@
-#include "UI/MCOStaminaWidget.h"
+#include "MCOStaminaWidget.h"
 #include "Components/Image.h"
 #include "Interface/MCOHUDInterface.h"
+#include "Interface/MCOGameModeInterface.h"
+#include "GameFramework/GameModeBase.h"
 
 
 void UMCOStaminaWidget::NativeConstruct()
@@ -8,8 +10,7 @@ void UMCOStaminaWidget::NativeConstruct()
 	Super::NativeConstruct();
 	
 	StaminaRadialProgressBar = Cast<UImage>(GetWidgetFromName(TEXT("RadialProgressBar")));
-	ensure(StaminaRadialProgressBar);
-	StaminaRadialProgressBar->SetVisibility(ESlateVisibility::Visible);
+	ensure(nullptr != StaminaRadialProgressBar);
 
 	bIsTimerTicking = false;
 	
@@ -17,6 +18,32 @@ void UMCOStaminaWidget::NativeConstruct()
 	if (nullptr != HUDInterface)
 	{
 		HUDInterface->SetupStaminaWidget(this);
+	}
+
+	// OnGameStateChanged
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::OnGameStateChanged);
+	
+	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
+{
+	if (InState == EMCOGameState::LOBBY)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (InState == EMCOGameState::FIGHT)
+	{
+		SetVisibility(ESlateVisibility::Visible);
+	}
+	else if (InState == EMCOGameState::REWARD)
+	{
+	}
+	else if (InState == EMCOGameState::RESULT)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 

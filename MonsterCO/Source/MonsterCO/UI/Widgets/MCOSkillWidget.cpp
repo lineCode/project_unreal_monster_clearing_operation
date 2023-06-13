@@ -1,4 +1,4 @@
-#include "UI/MCOSkillWidget.h"
+#include "MCOSkillWidget.h"
 #include "Components/Image.h"
 
 void UMCOSkillWidget::NativeConstruct()

@@ -2,8 +2,9 @@
 #include "Components/BoxComponent.h"
 #include "MCOMonstersData.h"
 #include "Character/Monster/MCOMonsterCharacter.h"
-#include "Game/MCOGameModeBase.h"
+#include "Interface/MCOGameModeInterface.h"
 #include "Item/MCOItem.h"
+#include "GameFramework/GameModeBase.h"
 
 
 AMCOMonsterSpawner::AMCOMonsterSpawner()
@@ -24,9 +25,9 @@ void AMCOMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const AMCOGameModeBase* MCOGameMode = Cast<AMCOGameModeBase>(GetWorld()->GetAuthGameMode());
-	ISTRUE(nullptr != MCOGameMode);
-	SpawnMonster(MCOGameMode->GetPhase());
+	const IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	SpawnMonster(GameModeInterface->GetPhase());
 }
 
 void AMCOMonsterSpawner::SpawnMonster(const int32& InPhase)

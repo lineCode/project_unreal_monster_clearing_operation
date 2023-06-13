@@ -3,6 +3,9 @@
 #include "BehaviorTree/BlackboardData.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "AI/MCOAIKeys.h"
+#include "Interface/MCOGameModeInterface.h"
+#include "GameFramework/GameModeBase.h"
+
 
 
 AMCOMonsterAIController::AMCOMonsterAIController(const FObjectInitializer& ObjectInitializer)
@@ -25,7 +28,24 @@ void AMCOMonsterAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 	
-	RunAI();
+	StopAI();
+}
+
+void AMCOMonsterAIController::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::OnChangeGameState);
+}
+
+void AMCOMonsterAIController::OnChangeGameState(const EMCOGameState& InState)
+{
+	if (InState == EMCOGameState::FIGHT)
+	{
+		RunAI();
+	}
 }
 
 void AMCOMonsterAIController::RunAI()

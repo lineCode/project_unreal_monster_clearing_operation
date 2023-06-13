@@ -184,9 +184,9 @@ void UMCOGameplayAbility::StartCooldownWidget() const
 	ISTRUE(nullptr != CurrentActorInfo);
 	ISTRUE(true == CooldownFragment->CanApplyCooldown());
 	
-	const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
-	ISTRUE(nullptr != HUDInterface);
-	HUDInterface->StartCooldownWidget(AbilityTag, CooldownFragment->CooldownTime);
+	// const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
+	// ISTRUE(nullptr != HUDInterface);
+	// HUDInterface->StartCooldownWidget(AbilityTag, CooldownFragment->CooldownTime);
 }
 
 void UMCOGameplayAbility::UpdateAttributeFragment(const UMCOActionFragment_Attribute* InAttributeFragment)

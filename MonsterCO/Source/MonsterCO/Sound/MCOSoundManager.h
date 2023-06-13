@@ -22,6 +22,7 @@ public:
 	virtual void BeginPlay() override;
 	
 public:
+	UFUNCTION()
 	void PlaySoundByGameState(const EMCOGameState& InState);	
 
 protected:

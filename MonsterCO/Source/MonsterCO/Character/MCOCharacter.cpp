@@ -5,11 +5,14 @@
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAttributeSet.h"
-#include "UI/MCOHpWidget.h"
-#include "UI/MCOAttributeWidget.h"
+#include "UI/Widgets/MCOHpWidget.h"
+#include "UI/Widgets/MCOAttributeWidget.h"
 #include "MCOPlayerState.h"
 #include "Item/MCOItemData.h"
 #include "Item/MCOItemData_Potion.h"
+#include "Interface/MCOGameModeInterface.h"
+#include "GameFramework/GameModeBase.h"
+#include "Interface/MCOMonsterAIInterface.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -69,6 +72,7 @@ void AMCOCharacter::PossessedBy(AController* NewController)
 void AMCOCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
 }
 
 void AMCOCharacter::Initialize()
@@ -281,6 +285,15 @@ void AMCOCharacter::FinishDying()
 	
 	SetActorHiddenInGame(true);
 	DestroyAllAttachedActors();
+
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+
+	if (Cast<IMCOMonsterAIInterface>(this) == nullptr)
+	{
+		GameModeInterface->OnGameResult(false);
+		GameModeInterface->OnChangeGameState(EMCOGameState::RESULT);
+	}
 	
 	// Uninitialize the ASC if we're still the avatar actor
 	// (otherwise another pawn already did it when they became the avatar actor)

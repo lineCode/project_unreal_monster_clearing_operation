@@ -11,7 +11,6 @@
 #include "EnhancedInputSubsystems.h"
 #include "Input/MCOInputComponent.h"
 #include "Input/MCOInputConfig.h"
-#include "UI/MCOHUDWidget.h"
 #include "MCOPlayerControlData.h"
 #include "Character/MCOCharacterData.h"
 #include "AbilitySystem/MCOCharacterTags.h"
@@ -20,8 +19,10 @@
 #include "Character/MCOPlayerState.h"
 #include "CharacterAttachment/MCOPlayerModeComponent.h"
 #include "CharacterAttachment/MCOWeapon.h"
-#include "UI/MCOStaminaWidget.h"
+#include "UI/MCOHUDWidget.h"
 #include "UI/MCOWidgetComponent.h"
+#include "UI/Widgets/MCOStaminaWidget.h"
+
 
 
 AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -85,10 +86,10 @@ void AMCOPlayerCharacter::PossessedBy(AController* NewController)
 void AMCOPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	ModeComponent->SpawnWeapon(this);
 	ModeComponent->SetMode(EMCOModeType::TwoHand);
-	InitializeHUD();
+	//InitializeHUD();
 }
 
 void AMCOPlayerCharacter::OnRep_PlayerState()
@@ -328,52 +329,51 @@ void AMCOPlayerCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y * CharacterControlData->BaseLookRate * GetWorld()->DeltaTimeSeconds);
 }
 
-void AMCOPlayerCharacter::SetHUD(UMCOHUDWidget* InHUDWidget)
+// void AMCOPlayerCharacter::SetHUD(UMCOHUDWidget* InHUDWidget)
+// {
+// 	HUDWidget = InHUDWidget;
+// }
+
+
+void AMCOPlayerCharacter::InitializeHUD(UMCOHUDWidget* InHUDWidget)
 {
+	ISTRUE(nullptr != InHUDWidget);
 	HUDWidget = InHUDWidget;
-}
-
-void AMCOPlayerCharacter::InitializeHUD()
-{
-	ISTRUE(nullptr != HUDWidget);
-
-	HUDWidget->InitializeHUDWidget(true);
-	InitializeWidget(HUDWidget->GetHpWidget(true), HUDWidget->GetAttributeWidget(true));
-	HUDWidget->ShowWidget(true, true);
-
-	// temp
-	HUDWidget->InitializeSkillWidget(
-		FMCOCharacterTags::Get().JumpTag,
-		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().JumpTag)
-	);
-
-	HUDWidget->InitializeSkillWidget(
-		FMCOCharacterTags::Get().DodgeTag,
-		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().DodgeTag)
-	);
 	
-	HUDWidget->InitializeSkillWidget(
-		FMCOCharacterTags::Get().AttackTag,
-		InputConfig->GetActionKeyName(FMCOCharacterTags::Get().AttackTag)
-	);	
+	InitializeWidget(InHUDWidget->GetHpWidget(true), InHUDWidget->GetAttributeWidget(true));
+
+	//HUDWidget->ShowInGameWidget(true, true);
+
+	// HUDWidget->InitializeSkillWidget(
+	// 	FMCOCharacterTags::Get().JumpTag,
+	// 	InputConfig->GetActionKeyName(FMCOCharacterTags::Get().JumpTag)
+	// );
+	//
+	// HUDWidget->InitializeSkillWidget(
+	// 	FMCOCharacterTags::Get().DodgeTag,
+	// 	InputConfig->GetActionKeyName(FMCOCharacterTags::Get().DodgeTag)
+	// );
+	//
+	// HUDWidget->InitializeSkillWidget(
+	// 	FMCOCharacterTags::Get().AttackTag,
+	// 	InputConfig->GetActionKeyName(FMCOCharacterTags::Get().AttackTag)
+	// );	
 }
 
 void AMCOPlayerCharacter::ShowMonsterInfo(IMCOCharacterInterface* InCharacter)
 {
 	ISTRUE(false == bIsMonsterInfoShowed);
-	ISTRUE(nullptr != HUDWidget);
-	
+
 	bIsMonsterInfoShowed = true;
-	HUDWidget->InitializeHUDWidget(false);
 	InCharacter->InitializeWidget(HUDWidget->GetHpWidget(false), HUDWidget->GetAttributeWidget(false));
-	HUDWidget->ShowWidget(false, true);
+	HUDWidget->OnMonsterFirstHit();
 }
 
-void AMCOPlayerCharacter::StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const
-{
-	ISTRUE(nullptr != HUDWidget);
-	HUDWidget->StartSkillWidget(InTag, InCooldownTime);
-}
+// void AMCOPlayerCharacter::StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const
+// {
+// 	ISTRUE(nullptr != HUDWidget);
+// 	HUDWidget->StartSkillWidget(InTag, InCooldownTime);
+// }
 
 void AMCOPlayerCharacter::SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget)
 {
@@ -388,6 +388,7 @@ void AMCOPlayerCharacter::SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget)
 	
 	InStaminaWidget->SetPercent(GetStamina() / GetMaxStamina());	
 	OnStaminaChangedDelegate.BindUObject(InStaminaWidget, &UMCOStaminaWidget::SetPercent);
+
 }
 
 void AMCOPlayerCharacter::OnStaminaChanged(float NewStaminaValue)

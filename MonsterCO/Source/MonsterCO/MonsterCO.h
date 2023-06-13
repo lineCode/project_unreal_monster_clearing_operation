@@ -27,7 +27,6 @@ DECLARE_LOG_CATEGORY_EXTERN(MCOLog, Display, All);
 DECLARE_LOG_CATEGORY_EXTERN(MCOAbility, Display, All);
 
 
-
 class MONSTERCO_API FLog
 {
 public:
@@ -46,6 +45,7 @@ public:
 #define MCOLOG_V(Verbosity, Format, ...) UE_LOG(MCOLog, Verbosity, TEXT("%s"), *FString::Printf(Format, ##__VA_ARGS__))
 #define MCOLOG_I(Format, ...)            UE_LOG(MCOLog, Warning, TEXT("%s%s"), MCOLOG_CALLINFO, *FString::Printf(Format, ##__VA_ARGS__))
 #define MCOLOG_C(Category, Format, ...)  UE_LOG(Category, Warning, TEXT("%s"), *FString::Printf(Format, ##__VA_ARGS__))
+
 
 // -- ConstructorHelpers
 #define GETASSET(OutResult, ClassType, Path)\
@@ -67,10 +67,10 @@ ensure(OutResult);
 UENUM(BlueprintType)
 enum class EMCOGameState : uint8
 {
-	READY,
+	LOBBY,
 	FIGHT,
 	REWARD,
-	NEXT
+	RESULT
 };
 
 

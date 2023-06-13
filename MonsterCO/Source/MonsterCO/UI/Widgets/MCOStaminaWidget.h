@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "MCOUserWidget.h"
+#include "UI/MCOUserWidget.h"
 #include "MCOStaminaWidget.generated.h"
 
 class UImage;
@@ -14,6 +14,10 @@ class MONSTERCO_API UMCOStaminaWidget : public UMCOUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
+public:
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
+	
 public:
 	void SetPercent(const float& InPercent);
 	

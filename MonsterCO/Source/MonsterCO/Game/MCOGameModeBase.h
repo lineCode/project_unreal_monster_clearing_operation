@@ -2,10 +2,13 @@
 
 #include "MonsterCO.h"
 #include "GameFramework/GameModeBase.h"
+#include "Interface/MCOGameModeInterface.h"
 #include "MCOGameModeBase.generated.h"
 
+
+
 UCLASS()
-class MONSTERCO_API AMCOGameModeBase : public AGameModeBase
+class MONSTERCO_API AMCOGameModeBase : public AGameModeBase, public IMCOGameModeInterface
 {
 	GENERATED_BODY()
 	
@@ -15,16 +18,22 @@ public:
 public:
 	virtual void StartPlay() override;
 	
-	FORCEINLINE int32 GetPhase() const { return CurrentPhase; }
-	FORCEINLINE EMCOGameState GetGameState() const { return CurrentGameState; }
+	virtual const int32& GetPhase() const override { return CurrentPhase; }
+	virtual const EMCOGameState& GetGameState() const override { return CurrentGameState; }
+	virtual FOnGameStateChanged& GetOnGameStateChangedDelegate() override { return OnGameStateChangedDelegate; }
+	virtual FOnGameResult& GetOnGameResultDelegate() override { return OnGameResultDelegate; }
 
-// --- Game
+	virtual void OnChangeGameState(const EMCOGameState& InState) override;
+	virtual void OnGameResult(const bool bWin) override;
+	
+// --- State
 protected:
+	FOnGameStateChanged OnGameStateChangedDelegate;
+	FOnGameResult OnGameResultDelegate;
+
 	UPROPERTY()
 	EMCOGameState CurrentGameState;
 	
-// --- Monster
-protected:
 	UPROPERTY()
 	int32 CurrentPhase;
 };

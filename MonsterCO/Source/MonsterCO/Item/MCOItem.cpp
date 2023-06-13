@@ -5,6 +5,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "Interface/MCOCharacterItemInterface.h"
 #include "Physics/MCOPhysics.h"
+#include "Interface/MCOGameModeInterface.h"
+#include "GameFramework/GameModeBase.h"
 
 
 AMCOItem::AMCOItem()
@@ -33,7 +35,6 @@ AMCOItem::AMCOItem()
 	Trigger->SetBoxExtent(FVector(45.0f, 45.0f, 45.0f));
 	Trigger->SetHiddenInGame(false);
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
-
 }
 
 void AMCOItem::PostInitializeComponents()
@@ -81,6 +82,9 @@ void AMCOItem::PostInitializeComponents()
 	FVector RelocationByHeight = GetActorLocation();
 	RelocationByHeight.Z += GetItemHalfHeight();
 	SetActorLocation(RelocationByHeight);
+
+
+
 	
 	SetActorHiddenInGame(false);
 }
@@ -120,6 +124,11 @@ void AMCOItem::OnPickupFinished(UAnimMontage* Montage, bool bInterrupted)
 	{
 		OnItemDestroyed.Broadcast();
 	}
+	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->OnGameResult(true);
+	GameModeInterface->OnChangeGameState(EMCOGameState::RESULT);
 	
 	SetActorHiddenInGame(true);
 	//Destroy();

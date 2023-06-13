@@ -1,8 +1,9 @@
 #include "MCOSoundManager.h"
 #include "MCOSoundData.h"
 #include "Components/AudioComponent.h"
-#include "Game/MCOGameModeBase.h"
+#include "Interface/MCOGameModeInterface.h"
 #include "Sound/SoundCue.h"
+#include "GameFramework/GameModeBase.h"
 
 
 
@@ -18,11 +19,9 @@ void AMCOSoundManager::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// temp
-	const AMCOGameModeBase* MCOGameMode = Cast<AMCOGameModeBase>(GetWorld()->GetAuthGameMode());
-	ISTRUE(nullptr != MCOGameMode);
-	const EMCOGameState CurrentState = MCOGameMode->GetGameState();
-	PlaySoundByGameState(CurrentState);
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddDynamic(this, &ThisClass::PlaySoundByGameState);
 }
 
 void AMCOSoundManager::PlaySoundByGameState(const EMCOGameState& InState)

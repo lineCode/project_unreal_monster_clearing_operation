@@ -1,4 +1,4 @@
-#include "UI/MCOSkillWidgetData.h"
+#include "MCOSkillWidgetData.h"
 
 void UMCOSkillWidgetData::SetData(const FGameplayTag& InTag, const uint8 InSlotLocation, const FText& InKeyText)
 {

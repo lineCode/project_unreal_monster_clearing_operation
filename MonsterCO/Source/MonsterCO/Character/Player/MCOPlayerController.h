@@ -8,6 +8,7 @@ class UMCOAbilitySystemComponent;
 class UMCOHUDWidget;
 
 
+
 UCLASS()
 class MONSTERCO_API AMCOPlayerController : public APlayerController
 {
@@ -20,6 +21,10 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void BeginPlay() override;
 
+protected:
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
+	
 // --- Ability
 public:
 	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;

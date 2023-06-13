@@ -17,16 +17,20 @@ public:
 	AMCOMonsterAIController(const FObjectInitializer& ObjectInitializer);
 	virtual void PostInitializeComponents() override;
 
+protected:
+	virtual void OnPossess(APawn* InPawn) override;
+	virtual void BeginPlay() override;
+	
 public:
+	UFUNCTION()
+	void OnChangeGameState(const EMCOGameState& InState);
+	
 	void RunAI();
 	void StopAI();
 	void ContinueAI();
 
 public:
 	UObject* GetTarget();
-	
-protected:
-	virtual void OnPossess(APawn* InPawn) override;
 
 private:
 	UPROPERTY()

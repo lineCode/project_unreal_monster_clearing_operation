@@ -19,10 +19,14 @@ class MONSTERCO_API IMCOHUDInterface
 {
 	GENERATED_BODY()
 
+// --- HUD
 public:
-	virtual void SetHUD(UMCOHUDWidget* InHUDWidget) = 0;
+	virtual void InitializeHUD(UMCOHUDWidget* InHUDWidget) = 0;
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) = 0;
-	virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const = 0;
+
+// ---- Cooldown
+public:
+	// virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const = 0;
 
 // --- Stamina
 public:
