@@ -99,16 +99,16 @@ void AMCOPlayerCharacter::BeginPlay()
 
 void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
-	if (InState == EMCOGameState::MOVE_TO_NEXT_STAGE)
-    {
-    	if (nullptr != GetMCOAbilitySystemComponent())
-    	{
-    		GetMCOAbilitySystemComponent()->CancelAbilityByTag(FMCOCharacterTags::Get().TakeItemTag);
-    	}
-    }
-	else if (InState == EMCOGameState::FIGHT)
+	if (InState == EMCOGameState::FIGHT)
 	{
 		StopCharacter(false);
+	}
+	else if (InState == EMCOGameState::NEXT)
+	{
+		if (nullptr != GetMCOAbilitySystemComponent())
+		{
+			GetMCOAbilitySystemComponent()->CancelAbilityByTag(FMCOCharacterTags::Get().TakeItemTag);
+		}
 	}
 	else if (InState == EMCOGameState::RESULT_WIN)
 	{
@@ -469,7 +469,7 @@ void AMCOPlayerCharacter::UpdateStaminaWidget()
 	
 	if (FMath::IsNearlyEqual(CurrentStaminaForWidget, GetStamina(), 0.5f))
 	{
-		MCOLOG(TEXT("[Stamina] Finish : %f / %f"), CurrentStaminaForWidget, GetMaxStamina());
+		//MCOLOG(TEXT("[Stamina] Finish : %f / %f"), CurrentStaminaForWidget, GetMaxStamina());
 		StopStaminaTimer();
 	}
 }

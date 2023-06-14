@@ -121,11 +121,13 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 		const float NewStamina = FMath::Clamp(GetStamina() + GetAdditiveStamina(), 0.0f, GetMaxStamina());
 		if (NewStamina != GetStamina())
 		{
+			MCOLOG(TEXT("-------------------------- New Stamina : %f"), NewStamina);
+			
 			SetStamina(NewStamina);
 
 			if (GetMaxStamina() <= GetStamina())
 			{
-				MCOLOG(TEXT("--------------------------Cancel stamina charging ability with tag because stamina is full"));
+				//MCOLOG(TEXT("Cancel stamina charging ability because it's full"));
 		
 				FGameplayTagContainer Tags;
 				Tags.AddTag(FMCOCharacterTags::Get().ChargingTag);

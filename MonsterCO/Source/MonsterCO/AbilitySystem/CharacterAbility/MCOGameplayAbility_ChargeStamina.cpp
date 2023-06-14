@@ -41,13 +41,11 @@ void UMCOGameplayAbility_ChargeStamina::ActivateAbility(const FGameplayAbilitySp
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	MCOLOG(TEXT("--------------------------(2) Activate charge ability"));
+	MCOLOG(TEXT("-------------------------- Activate charge ability"));
 }
 
 void UMCOGameplayAbility_ChargeStamina::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-	
-	MCOLOG(TEXT("--------------------------(3) End charge ability"));
 }
 

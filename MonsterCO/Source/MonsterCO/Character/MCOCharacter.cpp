@@ -105,7 +105,7 @@ void AMCOCharacter::Initialize()
 	AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
 	ISTRUE(nullptr != AttributeSet);
 	
-	MCOLOG(TEXT("%s : InitValues: Health = %f / %f, Stemina = %f / %f"),
+	MCOPRINT(TEXT("%s : InitValues: Health = %f / %f, Stemina = %f / %f"),
 		*CharacterName.ToString(),
 		GetHealth(), GetMaxHealth(),
 		GetStamina(), GetMaxStamina()
@@ -240,7 +240,7 @@ float AMCOCharacter::GetCapsuleRadius() const
 
 void AMCOCharacter::Die()
 {
-	MCOLOG(TEXT("%s : Died"), *CharacterName.ToString());
+	MCOPRINT(TEXT("%s : Died"), *CharacterName.ToString());
 
 	OffAllCollision();	
 	
