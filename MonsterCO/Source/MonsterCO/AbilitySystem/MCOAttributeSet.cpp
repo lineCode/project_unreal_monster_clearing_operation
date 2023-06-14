@@ -121,8 +121,6 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 		const float NewStamina = FMath::Clamp(GetStamina() + GetAdditiveStamina(), 0.0f, GetMaxStamina());
 		if (NewStamina != GetStamina())
 		{
-			MCOLOG(TEXT("---------------------------------NEW STAMINA!!!!!!!!!!!!!!!!!!!!!! "))
-			
 			SetStamina(NewStamina);
 
 			if (GetMaxStamina() <= GetStamina())

@@ -25,6 +25,8 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	void SetData(UMCOItemData* InData);
+	void InitializeItem(const FVector& InWorldLocation);
 	float GetItemHalfHeight() const;
 	
 protected:

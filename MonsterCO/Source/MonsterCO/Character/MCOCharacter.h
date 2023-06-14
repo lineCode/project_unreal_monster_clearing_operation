@@ -63,7 +63,7 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;
 
-protected:
+public:
 	virtual void Initialize();
 
 protected:

@@ -296,8 +296,7 @@ void AMCOCharacter::FinishDying()
 
 	if (Cast<IMCOMonsterAIInterface>(this) == nullptr)
 	{
-		GameModeInterface->OnGameResult(false);
-		GameModeInterface->OnChangeGameState(EMCOGameState::RESULT);
+		GameModeInterface->OnChangeGameState(EMCOGameState::RESULT_LOSE);
 	}
 	
 	// Uninitialize the ASC if we're still the avatar actor

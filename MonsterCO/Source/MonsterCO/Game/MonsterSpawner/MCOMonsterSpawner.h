@@ -20,16 +20,19 @@ public:
 	virtual void BeginPlay() override;
 
 protected:
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
+	
+protected:
 	UPROPERTY(VisibleAnywhere, Category = Box)
 	TObjectPtr<UBoxComponent> Box;
 	
 // --- Monster
 public:
-	void SpawnMonster(const int32& InStage);
+	void SpawnMonster();
 
 	UFUNCTION()
 	void OnMonsterDied(const AMCOCharacter* InCharacter);
-
 	
 protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -40,18 +43,18 @@ protected:
 	
 // --- Item
 public:
-	void SpawnItem(const FVector& InSpawnLocation);
+	void FindSpawnLocation(const AMCOCharacter* InCharacter);
+	void PickRandomItem(const FVector& InSpawnLocation);
+	void RespawnItem(const int32& RandomIndex, const FVector& InSpawnLocation);
+	void SpawnNewItem(const int32& RandomIndex, const FVector& InSpawnLocation, const FSoftObjectPtr& AssetPtr);
 
 	UFUNCTION()
 	void OnItemDestroyed();
-
-	FTimerHandle Timer;
-	void Tester();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = Item, Meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AMCOItem> ItemClass;
 
 	UPROPERTY(VisibleAnywhere, Category = Item, Meta = (AllowPrivateAccess = "true"))
-	TArray<TWeakObjectPtr<AMCOItem>> Items;
+	TMap<int32, TWeakObjectPtr<AMCOItem>> SpawnedItems;
 };

@@ -43,6 +43,8 @@ public:
 // --- Ability System
 protected:
 	virtual void OnRep_PlayerState() override;
+
+public:
 	virtual void Initialize() override;
 	
 // -- Control Data

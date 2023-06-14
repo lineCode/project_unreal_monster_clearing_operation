@@ -20,18 +20,14 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 
-public:
-	UFUNCTION()
-	void SetResultWidget(const bool bWin);
-	
 protected:
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
+
 	void SetSuccessUI();
 	void SetFailUI();
 
-	UFUNCTION()
 	void BackToTitle();
-	
-	UFUNCTION()
 	void RestartStage();
 	
 protected:

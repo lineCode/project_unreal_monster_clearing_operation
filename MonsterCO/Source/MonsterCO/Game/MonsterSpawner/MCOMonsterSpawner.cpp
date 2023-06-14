@@ -1,10 +1,12 @@
 #include "MCOMonsterSpawner.h"
 #include "Components/BoxComponent.h"
+#include "Engine/AssetManager.h"
 #include "MCOMonstersData.h"
 #include "Character/Monster/MCOMonsterCharacter.h"
 #include "Item/MCOItem.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
+#include "Item/MCOItemData.h"
 
 
 AMCOMonsterSpawner::AMCOMonsterSpawner()
@@ -24,27 +26,55 @@ AMCOMonsterSpawner::AMCOMonsterSpawner()
 void AMCOMonsterSpawner::BeginPlay()
 {
 	Super::BeginPlay();
-
-	const IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	SpawnMonster(GameModeInterface->GetPhase());
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
 }
 
-void AMCOMonsterSpawner::SpawnMonster(const int32& InStage)
+void AMCOMonsterSpawner::OnGameStateChanged(const EMCOGameState& InState)
 {
-	ISTRUE(InStage < MonstersData->Monsters.Num());
-	
-	SpawnedMonster = GetWorld()->SpawnActorDeferred<AMCOMonsterCharacter>(MonstersData->Monsters[InStage], GetTransform());
-	ISTRUE(nullptr != SpawnedMonster);
+	if (InState == EMCOGameState::LOBBY)
+	{
+	}
+	else if (InState == EMCOGameState::FIGHT)
+	{
+		SpawnMonster();
+	}
+	else if (InState == EMCOGameState::REWARD)
+	{
+	}
+}
 
-	SpawnedMonster->OnCharacterDeathFinished.AddUniqueDynamic(this, &ThisClass::OnMonsterDied);
-	SpawnedMonster->FinishSpawning(GetTransform());
+void AMCOMonsterSpawner::SpawnMonster()
+{
+	const IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+    ensure(nullptr != GameModeInterface);
+	const int32 State = GameModeInterface->GetStage();
+	
+	ensure(State < MonstersData->Monsters.Num());
+
+	if (nullptr != SpawnedMonster)
+	{
+		SpawnedMonster->SetActorLocation(GetActorLocation());
+		SpawnedMonster->Initialize();
+	}
+	else
+	{
+		SpawnedMonster = GetWorld()->SpawnActorDeferred<AMCOMonsterCharacter>(MonstersData->Monsters[State], GetTransform());
+		ISTRUE(nullptr != SpawnedMonster);
+		SpawnedMonster->FinishSpawning(GetTransform());
+		SpawnedMonster->OnCharacterDeathFinished.AddUniqueDynamic(this, &ThisClass::OnMonsterDied);
+	}		
 }
 
 void AMCOMonsterSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 {
-	ensure(nullptr != InCharacter);
+	FindSpawnLocation(InCharacter);	
+}
 
+void AMCOMonsterSpawner::FindSpawnLocation(const AMCOCharacter* InCharacter)
+{
 	TArray<FHitResult> TraceResults;
 	const FVector StartLocation = InCharacter->GetActorLocation();
 	const FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, -1000.0f); 
@@ -72,13 +102,48 @@ void AMCOMonsterSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 			continue;
 		}
 		
-		SpawnItem(HiResult.Location);
+		PickRandomItem(HiResult.Location);
 		break;
 	}
 }
 
-void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
+void AMCOMonsterSpawner::PickRandomItem(const FVector& InSpawnLocation)
 {
+	const UAssetManager& Manager = UAssetManager::Get();
+
+	TArray<FPrimaryAssetId> Assets;
+	Manager.GetPrimaryAssetIdList(ITEMDATA_NAME, Assets);
+	ensure(0 < Assets.Num());
+	
+	const int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
+
+	const FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
+	if (true == AssetPtr.IsPending())
+	{
+		AssetPtr.LoadSynchronous();
+	}
+
+	if (true == SpawnedItems.Contains(RandomIndex))
+	{
+		RespawnItem(RandomIndex, InSpawnLocation);
+	}
+	else
+	{
+		SpawnNewItem(RandomIndex, InSpawnLocation, AssetPtr);
+	}
+}
+
+void AMCOMonsterSpawner::RespawnItem(const int32& RandomIndex, const FVector& InSpawnLocation)
+{
+	MCOPRINT(TEXT("Item: %d -> Respawn !"), RandomIndex);
+	
+	SpawnedItems[RandomIndex]->InitializeItem(InSpawnLocation);
+}
+
+void AMCOMonsterSpawner::SpawnNewItem(const int32& RandomIndex, const FVector& InSpawnLocation, const FSoftObjectPtr& AssetPtr)
+{
+	MCOPRINT(TEXT("Item: %d -> New spawn !"), RandomIndex);
+		
 	FTransform Transform;
 	Transform.SetLocation(InSpawnLocation);
 	
@@ -88,7 +153,9 @@ void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
 	if (nullptr != Item)
 	{
 		Item->OnItemDestroyed.AddUObject(this, &ThisClass::OnItemDestroyed);
-		Items.Add(Item);
+		SpawnedItems.Add(RandomIndex, Item);
+		
+		Item->SetData(Cast<UMCOItemData>(AssetPtr.Get()));
 	}
 
 	if (nullptr != ItemActor)
@@ -101,6 +168,5 @@ void AMCOMonsterSpawner::OnItemDestroyed()
 {
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->OnGameResult(true);
-	GameModeInterface->OnChangeGameState(EMCOGameState::RESULT);
+	GameModeInterface->OnChangeGameState(EMCOGameState::NEXT);
 }

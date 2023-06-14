@@ -24,6 +24,7 @@ public:
 
 public:
 	void TryActivateAbilityByTag(const FGameplayTag& InTag);
+	void CancelAbilityByTag(const FGameplayTag& InTag);
 	
 // --- Input
 public:

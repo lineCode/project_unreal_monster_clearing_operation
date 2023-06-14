@@ -12,6 +12,8 @@
 
 const int SLOT_MAX = 5;
 const float WIDGET_RATE = 0.05f;
+const int32 NEXT_STAGE_TIME = 5.0f;
+
 #define ITEMDATA_NAME "MCOItemData"
 
 
@@ -68,9 +70,13 @@ UENUM(BlueprintType)
 enum class EMCOGameState : uint8
 {
 	LOBBY,
+	RESTART_STAGE_AFTER_LOSE,
+	MOVE_TO_NEXT_STAGE,
 	FIGHT,
 	REWARD,
-	RESULT
+	NEXT,
+	RESULT_WIN,
+	RESULT_LOSE
 };
 
 

@@ -34,7 +34,6 @@ void AMCOPlayerController::BeginPlay()
 	// OnGameStateChanged
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(HUDWidget, &UMCOHUDWidget::OnGameStateChanged);
 	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
 }
 
@@ -53,7 +52,7 @@ void AMCOPlayerController::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::REWARD)
 	{
 	}
-	else if (InState == EMCOGameState::RESULT)
+	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
 	{
 		SetInputMode(FInputModeUIOnly());
 		SetShowMouseCursor(true);

@@ -24,7 +24,6 @@ void UMCOStaminaWidget::NativeConstruct()
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
 	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
-	GameModeInterface->GetOnRestartStageDelegate().AddUniqueDynamic(this, &ThisClass::OnRestartStage);
 	
 	SetVisibility(ESlateVisibility::Hidden);
 }
@@ -35,6 +34,14 @@ void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
 	{
 		SetVisibility(ESlateVisibility::Hidden);
 	}
+	else if (InState == EMCOGameState::RESTART_STAGE_AFTER_LOSE)
+	{
+		IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(OwningActor);
+		if (nullptr != HUDInterface)
+		{
+			HUDInterface->SetupStaminaWidget(this);
+		}
+	}
 	else if (InState == EMCOGameState::FIGHT)
 	{
 		SetVisibility(ESlateVisibility::Visible);
@@ -42,18 +49,9 @@ void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::REWARD)
 	{
 	}
-	else if (InState == EMCOGameState::RESULT)
+	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
 	{
 		SetVisibility(ESlateVisibility::Hidden);
-	}
-}
-
-void UMCOStaminaWidget::OnRestartStage()
-{
-	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(OwningActor);
-	if (nullptr != HUDInterface)
-	{
-		HUDInterface->SetupStaminaWidget(this);
 	}
 }
 
@@ -69,7 +67,7 @@ void UMCOStaminaWidget::SetPercent(const float& InPercent)
 			StaminaTimerHandle,
 			this,
 			&ThisClass::OnStaminaFull,
-			1.5f,
+			2.0f,
 			false
 		);
 	}

@@ -20,24 +20,36 @@ void UMCOResultWidget::NativeConstruct()
 	ensure(nullptr != ResultTxt);
 	ensure(nullptr != ResultButtonTxt);
 	ensure(nullptr != ResultButton);
+
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
 	
 	SetVisibility(ESlateVisibility::Hidden);
 }
 
-void UMCOResultWidget::SetResultWidget(const bool bWin)
+void UMCOResultWidget::OnGameStateChanged(const EMCOGameState& InState)
 {
-	SetVisibility(ESlateVisibility::Hidden);
-	
-	if (true == bWin)
+	if (InState == EMCOGameState::LOBBY)
 	{
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (InState == EMCOGameState::FIGHT)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+	else if (InState == EMCOGameState::RESULT_WIN)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
 		SetSuccessUI();
+		SetVisibility(ESlateVisibility::Visible);
 	}
-	else
+	else if (InState == EMCOGameState::RESULT_LOSE)
 	{
+		SetVisibility(ESlateVisibility::Hidden);
 		SetFailUI();
+		SetVisibility(ESlateVisibility::Visible);
 	}
-	
-	SetVisibility(ESlateVisibility::Visible);
 }
 
 void UMCOResultWidget::SetSuccessUI()
@@ -71,5 +83,5 @@ void UMCOResultWidget::RestartStage()
 {
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->OnRestartStage();
+	GameModeInterface->OnChangeGameState(EMCOGameState::RESTART_STAGE_AFTER_LOSE);
 }

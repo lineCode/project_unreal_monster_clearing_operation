@@ -43,13 +43,14 @@ void UMCOGameplayAbility_TakeItem::ActivateAbility(const FGameplayAbilitySpecHan
 
 void UMCOGameplayAbility_TakeItem::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	MCOLOG(TEXT("----------------------------------------- EndAbility : TakeItem"));
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
 	IMCOCharacterItemInterface* CharacterItemInterface = Cast<IMCOCharacterItemInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != CharacterItemInterface);
 	CharacterItemInterface->EndTakeItem();
 
-	// !!!!!!!!!!!!!!!!!!!!!!
-	//ActivateStaminaChargeAbility();
+	ActivateStaminaChargeAbility();
 }
 

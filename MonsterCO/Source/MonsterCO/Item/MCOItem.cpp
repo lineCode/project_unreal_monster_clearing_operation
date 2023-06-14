@@ -1,12 +1,9 @@
 #include "Item/MCOItem.h"
-#include "Engine/AssetManager.h"
 #include "MCOItemData_Potion.h"
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Interface/MCOCharacterItemInterface.h"
 #include "Physics/MCOPhysics.h"
-#include "Interface/MCOGameModeInterface.h"
-#include "GameFramework/GameModeBase.h"
 
 
 AMCOItem::AMCOItem()
@@ -41,34 +38,14 @@ void AMCOItem::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(true);
+	ensure(nullptr != Data);
 	
-	const UAssetManager& Manager = UAssetManager::Get();
-
-	TArray<FPrimaryAssetId> Assets;
-	Manager.GetPrimaryAssetIdList(ITEMDATA_NAME, Assets);
-	ensure(0 < Assets.Num());
-	
-	const int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
-
-	MCOPRINT(TEXT("Item: %d of %d"), RandomIndex, Assets.Num());
-	
-	const FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
-	if (true == AssetPtr.IsPending())
-	{
-		AssetPtr.LoadSynchronous();
-	}
-
-	Data = Cast<UMCOItemData>(AssetPtr.Get());
-
 	// Set skeletal mesh 
 	if (Data->SkeletalMesh.IsPending())
 	{
 		Data->SkeletalMesh.LoadSynchronous();
 	}
 	SkeletalMesh->SetSkeletalMesh(Data->SkeletalMesh.Get());
-
 	
 	// Set material
 	if (Data->Material.IsPending())
@@ -77,19 +54,28 @@ void AMCOItem::PostInitializeComponents()
 	}
 	SkeletalMesh->SetMaterial(0, Data->Material.Get());
 	
-	ensure(nullptr != Data);
-	
-	FVector RelocationByHeight = GetActorLocation();
-	RelocationByHeight.Z += GetItemHalfHeight();
-	SetActorLocation(RelocationByHeight);
-
-	SetActorHiddenInGame(false);
+	InitializeItem(GetActorLocation());
 }
 
 void AMCOItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AMCOItem::SetData(UMCOItemData* InData)
+{
+	Data = InData;
+}
+
+void AMCOItem::InitializeItem(const FVector& InWorldLocation)
+{
+	FVector RelocationByHeight = InWorldLocation;
+	RelocationByHeight.Z += GetItemHalfHeight();
+	SetActorLocation(RelocationByHeight);
+	
+	SetActorEnableCollision(true);
+	SetActorHiddenInGame(false);
 }
 
 float AMCOItem::GetItemHalfHeight() const
@@ -109,7 +95,7 @@ void AMCOItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	
 	ISTRUE(SkeletalMesh);
 	ISTRUE(SkeletalMesh->GetAnimInstance());
-	SkeletalMesh->GetAnimInstance()->OnMontageEnded.AddDynamic(this, &ThisClass::OnPickupFinished);
+	SkeletalMesh->GetAnimInstance()->OnMontageEnded.AddUniqueDynamic(this, &ThisClass::OnPickupFinished);
 	SkeletalMesh->GetAnimInstance()->Montage_Play(PickupMontage);
 }
 

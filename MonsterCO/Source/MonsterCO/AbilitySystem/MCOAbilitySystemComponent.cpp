@@ -27,6 +27,15 @@ void UMCOAbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag& InT
 	}
 }
 
+void UMCOAbilitySystemComponent::CancelAbilityByTag(const FGameplayTag& InTag)
+{
+	ISTRUE(true == InTag.IsValid());
+
+	FGameplayTagContainer Tags;
+	Tags.AddTag(InTag);
+	CancelAbilities(&Tags);
+}
+
 void UMCOAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
 {
 	ISTRUE(true == InputTag.IsValid());

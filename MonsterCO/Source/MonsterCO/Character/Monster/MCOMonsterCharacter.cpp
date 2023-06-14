@@ -33,14 +33,23 @@ AMCOMonsterCharacter::AMCOMonsterCharacter(const FObjectInitializer& ObjectIniti
 	SetCharacterData();
 }
 
+void AMCOMonsterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
+	
+}
+
 void AMCOMonsterCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+	
 }
 
 void AMCOMonsterCharacter::BeginPlay()
 {
-	Super::BeginPlay();
+	Super::BeginPlay(); 
 	
 	ModeComponent->SpawnAttachment(this);
 

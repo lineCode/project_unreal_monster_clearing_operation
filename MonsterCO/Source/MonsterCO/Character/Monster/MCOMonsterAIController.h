@@ -15,16 +15,13 @@ class MONSTERCO_API AMCOMonsterAIController : public AAIController
 
 public:
 	AMCOMonsterAIController(const FObjectInitializer& ObjectInitializer);
-	virtual void PostInitializeComponents() override;
 
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void BeginPlay() override;
 	
 public:
-	UFUNCTION()
-	void OnChangeGameState(const EMCOGameState& InState);
-	
 	void RunAI();
 	void StopAI();
 	void ContinueAI();

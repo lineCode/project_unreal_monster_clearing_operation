@@ -24,23 +24,25 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 
-public:
+protected:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
-	
-	UFUNCTION()
-	void OnRestartStage();
 
+public:
 	void OnMonsterFirstHit();
-	void ShowInGameWidget(const FString& InName, bool bShow);
 	
 protected:
-	void SetInGameWidget(const FString& InName);
+	void ShowInGameWidget(const FName& InName, bool bShow);
+	void SetInGameWidget(const FName& InName);
 	void ShowTitleWidget(const bool bShow);
-	void ShowResultWidget(const bool bShow);
 
 protected:
-	FString GetCharacterName(const bool bIsPlayer);
+	UPROPERTY()
+	FName PlayerName;
+	
+	UPROPERTY()
+	FName MonsterName;
+	
 	
 // --- HP Widget
 public:
@@ -48,7 +50,7 @@ public:
 	
 protected:
 	UPROPERTY()
-	TMap<FString, TObjectPtr<UMCOHpWidget>> HpWidgets;
+	TMap<FName, TObjectPtr<UMCOHpWidget>> HpWidgets;
 	
 
 // --- Attribute Widget
@@ -57,19 +59,13 @@ public:
 	
 protected:
 	UPROPERTY()
-	TMap<FString, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
+	TMap<FName, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
 
 	
 // --- Title
 protected:
 	UPROPERTY()
 	TObjectPtr<UWidget> TitleWidget;
-
-	
-// --- Result Widget
-protected:
-	UPROPERTY()
-	TObjectPtr<UMCOResultWidget> ResultWidget;
 
 	
 // --- Skill Widget

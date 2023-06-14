@@ -14,12 +14,9 @@ class MONSTERCO_API UMCOStaminaWidget : public UMCOUserWidget
 protected:
 	virtual void NativeConstruct() override;
 
-public:
+protected:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
-
-	UFUNCTION()
-	void OnRestartStage();
 	
 public:
 	void SetPercent(const float& InPercent);
@@ -28,13 +25,12 @@ protected:
 	void OnStaminaFull();
 
 protected:
-	bool bIsTimerTicking = false;
-	FTimerHandle StaminaTimerHandle;
-	
-protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetImagePercent(float InPercent);
 
 	UPROPERTY()
 	TObjectPtr<UImage> StaminaRadialProgressBar;
+	
+	bool bIsTimerTicking = false;
+	FTimerHandle StaminaTimerHandle;
 };

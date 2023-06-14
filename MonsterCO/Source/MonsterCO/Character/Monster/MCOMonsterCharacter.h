@@ -18,6 +18,7 @@ public:
 	AMCOMonsterCharacter(const FObjectInitializer& ObjectInitializer);
 	
 protected:
+	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
 

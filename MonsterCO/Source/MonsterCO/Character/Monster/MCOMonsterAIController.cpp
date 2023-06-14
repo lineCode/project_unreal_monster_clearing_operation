@@ -8,8 +8,7 @@
 
 
 
-AMCOMonsterAIController::AMCOMonsterAIController(const FObjectInitializer& ObjectInitializer)
-	 :Super(ObjectInitializer)
+AMCOMonsterAIController::AMCOMonsterAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	bWantsPlayerState = true;
 
@@ -27,25 +26,14 @@ void AMCOMonsterAIController::PostInitializeComponents()
 void AMCOMonsterAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	
-	StopAI();
+
+	RunAI();
 }
 
 void AMCOMonsterAIController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
-	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnChangeGameState);
-}
-
-void AMCOMonsterAIController::OnChangeGameState(const EMCOGameState& InState)
-{
-	if (InState == EMCOGameState::FIGHT)
-	{
-		RunAI();
-	}
 }
 
 void AMCOMonsterAIController::RunAI()
