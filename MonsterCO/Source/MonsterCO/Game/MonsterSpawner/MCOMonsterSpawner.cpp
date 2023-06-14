@@ -2,8 +2,8 @@
 #include "Components/BoxComponent.h"
 #include "MCOMonstersData.h"
 #include "Character/Monster/MCOMonsterCharacter.h"
-#include "Interface/MCOGameModeInterface.h"
 #include "Item/MCOItem.h"
+#include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
 
 
@@ -45,20 +45,35 @@ void AMCOMonsterSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 {
 	ensure(nullptr != InCharacter);
 
-	FHitResult TraceResult;
-	FVector StartLocation = InCharacter->GetActorLocation();
-	FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, -1000.0f); 
+	TArray<FHitResult> TraceResults;
+	const FVector StartLocation = InCharacter->GetActorLocation();
+	const FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, -1000.0f); 
 
-	const FCollisionQueryParams Params;
+	const FCollisionQueryParams Params(
+		SCENE_QUERY_STAT(ItemSpawn),
+		false,
+		InCharacter
+	);
 	
-	if (GetWorld()->LineTraceSingleByChannel(
-		TraceResult,
+	const bool bResult = GetWorld()->LineTraceMultiByObjectType(
+		TraceResults,
 		StartLocation,
 		EndLocation,
 		ECC_WorldStatic,
-		Params))
+		Params
+	);
+
+	ensure(true == bResult);
+
+	for (FHitResult& HiResult : TraceResults)
 	{
-		SpawnItem(TraceResult.Location);
+		if (HiResult.GetActor()->IsA(APawn::StaticClass()))
+		{
+			continue;
+		}
+		
+		SpawnItem(HiResult.Location);
+		break;
 	}
 }
 
@@ -84,7 +99,8 @@ void AMCOMonsterSpawner::SpawnItem(const FVector& InSpawnLocation)
 
 void AMCOMonsterSpawner::OnItemDestroyed()
 {
-	//SetState(EStageState::NEXT);
-	
-	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->OnGameResult(true);
+	GameModeInterface->OnChangeGameState(EMCOGameState::RESULT);
 }

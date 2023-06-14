@@ -122,11 +122,6 @@ void AMCOItem::OnPickupFinished(UAnimMontage* Montage, bool bInterrupted)
 		OnItemDestroyed.Broadcast();
 	}
 	
-	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
-	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->OnGameResult(true);
-	GameModeInterface->OnChangeGameState(EMCOGameState::RESULT);
-	
 	SetActorHiddenInGame(true);
 	//Destroy();
 }
