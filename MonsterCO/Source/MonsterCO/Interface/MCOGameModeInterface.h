@@ -8,7 +8,6 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedDelegate, const EMCOGameState&, InState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRestartStageDelegate);
 
 
 

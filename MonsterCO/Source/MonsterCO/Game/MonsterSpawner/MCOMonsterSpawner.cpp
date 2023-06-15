@@ -50,7 +50,7 @@ void AMCOMonsterSpawner::SpawnMonster()
 {
 	const IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
     ensure(nullptr != GameModeInterface);
-	const int32 State = GameModeInterface->GetStage();
+	const int32 State = 0; // GameModeInterface->GetStage(); // only one monster is available now...
 	
 	ensure(State < MonstersData->Monsters.Num());
 

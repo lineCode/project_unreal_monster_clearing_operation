@@ -12,7 +12,8 @@
 
 const int SLOT_MAX = 5;
 const float WIDGET_RATE = 0.05f;
-const int32 NEXT_STAGE_TIME = 5.0f;
+const int32 NEXT_STAGE_TIME = 5;
+const int32 MAX_STAGE = 2;
 
 #define ITEMDATA_NAME "MCOItemData"
 

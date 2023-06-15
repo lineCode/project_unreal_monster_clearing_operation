@@ -9,7 +9,7 @@ AMCOGameModeBase::AMCOGameModeBase()
 	// PlayerControllerClass = AMCOPlayerController::StaticClass();
 	// PlayerStateClass      = AMCOPlayerState::StaticClass();
 
-	CurrentStage = 0;
+	CurrentStage = 1;
 }
 
 void AMCOGameModeBase::StartPlay()
@@ -25,7 +25,7 @@ void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)
 	
 	if (InState == EMCOGameState::MOVE_TO_NEXT_STAGE)
 	{
-		//CurrentStage++;
+		CurrentStage++;
 
 		ISTRUE(true == OnGameStateChangedDelegate.IsBound());
 		OnGameStateChangedDelegate.Broadcast(InState);
@@ -60,6 +60,14 @@ void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)
 		OnChangeGameState(EMCOGameState::FIGHT);
 
 		return;
+	}
+	else if (InState == EMCOGameState::NEXT)
+	{
+		if (MAX_STAGE <= CurrentStage)
+		{
+			OnChangeGameState(EMCOGameState::RESULT_WIN);
+			return;
+		}
 	}
 
 	ISTRUE(true == OnGameStateChangedDelegate.IsBound());

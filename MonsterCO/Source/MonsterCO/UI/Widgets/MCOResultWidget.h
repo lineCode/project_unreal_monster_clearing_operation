@@ -27,7 +27,10 @@ protected:
 	void SetSuccessUI();
 	void SetFailUI();
 
+	UFUNCTION()
 	void BackToTitle();
+	
+	UFUNCTION()
 	void RestartStage();
 	
 protected:
