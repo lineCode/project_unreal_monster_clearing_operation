@@ -19,6 +19,9 @@ class MONSTERCO_API UMCOGameplayAbility_CommonAttack : public UMCOGameplayAbilit
 
 public:
 	UMCOGameplayAbility_CommonAttack();
+
+protected:
+	void DoneAddingNativeTags();
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 

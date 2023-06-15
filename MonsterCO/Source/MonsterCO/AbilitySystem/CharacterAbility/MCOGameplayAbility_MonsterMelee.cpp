@@ -1,6 +1,5 @@
 #include "MCOGameplayAbility_MonsterMelee.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOMonsterAIInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
@@ -9,14 +8,13 @@
 UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 {
 	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Claw.DA_Dragon_Claw"));
-
-	SetID(EMCOAbilityID::NormalAttack, Data->ActivationTag);
 	
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
 	UpdateCooldownFragment(Fragment);
 	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
 	UpdateAttributeFragment(Stamina);
+	
 }
 
 bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const

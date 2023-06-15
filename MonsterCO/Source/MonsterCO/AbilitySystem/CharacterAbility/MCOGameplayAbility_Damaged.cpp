@@ -1,7 +1,6 @@
 #include "MCOGameplayAbility_Damaged.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOAttributeSet.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOPlayerInterface.h"
@@ -10,18 +9,22 @@
 
 UMCOGameplayAbility_Damaged::UMCOGameplayAbility_Damaged()
 {
-	SetID(EMCOAbilityID::Damaged, FMCOCharacterTags::Get().DamagedTag);
-	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag);
-
-	// Cancel these
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().JumpTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().EquipTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DodgeTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
-
 }
+
+// void UMCOGameplayAbility_Damaged::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag);
+//
+// 	// Cancel these
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().JumpTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().EquipTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DodgeTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+// }
 
 void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {

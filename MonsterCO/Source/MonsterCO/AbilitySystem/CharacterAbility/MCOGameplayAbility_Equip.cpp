@@ -1,5 +1,4 @@
 #include "MCOGameplayAbility_Equip.h"
-#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOPlayerInterface.h"
@@ -10,20 +9,26 @@ UMCOGameplayAbility_Equip::UMCOGameplayAbility_Equip()
 	GETASSET(MontageOnEquip, UAnimMontage, TEXT("/Game/Player/Animations/Montages/GreatSword_Equip_Montage.GreatSword_Equip_Montage"));
 	GETASSET(MontageOnUnequip, UAnimMontage, TEXT("/Game/Player/Animations/Montages/GreatSword_Unequip_Montage.GreatSword_Unequip_Montage"));
 	
-	SetID(EMCOAbilityID::Equip, FMCOCharacterTags::Get().EquipTag);
-
-	// Blocked by these
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
-	
-	// Cancel these 
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
-	
 	bIsToEquip = true;
+	
 }
+
+// void UMCOGameplayAbility_Equip::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	SetID(EMCOAbilityID::Equip, FMCOCharacterTags::Get().EquipTag);
+//
+// 	// Blocked by these
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+// 	
+// 	// Cancel these 
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+// }
 
 bool UMCOGameplayAbility_Equip::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {

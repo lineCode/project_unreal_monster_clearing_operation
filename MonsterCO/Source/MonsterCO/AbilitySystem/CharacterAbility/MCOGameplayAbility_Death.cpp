@@ -1,27 +1,28 @@
 #include "MCOGameplayAbility_Death.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 
 
 UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
-{
-	SetID(EMCOAbilityID::Dead, FMCOCharacterTags::Get().DeadTag);
-	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag);
-	
+{	
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
-
-	// Cancel ALL
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DodgeTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().EquipTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().JumpTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DamagedTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().TakeItemTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
+
+// void UMCOGameplayAbility_Death::DoneAddingNativeTags()
+// {	
+// 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag);
+// 	
+// 	// Cancel ALL
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DodgeTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().EquipTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().JumpTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DamagedTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().TakeItemTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+// }
 
 void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {

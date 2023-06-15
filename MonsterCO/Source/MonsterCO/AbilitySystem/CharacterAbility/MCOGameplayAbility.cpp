@@ -8,7 +8,6 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOCharacterInterface.h"
-#include "Interface/MCOHUDInterface.h"
 
 
 UMCOGameplayAbility::UMCOGameplayAbility()
@@ -18,29 +17,16 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
 	GETCLASS(InstantAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Instant.GE_Attribute_Instant_C"));
 	GETCLASS(InfiniteAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
-	
+
 	// Setting
 	bActivateAbilityOnGranted = false;
 	
 	ActivationPolicy = EMCOAbilityActivationPolicy::OnInputTriggered;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-		
-	// Blocked by these
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DeadTag);
-}
-
-void UMCOGameplayAbility::SetID(const EMCOAbilityID& InAbilityID, const FGameplayTag& InActivationTag)
-{
-	AbilityInputID = InAbilityID; 
-	AbilityTag = InActivationTag; 
-	AbilityTags.AddTag(AbilityTag);
-	ActivationOwnedTags.AddTag(AbilityTag);
-}
-
-void UMCOGameplayAbility::SetCancelOnStaminaEmptyTag()
-{
-	AbilityTags.AddTag(FMCOCharacterTags::Get().CancelOnStaminaEmptyTag);
-	ActivationOwnedTags.AddTag(FMCOCharacterTags::Get().CancelOnStaminaEmptyTag);
+	
+	// UGameplayTagsManager::Get().CallOrRegister_OnDoneAddingNativeTagsDelegate(
+	// 	FSimpleDelegate::CreateUObject(this, &ThisClass::DoneAddingNativeTags)
+	// );	
 }
 
 void UMCOGameplayAbility::SetTriggerTag(const FGameplayTag& InTag)
@@ -153,7 +139,7 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	ISTRUE(nullptr != CooldownEffectClass);
 	ISTRUE(true == CooldownFragment->CanApplyCooldown());
 	
-	//MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *FHelper::GetEnumDisplayName(TEXT("EMCOAbilityID"), (int32)AbilityInputID), CooldownTimeMax);
+	MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *AbilityTags.First().GetTagName().ToString(), CooldownFragment->CooldownTime);
 	
 	const FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
 	ISTRUE(true == HandleForCooldown.IsValid());
@@ -256,13 +242,16 @@ void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle 
 void UMCOGameplayAbility::StopAttributeEffect()
 {
 	ISTRUE(nullptr != AttributeFragment);
+
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
 		
 	FGameplayTagContainer Tags;
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_HealthTag);
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag);
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
 
-	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
+	ASC->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
 }
 
 void UMCOGameplayAbility::ActivateStaminaChargeAbility()
@@ -309,16 +298,20 @@ void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, co
 	ensure(nullptr != InMontage);
 	
 	UAbilityTask_PlayMontageAndWait* Task = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-		this, 
-		SectionName,
-		InMontage,
-		1.0f
+		this,         // UGameplayAbility* OwningAbility
+		SectionName,  // FName TaskInstanceName
+		InMontage,    // UAnimMontage* MontageToPlay
+		1.0f          // float Rate = 1.f
+		// FName StartSection = NAME_None
+		// bool bStopWhenAbilityEnds = true
+		// float AnimRootMotionTranslationScale = 1.f
+		// float StartTimeSeconds = 0.f
 	);
 	
 	Task->OnBlendOut.AddDynamic(this, &ThisClass::OnTaskCompleted);
 	Task->OnCompleted.AddDynamic(this, &ThisClass::OnTaskCompleted);
 	Task->OnCancelled.AddDynamic(this, &ThisClass::OnTaskCancelled);
-	Task->OnInterrupted.AddDynamic(this, &ThisClass::OnTaskCancelled);
+	Task->OnInterrupted.AddDynamic(this, &ThisClass::OnTaskInterrupted);
 	
 	Task->ReadyForActivation();
 }
@@ -328,14 +321,14 @@ void UMCOGameplayAbility::StartActivationWithMontageAndEventTag(UAnimMontage* In
 	ensure(nullptr != InMontage);
 	
 	UMCOAbilityTask_PlayMontageAndWaitForEvent* Task = UMCOAbilityTask_PlayMontageAndWaitForEvent::PlayMontageAndWaitForEvent(
-		this,                               // UGameplayAbility * OwningAbility,
-		NAME_None,                          // FName TaskInstanceName, 
-		InMontage,                          // UAnimMontage * MontageToPlay,
-		FGameplayTagContainer(),            // FGameplayTagContainer EventTags, 
-		1.0f,                               // float Rate, 
-		SectionName,                        // FName StartSection, 
-		true,                               // bool bStopWhenAbilityEnds, 
-		0.0f                                // float AnimRootMotionTranslationScale
+		this,                     // UGameplayAbility * OwningAbility,
+		NAME_None,                // FName TaskInstanceName, 
+		InMontage,                // UAnimMontage * MontageToPlay,
+		FGameplayTagContainer(),  // FGameplayTagContainer EventTags, 
+		1.0f,                     // float Rate, 
+		SectionName,              // FName StartSection, 
+		true,                     // bool bStopWhenAbilityEnds, 
+		0.0f                      // float AnimRootMotionTranslationScale
 	);
 	
 	Task->OnBlendOut.AddDynamic(this, &ThisClass::OnTaskCompletedWithEventTag);
@@ -366,6 +359,12 @@ void UMCOGameplayAbility::OnTaskCompleted()
 void UMCOGameplayAbility::OnTaskCancelled()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+}
+
+void UMCOGameplayAbility::OnTaskInterrupted()
+{
+	// removed for combo attack 
+	//EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
 
 void UMCOGameplayAbility::OnTaskCompletedWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData)

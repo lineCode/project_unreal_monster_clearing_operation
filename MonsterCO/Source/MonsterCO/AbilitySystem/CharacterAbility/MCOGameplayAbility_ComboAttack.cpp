@@ -1,6 +1,5 @@
 #include "MCOGameplayAbility_ComboAttack.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
@@ -22,16 +21,20 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 	const UMCOActionFragment_Attribute* Stamina = MontageFragment->ActionDefinition->GetAttributeFragment();
 	UpdateAttributeFragment(Stamina);
 	
-	SetID(EMCOAbilityID::NormalAttack, FMCOCharacterTags::Get().AttackTag);
-
-	// Cancel these
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
-
-	// Blocked by these
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 }
+
+// void UMCOGameplayAbility_ComboAttack::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	// Cancel these
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().DashTag);
+//
+// 	// Blocked by these
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
+// }
 
 bool UMCOGameplayAbility_ComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
@@ -94,12 +97,6 @@ void UMCOGameplayAbility_ComboAttack::OnTaskCompleted()
 
 void UMCOGameplayAbility_ComboAttack::OnTaskCancelled()
 {
-	if(true == bIsDoingCombo)
-	{
-		bIsDoingCombo = false;
-		return;
-	}
-	
 	ComboTimerHandle.Invalidate();
 	Super::OnTaskCancelled();
 }

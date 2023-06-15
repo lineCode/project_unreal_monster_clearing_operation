@@ -8,7 +8,7 @@ struct FMCOCharacterTags
 public:
 	static const FMCOCharacterTags& Get() { return CharacterTags; }
 
-	FMCOCharacterTags();
+	static void InitializeTags();
 
 	// Native ability
 	FGameplayTag MoveTag;
@@ -16,7 +16,6 @@ public:
 
 	// Effect
 	FGameplayTag GameplayEffect_CooldownTag;
-	FGameplayTag GameplayEffect_AfterDodgeTag;
 	
 	FGameplayTag GameplayEffect_DamageTag;
 	FGameplayTag GameplayEffect_StiffnessTag;
@@ -24,6 +23,7 @@ public:
 	FGameplayTag GameplayEffect_StaminaTag;
 
 	// Event
+	FGameplayTag GameplayEvent_AfterDodgeTag;
 	FGameplayTag GameplayEvent_TakeItemTag;
 	FGameplayTag GameplayEvent_StaminaChargeTag;
 	FGameplayTag GameplayEvent_DamagedTag;

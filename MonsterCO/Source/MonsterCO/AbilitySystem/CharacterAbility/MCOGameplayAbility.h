@@ -22,8 +22,6 @@ public:
 	UMCOGameplayAbility();
 	
 protected:
-	void SetID(const EMCOAbilityID& InAbilityID, const FGameplayTag& InActivationTag);
-	void SetCancelOnStaminaEmptyTag();
 	void SetTriggerTag(const FGameplayTag& InTag);
 
 public:
@@ -96,15 +94,6 @@ protected:
 	
 // --- Setting
 protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Ability")
-	FGameplayTag AbilityTag;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Ability")
-	EMCOAbilityID AbilityInputID = EMCOAbilityID::None;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Ability")
-	EMCOAbilityID AbilityLevelID = EMCOAbilityID::None;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability")
 	uint8 bActivateAbilityOnGranted:1;
 
@@ -127,6 +116,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnTaskCancelled();
+	
+	UFUNCTION()
+	virtual void OnTaskInterrupted();
 	
 	UFUNCTION()
 	virtual void OnTaskCompletedWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData);

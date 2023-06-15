@@ -1,11 +1,10 @@
 #include "MCOGameplayAbility_Dodge.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotionConstantForce.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
-#include "MCOGameplayAbility_Dash.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
+#include "GameFramework/RootMotionSource.h"
 #include "Interface/MCOPlayerInterface.h"
 
 
@@ -13,30 +12,36 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Dodge.DA_Player_Dodge"));
 	
-	SetID(EMCOAbilityID::Dodge, Data->ActivationTag);
-	
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
 	UpdateCooldownFragment(Cooldown);
 	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
 	UpdateAttributeFragment(Stamina);
-
-	// Cancel these
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
-
-	// Blocked by these
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
 	
 	Strength = 500.0f;
 	Duration = 0.5f;
+	
 }
+
+// void UMCOGameplayAbility_Dodge::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	// Cancel these
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().AttackTag);
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+//
+// 	// Blocked by these
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().EquipTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DashTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);	
+// }
 
 bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {
+	//MCOLOG(TEXT("------ CanActivateAbility : Dodge"))
+	
 	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
@@ -48,6 +53,8 @@ bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHan
 
 void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	//MCOLOG(TEXT("------ ActivateAbility : Dodge"))
+	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
@@ -80,7 +87,7 @@ void UMCOGameplayAbility_Dodge::OnTaskFinished()
 
 	if (true == bIsDodgeForward)
 	{
-		HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
+		HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEvent_AfterDodgeTag);
 	
 		// FGameplayEffectSpecHandle HandleForDash = MakeOutgoingGameplayEffectSpec(TagEffectClass);
 		// ISTRUE(true == HandleForDash.IsValid());

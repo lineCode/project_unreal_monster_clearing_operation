@@ -93,7 +93,7 @@ void AMCOMonsterSpawner::FindSpawnLocation(const AMCOCharacter* InCharacter)
 		Params
 	);
 
-	ensure(true == bResult);
+	ISTRUE(true == bResult);
 
 	for (FHitResult& HiResult : TraceResults)
 	{

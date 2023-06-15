@@ -48,7 +48,7 @@ void UMCOPlayerAnimInstance::SetPawnDirection(const FVector& InVelocity, const F
     ISTRUE(nullptr != Owner);
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(GetOwningActor());
     ISTRUE(nullptr != PlayerInterface);
-    
+
     if (false == Owner->HasTag(FMCOCharacterTags::Get().DodgeTag)) // Stay the same direction on dodging
     {
         CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(PlayerInterface->GetInputWorldDirection(), InActorRotation);

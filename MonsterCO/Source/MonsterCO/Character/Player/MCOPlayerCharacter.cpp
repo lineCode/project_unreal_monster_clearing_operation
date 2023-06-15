@@ -100,6 +100,12 @@ void AMCOPlayerCharacter::BeginPlay()
 	ModeComponent->SetMode(EMCOModeType::TwoHand);
 }
 
+void AMCOPlayerCharacter::Tick(float Delta)
+{
+	Super::Tick(Delta);
+	
+}
+
 void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::FIGHT)
@@ -164,8 +170,9 @@ void AMCOPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 
 	MCOInputComponent->SetMappingContext(InputConfig, Subsystem);
 		
-	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().MoveTag, ETriggerEvent::Triggered, this, &AMCOPlayerCharacter::Move);
-	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().LookTag, ETriggerEvent::Triggered, this, &AMCOPlayerCharacter::Look);
+	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().MoveTag, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().MoveTag, ETriggerEvent::Completed, this, &ThisClass::MoveReleased);
+	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().LookTag, ETriggerEvent::Triggered, this, &ThisClass::Look);
 
 	MCOInputComponent->BindAbilityActions(InputConfig, this, &AMCOPlayerCharacter::Input_AbilityInputTagPressed, &AMCOPlayerCharacter::Input_AbilityInputTagReleased);
 }
@@ -186,12 +193,23 @@ void AMCOPlayerCharacter::Input_AbilityInputTagReleased(FGameplayTag InputTag)
 
 FVector AMCOPlayerCharacter::GetInputWorldDirection() const
 {
-	return GetCharacterMovement()->GetLastInputVector();
+	if (nullptr == Controller)
+	{
+		return FVector();
+	}
+	
+	const FRotator Rotation = Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X) * InputVector.X;
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y) * InputVector.Y;
+	
+	return (ForwardDirection + RightDirection).GetSafeNormal();
 }
 
 bool AMCOPlayerCharacter::IsInputForward() const
 {
-	return GetCharacterMovement()->GetLastInputVector().Equals(GetActorForwardVector(), 0.05f);
+	return GetInputWorldDirection().Equals(GetActorForwardVector(), 0.05f);
 }
 
 EMCOModeType AMCOPlayerCharacter::GetModeType() const
@@ -290,11 +308,9 @@ bool AMCOPlayerCharacter::CanEquipAction() const
 bool AMCOPlayerCharacter::CanDodgeAction() const
 {
 	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(true == bGetInput);
+	//ISTRUE_F(true == bGetInput); // removed to cancel attack ability
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
-
-	const FVector InputVector = GetCharacterMovement()->GetLastInputVector();
 	ISTRUE_F(false == InputVector.IsNearlyZero());
 
 	return true;
@@ -306,9 +322,7 @@ bool AMCOPlayerCharacter::CanDashAction() const
 	ISTRUE_F(true == bGetInput);
 	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
 	ISTRUE_F(ModeComponent->IsEquipped() == true);
-	ISTRUE_F(UGameplayStatics::GetPlayerController(GetWorld(), 0)->IsInputKeyDown(
-		InputConfig->GetActionKey(FMCOCharacterTags::Get().DashTag)
-	));
+	ISTRUE_F(KINDA_SMALL_NUMBER < InputVector.X);
 	
 	return true;
 }
@@ -341,7 +355,7 @@ void AMCOPlayerCharacter::StopCharacter(bool bToStop)
 
 void AMCOPlayerCharacter::Move(const FInputActionValue& Value)
 {
-	const FVector2D MovementVector = Value.Get<FVector2D>();
+	InputVector = Value.Get<FVector2D>();
 
 	const FRotator Rotation = Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -357,8 +371,13 @@ void AMCOPlayerCharacter::Move(const FInputActionValue& Value)
 		return;
 	}
 	
-	AddMovementInput(ForwardDirection, MovementVector.X);
-	AddMovementInput(RightDirection, MovementVector.Y);
+	AddMovementInput(ForwardDirection, InputVector.X);
+	AddMovementInput(RightDirection, InputVector.Y);
+}
+
+void AMCOPlayerCharacter::MoveReleased()
+{
+	InputVector = FVector2D(0.0f, 0.0f);
 }
 
 void AMCOPlayerCharacter::Look(const FInputActionValue& Value)

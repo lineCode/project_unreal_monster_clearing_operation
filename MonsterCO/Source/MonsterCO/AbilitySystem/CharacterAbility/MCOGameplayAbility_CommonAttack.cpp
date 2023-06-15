@@ -15,18 +15,23 @@
 
 UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 {
-	// Class, Asset
 	GETCLASS(AttributeEffect, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveDamage.GE_GiveDamage_C"));
-
+	
 	// Setting 
 	bIsUsingCollision = false;
 
-	// Blocked by these
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
-
-	// Cancel these
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
+
+// void UMCOGameplayAbility_CommonAttack::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	// Blocked by these
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+//
+// 	// Cancel these
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+// }
 
 void UMCOGameplayAbility_CommonAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {

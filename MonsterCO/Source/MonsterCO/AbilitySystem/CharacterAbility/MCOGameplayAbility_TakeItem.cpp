@@ -1,5 +1,4 @@
-#include "AbilitySystem/CharacterAbility/MCOGameplayAbility_TakeItem.h"
-#include "AbilitySystem/MCOCharacterTags.h"
+#include "MCOGameplayAbility_TakeItem.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "Interface/MCOCharacterItemInterface.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
@@ -7,12 +6,19 @@
 
 UMCOGameplayAbility_TakeItem::UMCOGameplayAbility_TakeItem()
 {
-	SetID(EMCOAbilityID::Idle, FMCOCharacterTags::Get().TakeItemTag);
-	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_TakeItemTag);
 	
-	// Cancel these
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
+
+// void UMCOGameplayAbility_TakeItem::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	SetID(EMCOAbilityID::Idle, FMCOCharacterTags::Get().TakeItemTag);
+// 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEvent_TakeItemTag);
+// 	
+// 	// Cancel these
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+// }
 
 bool UMCOGameplayAbility_TakeItem::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {

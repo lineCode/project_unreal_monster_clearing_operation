@@ -36,6 +36,7 @@ public:
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
+	virtual void Tick(float Delta) override;
 	
 public:
 	UFUNCTION()
@@ -69,6 +70,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = "MCO|Input")
 	TObjectPtr<UMCOInputConfig> InputConfig;
 
+	UPROPERTY()
+	FVector2D InputVector;
 	
 // --- Action
 public:
@@ -82,6 +85,7 @@ public:
 	virtual bool CanAttack() const override;
 	
 	void Move(const FInputActionValue& Value);
+	void MoveReleased();
 	void Look(const FInputActionValue& Value);
 	
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const override; 

@@ -1,5 +1,4 @@
 #include "MCOGameplayAbility_Dash.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
@@ -13,18 +12,23 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
 	UpdateAttributeFragment(Stamina);
 	
-	SetID(EMCOAbilityID::Dash, Data->ActivationTag);
-	SetCancelOnStaminaEmptyTag();
-	SetTriggerTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
-
-	// Blocked by these
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
-
-	// Cancel these
-	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 }
+
+// void UMCOGameplayAbility_Dash::DoneAddingNativeTags()
+// {
+// 	Super::DoneAddingNativeTags();
+// 	
+// 	SetCancelOnStaminaEmptyTag();
+// 	SetTriggerTag(FMCOCharacterTags::Get().GameplayEffect_AfterDodgeTag);
+//
+// 	// Blocked by these
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
+// 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+//
+// 	// Cancel these
+// 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
+// }
 
 bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
 {

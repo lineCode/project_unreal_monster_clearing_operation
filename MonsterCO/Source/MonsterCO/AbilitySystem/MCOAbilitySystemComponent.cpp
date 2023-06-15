@@ -45,7 +45,7 @@ void UMCOAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inpu
 		if (AbilitySpec.Ability == nullptr) continue;
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag) == false) continue;
 
-		// MCOLOG_C(MCOAbility, TEXT("[%s] is pressed"), *InputTag.GetTagName().ToString());
+		//MCOLOG_C(MCOAbility, TEXT("[%s] is pressed"), *InputTag.GetTagName().ToString());
 
 		InputPressedSpecHandles.AddUnique(AbilitySpec.Handle);
 		InputHeldSpecHandles.AddUnique(AbilitySpec.Handle);
