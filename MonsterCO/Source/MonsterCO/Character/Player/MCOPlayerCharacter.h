@@ -15,6 +15,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UMCOHUDWidget;
 class UWidgetComponent;
+class UMCOPlayerSetting;
 
 
 
@@ -39,6 +40,11 @@ protected:
 public:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
+
+// --- Settings
+protected:
+	UPROPERTY()
+	TObjectPtr<UMCOPlayerSetting> PlayerSetting;
 	
 // --- Ability System
 protected:

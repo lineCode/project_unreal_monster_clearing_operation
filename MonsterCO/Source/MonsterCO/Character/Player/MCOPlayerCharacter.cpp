@@ -12,6 +12,7 @@
 #include "Input/MCOInputComponent.h"
 #include "Input/MCOInputConfig.h"
 #include "MCOPlayerControlData.h"
+#include "MCOPlayerSetting.h"
 #include "Character/MCOCharacterData.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
@@ -54,6 +55,8 @@ AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitial
 		WidgetComponent->SetDrawSize(FVector2D(70.0f, 70.0f)); 
 		WidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	PlayerSetting = CreateDefaultSubobject<UMCOPlayerSetting>(TEXT("NAME_PlayerSetting"));
 }
 
 void AMCOPlayerCharacter::SetControlData()
