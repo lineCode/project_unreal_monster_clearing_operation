@@ -35,7 +35,8 @@ void AMCOSoundManager::PlaySound(USoundCue* SoundCue) const
 {
 	ISTRUE(nullptr != SoundCue);
 	ISTRUE(nullptr != AudioComponent);
-
+	ISTRUE(AudioComponent->Sound != SoundCue);
+	
 	AudioComponent->SetSound(SoundCue);
 	AudioComponent->Activate();
 }

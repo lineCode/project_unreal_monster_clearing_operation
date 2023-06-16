@@ -118,7 +118,7 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::FIGHT)
 	{
-		StopCharacter(false);
+		bIsMonsterInfoShowed = false;
 	}
 	else if (InState == EMCOGameState::NEXT)
 	{
@@ -135,13 +135,8 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 			{
 				Controller->SetIgnoreMoveInput(true);
 			}
-			
-			StopCharacter(true);
-			UCharacterMovementComponent* MovementComp = GetCharacterMovement();
-			ensure(nullptr != MovementComp);
-			MovementComp->StopMovementImmediately();
-			MovementComp->DisableMovement();
-			
+
+			DisableMovement();
 			AbilitySystemComponent->CancelAbilities();
 			StopStaminaTimer();	
 		}
