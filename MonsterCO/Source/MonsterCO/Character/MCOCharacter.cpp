@@ -188,6 +188,10 @@ bool AMCOCharacter::CanActivateAbility(const FGameplayTag& InTag)
 		ISTRUE_F(false == GetMovementComponent()->IsFalling());
 		ISTRUE_F(GetStamina() < GetMaxStamina());
 	}
+	else if (InTag == FMCOCharacterTags::Get().DamagedTag)
+	{
+		ISTRUE_F(true == IsAlive());
+	}
 
 	return true;
 }
