@@ -1,10 +1,7 @@
 #include "MCOGameplayAbility_ComboAttack.h"
-#include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
-#include "Interface/MCOCharacterInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
-#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
 
 
@@ -35,17 +32,6 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 // 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().JumpTag);
 // 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DodgeTag);
 // }
-
-bool UMCOGameplayAbility_ComboAttack::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
-{
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
-
-	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(CharacterInterface);
-	ISTRUE_F(CharacterInterface->CanAttack());
-
-	return true;
-}
 
 void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -136,7 +122,7 @@ void UMCOGameplayAbility_ComboAttack::SetComboTimer()
 	float ComboCheckTime = TimerFragment->GetComboCheckTime();
 	ISTRUE(ComboCheckTime > 0.0f);
 	
-	// MCOLOG(TEXT("[Combo] SetComboTimer: %f"), ComboCheckTime);
+	// MCOLOG_C(MCOAbility, TEXT("[Combo] SetComboTimer: %f"), ComboCheckTime);
 	
 	GetWorld()->GetTimerManager().SetTimer(
 		ComboTimerHandle,
@@ -155,7 +141,7 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	bIsComboCommandPressed = false;
 
 	int32 MaxCombo = Data->GetMaxCombo();
-	// MCOLOG(TEXT("[Combo] %d / %d"), CurrentCombo, MaxCombo);
+	// MCOLOG_C(MCOAbility, TEXT("[Combo] %d / %d"), CurrentCombo, MaxCombo);
 	ISTRUE(CurrentCombo <= MaxCombo);
 
 	bIsDoingCombo = true;

@@ -17,14 +17,39 @@ class MONSTERCO_API UMCOAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	UMCOAbilitySystemComponent();
 
+public:
 	bool bCharacterAbilitySetGiven;
 
-	UPROPERTY()
-	TObjectPtr<const UMCOAttributeSet> AttributeSet;
 
 public:
 	void TryActivateAbilityByTag(const FGameplayTag& InTag);
 	void CancelAbilityByTag(const FGameplayTag& InTag);
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	virtual bool IsAlive() const;
+
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetHealth() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetMaxHealth() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetStiffness() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetMaxStiffness() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetStamina() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
+	float GetMaxStamina() const;
+	
+public:
+	UPROPERTY()
+	TObjectPtr<const UMCOAttributeSet> AttributeSet;
 	
 // --- Input
 public:

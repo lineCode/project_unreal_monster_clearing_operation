@@ -1,6 +1,5 @@
 #include "MCOGameplayAbility_Equip.h"
 #include "AbilitySystem/MCOCharacterTags.h"
-#include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOPlayerInterface.h"
 
 
@@ -10,7 +9,7 @@ UMCOGameplayAbility_Equip::UMCOGameplayAbility_Equip()
 	GETASSET(MontageOnUnequip, UAnimMontage, TEXT("/Game/Player/Animations/Montages/GreatSword_Unequip_Montage.GreatSword_Unequip_Montage"));
 	
 	bIsToEquip = true;
-	
+	bAutoStopCharacter = true;	
 }
 
 // void UMCOGameplayAbility_Equip::DoneAddingNativeTags()
@@ -30,37 +29,14 @@ UMCOGameplayAbility_Equip::UMCOGameplayAbility_Equip()
 // 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 // }
 
-bool UMCOGameplayAbility_Equip::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
-{
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
-
-	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(PlayerInterface);
-	ISTRUE_F(PlayerInterface->CanEquipAction());
-
-	return true;
-}
-
 void UMCOGameplayAbility_Equip::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
-
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
 
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ensure(PlayerInterface);
 
 	StartActivationWithMontage(PlayerInterface->IsEquipped() ? MontageOnUnequip : MontageOnEquip);
 	
-	CharacterInterface->StopCharacter(true);
 	PlayerInterface->SwitchEquipUnequip();
-}
-
-void UMCOGameplayAbility_Equip::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
-	MakeCharacterMove();
-	ActivateStaminaChargeAbility();
 }

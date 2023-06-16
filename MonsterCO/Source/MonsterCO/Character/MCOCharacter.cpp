@@ -8,26 +8,12 @@
 #include "UI/Widgets/MCOHpWidget.h"
 #include "UI/Widgets/MCOAttributeWidget.h"
 #include "MCOPlayerState.h"
-#include "Item/MCOItemData.h"
-#include "Item/MCOItemData_Potion.h"
-#include "Interface/MCOGameModeInterface.h"
-#include "GameFramework/GameModeBase.h"
-#include "Interface/MCOMonsterAIInterface.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// PrimaryActorTick.bCanEverTick = true;
-	
-	TakeItemActions.Emplace(EMCOItemType::Weapon, FTakeItemDelegateWrapper(
-		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::EquipWeapon)
-	));
-	TakeItemActions.Emplace(EMCOItemType::Potion, FTakeItemDelegateWrapper(
-		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::DrinkPotion)
-	));
-	TakeItemActions.Emplace(EMCOItemType::Scroll, FTakeItemDelegateWrapper(
-		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::ReadScroll)
-	));
+
 }
 
 void AMCOCharacter::SetCharacterData()
@@ -52,21 +38,11 @@ void AMCOCharacter::SetCharacterData()
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 }
 
-UAbilitySystemComponent* AMCOCharacter::GetAbilitySystemComponent() const
-{
-	return AbilitySystemComponent.Get();
-}
-
-UMCOAbilitySystemComponent* AMCOCharacter::GetMCOAbilitySystemComponent() const
-{
-	return AbilitySystemComponent.Get();
-}
-
 void AMCOCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	Initialize();
+	InitializeCharacter();
 }
 
 void AMCOCharacter::BeginPlay()
@@ -75,60 +51,49 @@ void AMCOCharacter::BeginPlay()
 
 }
 
-void AMCOCharacter::Initialize()
+void AMCOCharacter::StopCharacter(bool bToStop)
 {
-	AMCOPlayerState* MCOPlayerState = GetPlayerState<AMCOPlayerState>();
-	ISTRUE(nullptr != MCOPlayerState);
-
-	AbilitySystemComponent = MCOPlayerState->GetMCOAbilitySystemComponent();
-	ISTRUE(nullptr != AbilitySystemComponent);
-	AbilitySystemComponent->InitAbilityActorInfo(MCOPlayerState, this);
-	AbilitySystemComponent->SetTagMapCount(FMCOCharacterTags::Get().DeadTag, 0);
-	AbilitySystemComponent->OnDamagedReceived.AddUniqueDynamic(this, &AMCOCharacter::ReceiveDamage);
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	ISTRUE(CharacterMC);
 	
-	// give ability set
-	ISTRUE(GetLocalRole() == ROLE_Authority);
-	if (nullptr != CharacterData && nullptr != CharacterData->AbilitySet)
+	CharacterMC->MovementMode = (true == bToStop) ? MOVE_None : MOVE_Walking;
+}
+
+void AMCOCharacter::DisableMovement() const
+{
+	// ignore input
+	if (nullptr != Controller)
 	{
-		if (false == AbilitySystemComponent->bCharacterAbilitySetGiven)
-		{	
-			CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-		}
-		else
-		{
-			CharacterData->AbilitySet->AddStartupEffects(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-		}
-	}	
-	
-	// set delegates
-	MCOPlayerState->InitializeAbilityDelegates();
-	AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
-	ISTRUE(nullptr != AttributeSet);
-	
-	MCOPRINT(TEXT("%s : InitValues: Health = %f / %f, Stemina = %f / %f"),
-		*CharacterName.ToString(),
-		GetHealth(), GetMaxHealth(),
-		GetStamina(), GetMaxStamina()
-	);
+		Controller->SetIgnoreMoveInput(true);
+	}
+
+	// stop and disable movement
+	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+	ensure(nullptr != MovementComp);
+	MovementComp->StopMovementImmediately();
+	MovementComp->DisableMovement();
+
+	// GetCharacterMovement()->GravityScale = 0;
+	// GetCharacterMovement()->Velocity = FVector(0);
 }
 
-bool AMCOCharacter::IsAlive() const
+void AMCOCharacter::DisableAllCollision()
 {
-	return 0.0f < GetHealth();
+	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
+	ensure(nullptr != CapsuleComp);
+	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
-float AMCOCharacter::GetCurrentStamina() const
+void AMCOCharacter::DestroyAllAttachedActors() const
 {
-	return GetStamina();
-}
+	TArray<AActor*> Actors;
+	GetAttachedActors(Actors);
 
-bool AMCOCharacter::CanChargeStamina() const
-{
-	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
-	ISTRUE_F(GetStamina() < GetMaxStamina());
-
-	return true;
+	for (AActor* Actor : Actors)
+	{
+		Actor->Destroy();
+	}
 }
 
 FVector AMCOCharacter::GetSocketLocation(const FName& InSocketName)
@@ -140,11 +105,96 @@ FVector AMCOCharacter::GetSocketLocation(const FName& InSocketName)
 	}
 	return SocketLocation;
 }
-
-int32 AMCOCharacter::GetAbilityLevel(EMCOAbilityID InAbilityLevelID) const
+void AMCOCharacter::InitializeCharacter()
 {
-	// TO DO
-	return 1;
+	// get ASC
+	AMCOPlayerState* MCOPlayerState = GetPlayerState<AMCOPlayerState>();
+	ensure(nullptr != MCOPlayerState);
+	AbilitySystemComponent = MCOPlayerState->GetMCOAbilitySystemComponent();
+	ensure(nullptr != AbilitySystemComponent);
+
+	// init ASC
+	AbilitySystemComponent->InitAbilityActorInfo(MCOPlayerState, this);
+	AbilitySystemComponent->SetTagMapCount(FMCOCharacterTags::Get().DeadTag, 0);
+	AbilitySystemComponent->OnDamagedReceived.AddUniqueDynamic(this, &AMCOCharacter::ReceiveDamage);
+	
+	// give ability
+	ISTRUE(GetLocalRole() == ROLE_Authority);
+	ISTRUE(nullptr != CharacterData);
+	ISTRUE(nullptr != CharacterData->AbilitySet);
+	if (false == AbilitySystemComponent->bCharacterAbilitySetGiven)
+	{	
+		CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+	}
+	else
+	{
+		CharacterData->AbilitySet->AddStartupEffects(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+	}
+	
+	// set delegates "after giving abilities" 
+	MCOPlayerState->InitializeAbilitySystem();
+	AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
+	
+	MCOPRINT(TEXT("[Init: %s] Health (%.1f/%.1f), Stemina (%.1f/%.1f), Stiffness (%.1f/%.1f)"),
+		*CharacterName.ToString(),
+		GetHealth(), GetMaxHealth(),
+		GetStamina(), GetMaxStamina(),
+		GetStiffness(), GetMaxStiffness()
+	);
+}
+
+void AMCOCharacter::UninitializeAbilitySystem()
+{
+	ISTRUE(nullptr != AbilitySystemComponent.Get());
+	
+	// Uninitialize the ASC if we're still the avatar actor
+	// (otherwise another pawn already did it when they became the avatar actor)
+	if (AbilitySystemComponent->GetAvatarActor() == GetOwner())
+	{
+		AbilitySystemComponent->CancelAbilities(nullptr, nullptr);
+		AbilitySystemComponent->ClearAbilityInput();
+		AbilitySystemComponent->RemoveAllGameplayCues();
+
+		if (nullptr != AbilitySystemComponent->GetOwnerActor())
+		{
+			AbilitySystemComponent->SetAvatarActor(nullptr);
+		}
+		else
+		{
+			// If the ASC doesn't have a valid owner,
+			// we need to clear *all* actor info, not just the avatar pairing
+			AbilitySystemComponent->ClearActorInfo();
+		}
+	}
+	
+	AbilitySystemComponent = nullptr;
+}
+
+UAbilitySystemComponent* AMCOCharacter::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent.Get();
+}
+
+UMCOAbilitySystemComponent* AMCOCharacter::GetMCOAbilitySystemComponent() const
+{
+	return AbilitySystemComponent.Get();
+}
+
+bool AMCOCharacter::CanActivateAbility(const FGameplayTag& InTag)
+{
+	if (InTag == FMCOCharacterTags::Get().ChargingTag)
+	{
+		ISTRUE_F(true == IsAlive());
+		ISTRUE_F(false == GetMovementComponent()->IsFalling());
+		ISTRUE_F(GetStamina() < GetMaxStamina());
+	}
+
+	return true;
+}
+
+bool AMCOCharacter::IsAlive() const
+{
+	return 0.0f < GetHealth();
 }
 
 float AMCOCharacter::GetHealth() const
@@ -223,14 +273,6 @@ void AMCOCharacter::SetDamagedData(const FMCODamagedData& InDamagedData)
 	CurrentDamagedData = InDamagedData;
 }
 
-void AMCOCharacter::OffAllCollision()
-{
-	UCapsuleComponent* CapsuleComp = GetCapsuleComponent();
-	ensure(nullptr != CapsuleComp);
-	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-}
-
 float AMCOCharacter::GetCapsuleRadius() const
 {
 	UCapsuleComponent* Capsule = GetCapsuleComponent();
@@ -242,23 +284,9 @@ void AMCOCharacter::Die()
 {
 	MCOPRINT(TEXT("%s : Died"), *CharacterName.ToString());
 
-	OffAllCollision();	
+	DisableMovement();
+	DisableAllCollision();	
 	
-	if (nullptr != Controller)
-	{
-		Controller->SetIgnoreMoveInput(true);
-	}
-
-	StopCharacter(true);
-	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
-	ensure(nullptr != MovementComp);
-	MovementComp->StopMovementImmediately();
-	MovementComp->DisableMovement();
-	
-	// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// GetCharacterMovement()->GravityScale = 0;
-	// GetCharacterMovement()->Velocity = FVector(0);
-		
 	// if (true == AbilitySystemComponent.IsValid())
 	// {
 	// 	AbilitySystemComponent->CancelAbilities();
@@ -268,116 +296,21 @@ void AMCOCharacter::Die()
 	// 	int32 NumEffectsRemoved = AbilitySystemComponent->RemoveActiveEffectsWithTags(EffectsTagToRemove);
 	// 	AbilitySystemComponent->AddLooseGameplayTag(FMCOCharacterTags::Get().DeadTag);
 	// }
-	//
-	// if (nullptr != DeathMontage)
-	// {
-	// 	PlayAnimMontage(DeathMontage);
-	// }
-	// else
-	// {
-	// 	FinishDying();
-	// }
 }
 
 void AMCOCharacter::FinishDying()
 {
-	OnCharacterDeathFinished.Broadcast(this);
-	
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		DetachFromControllerPendingDestroy();
-		SetActorHiddenInGame(true);
 		DestroyAllAttachedActors();
 		SetLifeSpan(0.1f);
 	}
 
-	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
-	ISTRUE(nullptr != GameModeInterface);
-
-	if (Cast<IMCOMonsterAIInterface>(this) == nullptr)
-	{
-		GameModeInterface->OnChangeGameState(EMCOGameState::RESULT_LOSE);
-	}
+	SetActorHiddenInGame(true);
+	UninitializeAbilitySystem();
 	
-	// Uninitialize the ASC if we're still the avatar actor
-	// (otherwise another pawn already did it when they became the avatar actor)
-	ISTRUE(nullptr != AbilitySystemComponent.Get());
-	ISTRUE(AbilitySystemComponent->GetAvatarActor() == GetOwner());
-	
-	AbilitySystemComponent->CancelAbilities(nullptr, nullptr);
-	AbilitySystemComponent->ClearAbilityInput();
-	AbilitySystemComponent->RemoveAllGameplayCues();
-
-	if (nullptr != AbilitySystemComponent->GetOwnerActor())
-	{
-		AbilitySystemComponent->SetAvatarActor(nullptr);
-	}
-	else
-	{
-		// If the ASC doesn't have a valid owner, we need to clear *all* actor info, not just the avatar pairing
-		AbilitySystemComponent->ClearActorInfo();
-	}
-
-	AbilitySystemComponent = nullptr;
-}
-
-void AMCOCharacter::DestroyAllAttachedActors()
-{
-	TArray<AActor*> Actors;
-	GetAttachedActors(Actors);
-
-	for (AActor* Actor : Actors)
-	{
-		Actor->Destroy();
-	}
-}
-
-void AMCOCharacter::StopCharacter(bool bToStop)
-{
-	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
-	ISTRUE(CharacterMC);
-	
-	CharacterMC->MovementMode = (true == bToStop) ? MOVE_None : MOVE_Walking;
-}
-
-void AMCOCharacter::TakeItem(const UMCOItemData* InItemData)
-{
-	ensure(nullptr != InItemData);
-	TakeItemActions[InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
-	
-	FGameplayEventData Payload;
-	Payload.EventTag       = FMCOCharacterTags::Get().GameplayEvent_TakeItemTag;
-	Payload.Instigator     = this;
-	Payload.Target         = this;
-	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
-}
-
-void AMCOCharacter::DrinkPotion(const UMCOItemData* InItemData)
-{
-	const UMCOItemData_Potion* PotionData = Cast<UMCOItemData_Potion>(InItemData); 
-	ensure(nullptr != PotionData);
-	
-	ItemAttributeFragment = PotionData->AttributeFragment;
-}
-
-void AMCOCharacter::EquipWeapon(const UMCOItemData* InItemData)
-{
-	MCOPRINT(TEXT("Equip Weapon"));
-}
-
-void AMCOCharacter::ReadScroll(const UMCOItemData* InItemData)
-{
-	MCOPRINT(TEXT("Read Scroll"));
-}
-
-UMCOActionFragment_Attribute* AMCOCharacter::GetItemAttributeFragment()
-{
-	return ItemAttributeFragment;
-}
-
-void AMCOCharacter::EndTakeItem()
-{
-	ItemAttributeFragment = nullptr;
+	OnCharacterDeathFinished.Broadcast(this);
 }
 
 void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget)

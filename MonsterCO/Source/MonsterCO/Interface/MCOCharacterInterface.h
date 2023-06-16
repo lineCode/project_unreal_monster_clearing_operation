@@ -2,6 +2,7 @@
 
 #include "MonsterCO.h"
 #include "UObject/Interface.h"
+#include "GameplayTagContainer.h"
 #include "MCOCharacterInterface.generated.h"
 
 
@@ -39,12 +40,10 @@ class MONSTERCO_API IMCOCharacterInterface
 {
 	GENERATED_BODY()
 
-public:	
 // --- Action
-	virtual float GetCurrentStamina() const = 0;
-	virtual bool CanChargeStamina() const = 0; 
-	virtual void OffAllCollision() = 0;
-	virtual bool CanAttack() const = 0;
+public:
+	virtual bool CanActivateAbility(const FGameplayTag& InTag) = 0;
+	virtual void DisableAllCollision() = 0;
 	virtual void StopCharacter(bool InToStop) = 0;
 	virtual float GetCapsuleRadius() const = 0;
 

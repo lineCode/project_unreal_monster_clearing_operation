@@ -30,26 +30,8 @@ UMCOGameplayAbility_ChargeStamina::UMCOGameplayAbility_ChargeStamina()
 // 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);	
 // }
 
-bool UMCOGameplayAbility_ChargeStamina::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
-{
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == true);
-	
-	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(nullptr != CharacterInterface);
-	ISTRUE_F(true == CharacterInterface->CanChargeStamina());
-
-	return true;
-}
 
 void UMCOGameplayAbility_ChargeStamina::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
-
-	MCOLOG(TEXT("-------------------------- Activate charge ability"));
 }
-
-void UMCOGameplayAbility_ChargeStamina::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-

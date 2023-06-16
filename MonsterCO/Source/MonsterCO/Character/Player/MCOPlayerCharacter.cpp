@@ -14,10 +14,10 @@
 #include "MCOPlayerControlData.h"
 #include "MCOPlayerSetting.h"
 #include "Character/MCOCharacterData.h"
+#include "Character/MCOPlayerState.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOAttributeSet.h"
-#include "Character/MCOPlayerState.h"
 #include "CharacterAttachment/MCOPlayerModeComponent.h"
 #include "CharacterAttachment/MCOWeapon.h"
 #include "UI/MCOHUDWidget.h"
@@ -25,7 +25,7 @@
 #include "UI/Widgets/MCOStaminaWidget.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
-
+#include "Item/MCOItemData_Potion.h"
 
 
 AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -44,6 +44,7 @@ AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitial
 	SetCharacterData();
 	SetControlData();
 
+	// Stamina Widget
 	WidgetComponent = CreateDefaultSubobject<UMCOWidgetComponent>(TEXT("NAME_WidgetComponent"));
 	WidgetComponent->SetupAttachment(GetMesh());
 	WidgetComponent->SetRelativeLocation(FVector(20.0f, -50.0f, 160.0f));
@@ -56,7 +57,20 @@ AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitial
 		WidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 
+	// Setting
 	PlayerSetting = CreateDefaultSubobject<UMCOPlayerSetting>(TEXT("NAME_PlayerSetting"));
+
+	// Item
+	TakeItemActions.Emplace(EMCOItemType::Weapon, FTakeItemDelegateWrapper(
+		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::EquipWeapon)
+	));
+	TakeItemActions.Emplace(EMCOItemType::Potion, FTakeItemDelegateWrapper(
+		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::DrinkPotion)
+	));
+	TakeItemActions.Emplace(EMCOItemType::Scroll, FTakeItemDelegateWrapper(
+		FOnTakeItemDelegate::CreateUObject(this, &ThisClass::ReadScroll)
+	));
+
 }
 
 void AMCOPlayerCharacter::SetControlData()
@@ -100,12 +114,6 @@ void AMCOPlayerCharacter::BeginPlay()
 	ModeComponent->SetMode(EMCOModeType::TwoHand);
 }
 
-void AMCOPlayerCharacter::Tick(float Delta)
-{
-	Super::Tick(Delta);
-	
-}
-
 void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::FIGHT)
@@ -144,14 +152,14 @@ void AMCOPlayerCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
-	Initialize();
+	InitializeCharacter();
 }
 
-void AMCOPlayerCharacter::Initialize()
+void AMCOPlayerCharacter::InitializeCharacter()
 {
-	Super::Initialize();
+	Super::InitializeCharacter();
 	
-	bGetInput = true;
+	bIsGettingInput = true;
 	bIsMonsterInfoShowed = false;
 	bIsStaminaTimerTicking = false;
 	CurrentStaminaForWidget = GetStamina();
@@ -217,9 +225,9 @@ EMCOModeType AMCOPlayerCharacter::GetModeType() const
 	return ModeComponent->GetModeType();
 }
 
-void AMCOPlayerCharacter::OffAllCollision()
+void AMCOPlayerCharacter::DisableAllCollision()
 {
-	Super::OffAllCollision();
+	Super::DisableAllCollision();
 
 	ModeComponent->GetWeapon()->TurnOnAllCollision();
 }
@@ -270,72 +278,67 @@ bool AMCOPlayerCharacter::CheckCanMoveWithTags() const
 
 bool AMCOPlayerCharacter::CanMoveCamera() const
 {
-	ISTRUE_F(IsAlive());
-	ISTRUE_F(HasTag(FMCOCharacterTags::Get().DodgeTag) == false);
+	ISTRUE_F(true == IsAlive());
+	ISTRUE_F(false == HasTag(FMCOCharacterTags::Get().DodgeTag));
 
 	return true;
 }
 
 bool AMCOPlayerCharacter::CanMoveCharacter() const
 {
+	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == CheckCanMoveWithTags());
-	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
+	ISTRUE_F(true == bIsGettingInput);
+	ISTRUE_F(false == GetMovementComponent()->IsFalling());
 
 	return true;
 }
 
-bool AMCOPlayerCharacter::CanJumpAction() const
+bool AMCOPlayerCharacter::CanActivateAbility(const FGameplayTag& InTag)
 {
-	ISTRUE_F(true == CanJump());
-	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
+	ISTRUE_F(true == Super::CanActivateAbility(InTag));
 
-	return true;
-}
-
-bool AMCOPlayerCharacter::CanEquipAction() const
-{
-	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
-
-	return true;
-}
-
-bool AMCOPlayerCharacter::CanDodgeAction() const
-{
-	ISTRUE_F(true == IsAlive());
-	//ISTRUE_F(true == bGetInput); // removed to cancel attack ability
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
-	ISTRUE_F(ModeComponent->IsEquipped() == true);
-	ISTRUE_F(false == InputVector.IsNearlyZero());
-
-	return true;
-}
-
-bool AMCOPlayerCharacter::CanDashAction() const
-{
-	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
-	ISTRUE_F(ModeComponent->IsEquipped() == true);
-	ISTRUE_F(KINDA_SMALL_NUMBER < InputVector.X);
+	if (InTag == FMCOCharacterTags::Get().JumpTag)
+	{
+		ISTRUE_F(true == IsAlive());
+		ISTRUE_F(true == CanJump());
+		//ISTRUE_F(true == bGetInput);
+		ISTRUE_F(false == GetMovementComponent()->IsFalling());
+	}
+	else if (InTag == FMCOCharacterTags::Get().EquipTag)
+	{
+		ISTRUE_F(true == IsAlive());
+		//ISTRUE_F(true == bGetInput);
+		ISTRUE_F(false == GetMovementComponent()->IsFalling());
+	}
+	else if (InTag == FMCOCharacterTags::Get().DodgeTag)
+	{
+		ISTRUE_F(true == IsAlive());
+		//ISTRUE_F(true == bGetInput); // removed to cancel attack ability
+		ISTRUE_F(false == GetMovementComponent()->IsFalling());
+		ISTRUE_F(true == ModeComponent->IsEquipped());
+		ISTRUE_F(false == InputVector.IsNearlyZero());
+	}
+	else if (InTag == FMCOCharacterTags::Get().DashTag)
+	{
+		ISTRUE_F(true == IsAlive());
+		//ISTRUE_F(true == bGetInput);
+		ISTRUE_F(false == GetMovementComponent()->IsFalling());
+		ISTRUE_F(true == ModeComponent->IsEquipped());
+		ISTRUE_F(KINDA_SMALL_NUMBER < InputVector.X);
+	}
+	else if (InTag == FMCOCharacterTags::Get().AttackTag)
+	{
+		ISTRUE_F(true == IsAlive());
+		//ISTRUE_F(true == bGetInput);
+		ISTRUE_F(false == GetMovementComponent()->IsFalling());
+		ISTRUE_F(true == ModeComponent->IsEquipped());
+	}
+	else if (InTag == FMCOCharacterTags::Get().TakeItemTag)
+	{
+		ISTRUE_F(nullptr != ItemAttributeFragment);
+	}
 	
-	return true;
-}
-
-bool AMCOPlayerCharacter::CanAttack() const
-{
-	Super::CanAttack();
-	
-	ISTRUE_F(true == IsAlive());
-	ISTRUE_F(true == bGetInput);
-	ISTRUE_F(GetMovementComponent()->IsFalling() == false);
-	ISTRUE_F(ModeComponent->IsEquipped() == true);
-
 	return true;
 }
 
@@ -350,7 +353,7 @@ void AMCOPlayerCharacter::SetSpeed(const EMCOCharacterSpeed& InSpeed) const
 
 void AMCOPlayerCharacter::StopCharacter(bool bToStop)
 {
-	bGetInput = bToStop == false;
+	bIsGettingInput = bToStop == false;
 }
 
 void AMCOPlayerCharacter::Move(const FInputActionValue& Value)
@@ -395,6 +398,55 @@ void AMCOPlayerCharacter::Look(const FInputActionValue& Value)
 // 	HUDWidget = InHUDWidget;
 // }
 
+
+void AMCOPlayerCharacter::FinishDying()
+{
+	Super::FinishDying();
+	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->OnChangeGameState(EMCOGameState::RESULT_LOSE);	
+}
+
+void AMCOPlayerCharacter::TakeItem(const UMCOItemData* InItemData)
+{
+	ensure(nullptr != InItemData);
+	TakeItemActions[InItemData->Type].ItemDelegate.ExecuteIfBound(InItemData);
+	
+	FGameplayEventData Payload;
+	Payload.EventTag       = FMCOCharacterTags::Get().GameplayEvent_TakeItemTag;
+	Payload.Instigator     = this;
+	Payload.Target         = this;
+	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
+}
+
+void AMCOPlayerCharacter::DrinkPotion(const UMCOItemData* InItemData)
+{
+	const UMCOItemData_Potion* PotionData = Cast<UMCOItemData_Potion>(InItemData); 
+	ensure(nullptr != PotionData);
+	
+	ItemAttributeFragment = PotionData->AttributeFragment;
+}
+
+void AMCOPlayerCharacter::EquipWeapon(const UMCOItemData* InItemData)
+{
+	MCOPRINT(TEXT("Equip Weapon"));
+}
+
+void AMCOPlayerCharacter::ReadScroll(const UMCOItemData* InItemData)
+{
+	MCOPRINT(TEXT("Read Scroll"));
+}
+
+UMCOActionFragment_Attribute* AMCOPlayerCharacter::GetItemAttributeFragment()
+{
+	return ItemAttributeFragment;
+}
+
+void AMCOPlayerCharacter::EndTakeItem()
+{
+	ItemAttributeFragment = nullptr;
+}
 
 void AMCOPlayerCharacter::InitializeHUD(UMCOHUDWidget* InHUDWidget)
 {

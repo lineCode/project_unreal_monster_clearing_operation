@@ -3,15 +3,9 @@
 #include "MCOCharacterTags.h"
 #include "CharacterAbility/MCOGameplayAbility.h"
 
-
 UMCOAbilitySystemComponent::UMCOAbilitySystemComponent()
 {
 	bCharacterAbilitySetGiven = false;
-}
-
-void UMCOAbilitySystemComponent::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage, float TotalStiffness)
-{
-	OnDamagedReceived.Broadcast(SourceASC, Damage);
 }
 
 void UMCOAbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag& InTag)
@@ -34,6 +28,65 @@ void UMCOAbilitySystemComponent::CancelAbilityByTag(const FGameplayTag& InTag)
 	FGameplayTagContainer Tags;
 	Tags.AddTag(InTag);
 	CancelAbilities(&Tags);
+}
+
+bool UMCOAbilitySystemComponent::IsAlive() const
+{
+	return 0.0f < GetHealth();
+}
+
+float UMCOAbilitySystemComponent::GetHealth() const
+{
+	if (nullptr != AttributeSet)
+	{
+		return AttributeSet->GetHealth();
+	}
+	return 0.0f;
+}
+
+float UMCOAbilitySystemComponent::GetMaxHealth() const
+{
+	if (nullptr != AttributeSet)
+	{
+		return AttributeSet->GetMaxHealth();
+	}
+	return 0.0f;
+}
+
+float UMCOAbilitySystemComponent::GetStiffness() const
+{
+	if (nullptr != AttributeSet)
+	{
+		return AttributeSet->GetStiffness();
+	}
+	return 0.0f;
+}
+
+float UMCOAbilitySystemComponent::GetMaxStiffness() const
+{
+	if (nullptr != AttributeSet)
+	{
+		return AttributeSet->GetMaxStiffness();
+	}
+	return 0.0f;
+}
+
+float UMCOAbilitySystemComponent::GetStamina() const
+{
+	if (nullptr != AttributeSet)
+	{
+		return AttributeSet->GetStamina();
+	}
+	return 0.0f;
+}
+
+float UMCOAbilitySystemComponent::GetMaxStamina() const
+{
+	if (nullptr != AttributeSet)
+	{
+		return AttributeSet->GetMaxStamina();
+	}
+	return 0.0f;
 }
 
 void UMCOAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
@@ -139,4 +192,10 @@ void UMCOAbilitySystemComponent::ClearAbilityInput()
 	InputReleasedSpecHandles.Reset();
 	InputHeldSpecHandles.Reset();
 }
+
+void UMCOAbilitySystemComponent::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage, float TotalStiffness)
+{
+	OnDamagedReceived.Broadcast(SourceASC, Damage);
+}
+
 

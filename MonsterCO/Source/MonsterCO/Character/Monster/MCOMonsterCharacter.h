@@ -10,7 +10,8 @@ class UMCOMonsterAIData;
 
 
 UCLASS()
-class MONSTERCO_API AMCOMonsterCharacter : public AMCOCharacter, public IMCOMonsterAIInterface
+class MONSTERCO_API AMCOMonsterCharacter : public AMCOCharacter,
+											public IMCOMonsterAIInterface
 {
 	GENERATED_BODY()
 
@@ -22,6 +23,10 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
 
+// --- Ability
+public:
+	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
+	
 // --- AI
 protected:
 	virtual UObject* GetTarget() override;
@@ -36,7 +41,6 @@ protected:
 	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) override;
 	virtual void SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished) override;
 
-	virtual bool CanAttack() override;
 	virtual void AttackByAI() override;
 	virtual void StopCharacter(bool bToStop) override;
 
@@ -58,7 +62,7 @@ protected:
 public:
 	FORCEINLINE UMCOMonsterModeComponent* GetModeComponent() { return ModeComponent; }
 
-	virtual void OffAllCollision() override;
+	virtual void DisableAllCollision() override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = MCO)

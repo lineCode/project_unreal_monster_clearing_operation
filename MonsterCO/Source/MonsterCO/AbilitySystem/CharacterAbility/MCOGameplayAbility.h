@@ -9,6 +9,7 @@
 class AMCOCharacter;
 class AController;
 class UMCOAbilitySystemComponent;
+class IMCOCharacterInterface;
 class UMCOActionFragment_Cooldown;
 class UMCOActionFragment_Attribute;
 
@@ -24,26 +25,55 @@ public:
 protected:
 	void SetTriggerTag(const FGameplayTag& InTag);
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MCO|Ability")
+	FGameplayTag AbilityTag;
+
 public:
 	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+protected:
 	bool SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
 	void CancelAllAbility();
 	void HandleGameplayEventWithTag(const FGameplayTag& InTag);
-	void MakeCharacterMove() const;
+
+protected:
+	void StopCharacter(const bool& InStop) const;
+
+	
+// --- Setting
+public:
+	EMCOAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
+	
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MCO|Ability Activation")
+	EMCOAbilityActivationPolicy ActivationPolicy;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
+	uint8 bActivateAbilityOnGranted:1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
+	uint8 bAutoStopCharacter:1;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
+	uint8 bAutoActivateChargingStaminaAbility:1;
+	
 	
 // --- Getter
 protected:
 	ACharacter* GetCharacter() const;
 	AController* GetController() const;
+	IMCOCharacterInterface* GetMCOCharacterInterface() const;
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
+	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;
 
-// --- Effect
-protected:
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> TagEffectClass;
+// // --- Effect
+// protected:
+// 	UPROPERTY()
+// 	TSubclassOf<UGameplayEffect> TagEffectClass;
+
 	
 // --- Cooldown
 protected:
@@ -57,9 +87,10 @@ protected:
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
 
 private:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "MCO|Fragment")
 	TObjectPtr<const UMCOActionFragment_Cooldown> CooldownFragment;
 
+	
 // --- Attribute Effect
 protected:
 	void UpdateAttributeFragment(const UMCOActionFragment_Attribute* InAttributeFragment);
@@ -67,7 +98,7 @@ protected:
 	void ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
 	
 private:
-	void StopAttributeEffect();
+	void StopAttributeEffect() const;
 	
 protected:
 	UPROPERTY()
@@ -77,33 +108,14 @@ protected:
 	TSubclassOf<UGameplayEffect> InfiniteAttributeEffectClass;
 	
 private:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "MCO|Fragment")
 	TObjectPtr<const UMCOActionFragment_Attribute> AttributeFragment;
+
 	
 // --- Stamina charge
 protected:
 	void ActivateStaminaChargeAbility();
-
-// --- Ability end delay
-protected:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Stamina")
-	float AbilityEndDelay; 
 	
-	FTimerHandle AbilityEndDelayTimer;
-	
-	
-// --- Setting
-protected:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability")
-	uint8 bActivateAbilityOnGranted:1;
-
-public:
-	EMCOAbilityActivationPolicy GetActivationPolicy() const { return ActivationPolicy; }
-	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MCO|Ability Activation")
-	EMCOAbilityActivationPolicy ActivationPolicy;
-
 	
 // --- Montage Task
 protected:

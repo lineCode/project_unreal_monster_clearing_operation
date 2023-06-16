@@ -18,10 +18,6 @@ class MONSTERCO_API IMCOPlayerInterface
 
 // --- Action
 public:
-	virtual bool CanJumpAction() const = 0;
-	virtual bool CanEquipAction() const = 0;
-	virtual bool CanDodgeAction() const = 0;
-	virtual bool CanDashAction() const = 0;
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const = 0;
 	
 	virtual FVector GetInputWorldDirection() const = 0;

@@ -57,7 +57,7 @@ void AMCOMonsterSpawner::SpawnMonster()
 	if (nullptr != SpawnedMonster)
 	{
 		SpawnedMonster->SetActorLocation(GetActorLocation());
-		SpawnedMonster->Initialize();
+		SpawnedMonster->InitializeCharacter();
 	}
 	else
 	{

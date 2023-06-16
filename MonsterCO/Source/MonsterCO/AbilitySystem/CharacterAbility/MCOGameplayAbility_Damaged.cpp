@@ -9,6 +9,7 @@
 
 UMCOGameplayAbility_Damaged::UMCOGameplayAbility_Damaged()
 {
+	bAutoStopCharacter = true;
 }
 
 // void UMCOGameplayAbility_Damaged::DoneAddingNativeTags()
@@ -36,36 +37,10 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 		PlayerInterface->SetEquippedWithoutAnimation();
 	}
 	
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
+	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(CharacterInterface);
 	
 	CancelAllAbility();
 	// CharacterInterface->OffAllCollision();
-	CharacterInterface->StopCharacter(true);
 	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().DamagedDegree));
-}
-
-void UMCOGameplayAbility_Damaged::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
-	ActivateStaminaChargeAbility();
-}
-
-void UMCOGameplayAbility_Damaged::OnTaskCompleted()
-{
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
-	CharacterInterface->StopCharacter(false);
-	
-	Super::OnTaskCompleted();
-}
-
-void UMCOGameplayAbility_Damaged::OnTaskCancelled()
-{
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(CharacterInterface);
-	CharacterInterface->StopCharacter(false);
-	
-	Super::OnTaskCancelled();
 }

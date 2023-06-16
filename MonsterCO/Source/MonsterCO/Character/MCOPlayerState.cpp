@@ -14,15 +14,17 @@ AMCOPlayerState::AMCOPlayerState()
     NetUpdateFrequency = 100.0f;
 }
 
-void AMCOPlayerState::InitializeAbilityDelegates()
+void AMCOPlayerState::InitializeAbilitySystem()
 {
     ISTRUE(nullptr != AbilitySystemComponent);
 
-    OnAttributeChangedDelegate.Empty();
-    
+    // attribute set after giving abilities in character 
     AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
-    AttributeSet->OnHandleAttributeEventDelegate.AddUObject(this, &ThisClass::HandleEventWithTag);
     AbilitySystemComponent->AttributeSet = AttributeSet;
+
+    // delegates
+    OnAttributeChangedDelegate.Empty();
+    AttributeSet->OnHandleAttributeEventDelegate.AddUObject(this, &ThisClass::HandleEventWithTag);
     
     RegisterAttributeChangedDelegate(AttributeSet->GetHealthAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxHealthAttribute());

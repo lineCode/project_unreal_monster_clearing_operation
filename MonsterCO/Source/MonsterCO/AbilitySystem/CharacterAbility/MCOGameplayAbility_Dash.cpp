@@ -30,17 +30,6 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 // 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 // }
 
-bool UMCOGameplayAbility_Dash::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
-{
-	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(nullptr != PlayerInterface);
-	ISTRUE_F(true == PlayerInterface->CanDashAction());
-
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags) == true);
-
-	return true;
-}
-
 void UMCOGameplayAbility_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
@@ -65,7 +54,4 @@ void UMCOGameplayAbility_Dash::EndAbility(const FGameplayAbilitySpecHandle Handl
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE(PlayerInterface);
 	PlayerInterface->SetSpeed(EMCOCharacterSpeed::Normal);
-	
-	ActivateStaminaChargeAbility();
-
 }

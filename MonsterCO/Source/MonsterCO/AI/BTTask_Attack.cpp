@@ -1,5 +1,7 @@
 #include "BTTask_Attack.h"
 #include "AIController.h"
+#include "AbilitySystem/MCOCharacterTags.h"
+#include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOMonsterAIInterface.h"
 
 
@@ -23,7 +25,9 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	{
 		return EBTNodeResult::Failed;
 	}
-	if (false == AIPawn->CanAttack())
+
+	IMCOCharacterInterface* MCOCharacter = Cast<IMCOCharacterInterface>(ControllingPawn);
+	if (false == MCOCharacter->CanActivateAbility(FMCOCharacterTags::Get().AttackTag))
 	{
 		return EBTNodeResult::Failed;
 	}

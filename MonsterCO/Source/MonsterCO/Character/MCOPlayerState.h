@@ -31,7 +31,7 @@ class MONSTERCO_API AMCOPlayerState : public APlayerState, public IAbilitySystem
 	
 public:
 	AMCOPlayerState();
-	void InitializeAbilityDelegates();
+	void InitializeAbilitySystem();
 
 protected:
 	virtual void BeginPlay() override;

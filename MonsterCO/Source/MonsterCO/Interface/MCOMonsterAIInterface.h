@@ -36,6 +36,5 @@ public:
 	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) = 0;
 	virtual void SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished) = 0;
 
-	virtual bool CanAttack() = 0;
 	virtual void AttackByAI() = 0;
 };

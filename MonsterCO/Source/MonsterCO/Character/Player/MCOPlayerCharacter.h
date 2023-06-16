@@ -26,7 +26,10 @@ DECLARE_MULTICAST_DELEGATE(FOnMonsterFirstHit);
 
 
 UCLASS()
-class MONSTERCO_API AMCOPlayerCharacter : public AMCOCharacter, public IMCOHUDInterface, public IMCOPlayerInterface
+class MONSTERCO_API AMCOPlayerCharacter : public AMCOCharacter,
+											public IMCOHUDInterface,
+											public IMCOPlayerInterface,
+											public IMCOCharacterItemInterface
 {
 	GENERATED_BODY()
 
@@ -36,37 +39,42 @@ public:
 protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
-	virtual void Tick(float Delta) override;
 	
+	
+// -- Control Data
+protected:
+	void SetControlData();
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "MCO|Control")
+	TObjectPtr<UMCOPlayerControlData> CharacterControlData;
+
+// --- Game State
 public:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
-
+	
 // --- Settings
 protected:
 	UPROPERTY()
 	TObjectPtr<UMCOPlayerSetting> PlayerSetting;
+
 	
 // --- Ability System
 protected:
 	virtual void OnRep_PlayerState() override;
 
 public:
-	virtual void Initialize() override;
-	
-// -- Control Data
-protected:
-	void SetControlData();
-	
-	UPROPERTY(EditAnywhere, Category = "MCO|Control")
-	TObjectPtr<UMCOPlayerControlData> CharacterControlData;
+	virtual void InitializeCharacter() override;
+
 	
 // --- Input
 public:	
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	void Input_AbilityInputTagPressed(FGameplayTag InputTag);
 	void Input_AbilityInputTagReleased(FGameplayTag InputTag);
-	
+
+protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|Input")
 	TObjectPtr<UMCOInputConfig> InputConfig;
 
@@ -78,11 +86,7 @@ public:
 	bool CheckCanMoveWithTags() const;
 	bool CanMoveCamera() const;
 	bool CanMoveCharacter() const;
-	virtual bool CanJumpAction() const override;
-	virtual bool CanEquipAction() const override;
-	virtual bool CanDodgeAction() const override;
-	virtual bool CanDashAction() const override;
-	virtual bool CanAttack() const override;
+	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
 	
 	void Move(const FInputActionValue& Value);
 	void MoveReleased();
@@ -94,13 +98,13 @@ public:
 	virtual FVector GetInputWorldDirection() const override;
 	virtual bool IsInputForward() const override;
 	
-	bool bGetInput;
+	bool bIsGettingInput;
 	
 // --- Mode & Weapon 
 public:
 	EMCOModeType GetModeType() const;
 	
-	virtual void OffAllCollision() override;
+	virtual void DisableAllCollision() override;
 	virtual bool IsEquipped() override;
 	virtual void SetEquippedWithoutAnimation() override;
 	virtual void SwitchEquipUnequip() override;
@@ -119,6 +123,28 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "MCO|Camera")
 	TObjectPtr<UCameraComponent> Camera;
 
+	
+// --- Die
+public:
+	virtual void FinishDying() override;
+
+	
+// --- Item
+public:
+	virtual void TakeItem(const UMCOItemData* InItemData) override;
+	virtual void DrinkPotion(const UMCOItemData* InItemData);
+	virtual void EquipWeapon(const UMCOItemData* InItemData);
+	virtual void ReadScroll(const UMCOItemData* InItemData);
+	virtual UMCOActionFragment_Attribute* GetItemAttributeFragment() override;
+	virtual void EndTakeItem() override;
+	
+	UPROPERTY()
+	TMap<EMCOItemType, FTakeItemDelegateWrapper> TakeItemActions;
+	
+	UPROPERTY()
+	TObjectPtr<UMCOActionFragment_Attribute> ItemAttributeFragment;
+
+	
 // --- Widget
 public:
 	void InitializeHUD(UMCOHUDWidget* InHUDWidget);

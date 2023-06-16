@@ -65,6 +65,24 @@ void AMCOMonsterCharacter::BeginPlay()
 	// Body->SetRelativeLocationAndRotation(FVector(-30.0f, 0.0f, -60.0f), FRotator(-90.0f, 180.0f, 180.0f));
 }
 
+bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
+{
+	ISTRUE_F(true == Super::CanActivateAbility(InTag));
+
+	if (InTag == FMCOCharacterTags::Get().JumpTag)
+	{
+		ISTRUE_F(nullptr != GetAbilitySystemComponent());
+	
+		FGameplayTagContainer ActivationBlockedTags;
+		ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
+		ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
+	
+		return GetAbilitySystemComponent()->HasAnyMatchingGameplayTags(ActivationBlockedTags) == false;
+	}
+
+	return true;
+}
+
 UObject* AMCOMonsterCharacter::GetTarget()
 {
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
@@ -107,17 +125,6 @@ void AMCOMonsterCharacter::SetAIAttackDelegate(const FAICharacterAITaskFinishedD
 	OnAttackFinished = InOnAttackFinished;
 }
 
-bool AMCOMonsterCharacter::CanAttack()
-{
-	ISTRUE_F(nullptr != GetAbilitySystemComponent());
-	
-	FGameplayTagContainer ActivationBlockedTags;
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
-	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
-	
-	return GetAbilitySystemComponent()->HasAnyMatchingGameplayTags(ActivationBlockedTags) == false;
-}
-
 void AMCOMonsterCharacter::SetTurnVector(const bool InIsTurning, const FVector& InTurnVector)
 {
 	bIsTurning = InIsTurning;
@@ -158,9 +165,9 @@ void AMCOMonsterCharacter::StopAI()
 	AIController->StopAI();
 }
 
-void AMCOMonsterCharacter::OffAllCollision()
+void AMCOMonsterCharacter::DisableAllCollision()
 {
-	Super::OffAllCollision();
+	Super::DisableAllCollision();
 
 	GetModeComponent()->GetAttachment()->TurnOffAllCollision();
 }

@@ -1,7 +1,7 @@
 #include "MCOGameplayAbility.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
@@ -13,13 +13,15 @@
 UMCOGameplayAbility::UMCOGameplayAbility()
 {
 	// Effect 
-	GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
+	// GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
 	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
 	GETCLASS(InstantAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Instant.GE_Attribute_Instant_C"));
 	GETCLASS(InfiniteAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
 
 	// Setting
 	bActivateAbilityOnGranted = false;
+	bAutoStopCharacter = false;
+	bAutoActivateChargingStaminaAbility = true;
 	
 	ActivationPolicy = EMCOAbilityActivationPolicy::OnInputTriggered;
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -48,10 +50,15 @@ void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 }
 
 bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
-{	
-	ISTRUE_F(true == Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
+{
 	ISTRUE_F(nullptr != ActorInfo);
 	ISTRUE_F(true == ActorInfo->AvatarActor.IsValid());
+	ISTRUE_F(true == ActorInfo->AbilitySystemComponent.IsValid());
+	ISTRUE_F(true == Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
+
+	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
+	ISTRUE_F(nullptr != CharacterInterface);
+	ISTRUE_F(true == CharacterInterface->CanActivateAbility(AbilityTag));
 	ISTRUE_F(true == CheckCanActivateWithStamina());
 
 	return true;
@@ -59,9 +66,21 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
+	MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
+	
+	if (true == bAutoStopCharacter)
+	{
+		StopCharacter(false);
+	}
+	
 	StopAttributeEffect();
+
+	if (true == bAutoActivateChargingStaminaAbility)
+	{
+		ActivateStaminaChargeAbility();
+	}
 }
 
 bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -100,32 +119,41 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
+	MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
+
 	ApplyAttributeEffect(Handle, ActorInfo, ActivationInfo);
+
+	if (true == bAutoStopCharacter)
+	{
+		StopCharacter(true);
+	}
 
 	return true;
 }
 
 ACharacter* UMCOGameplayAbility::GetCharacter() const
 {
-	ISTRUE_N(CurrentActorInfo);
-	
-	return Cast<ACharacter>(CurrentActorInfo->AvatarActor.Get());
+	return CurrentActorInfo ? Cast<ACharacter>(CurrentActorInfo->AvatarActor.Get()) : nullptr;
 }
 
 AController* UMCOGameplayAbility::GetController() const
 {
-	const ACharacter* Character = GetCharacter();
-	ISTRUE_N(Character);
-	return Cast<AController>(Character->GetController());
+	return CurrentActorInfo ? CurrentActorInfo->PlayerController.Get() : nullptr;
+}
+
+IMCOCharacterInterface* UMCOGameplayAbility::GetMCOCharacterInterface() const
+{
+	return CurrentActorInfo ? Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get()) : nullptr;
 }
 
 UAbilitySystemComponent* UMCOGameplayAbility::GetAbilitySystemComponent() const
 {
-	ACharacter* Character = GetCharacter();
-	ISTRUE_N(Character);
-	const IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Character);
-	ISTRUE_N(ASCInterface);
-	return ASCInterface->GetAbilitySystemComponent();
+	return CurrentActorInfo ? CurrentActorInfo->AbilitySystemComponent.Get() : nullptr;
+}
+
+UMCOAbilitySystemComponent* UMCOGameplayAbility::GetMCOAbilitySystemComponent() const
+{
+	return CurrentActorInfo ? Cast<UMCOAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr;
 }
 
 void UMCOGameplayAbility::UpdateCooldownFragment(const UMCOActionFragment_Cooldown* InCooldownFragment)
@@ -139,7 +167,7 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	ISTRUE(nullptr != CooldownEffectClass);
 	ISTRUE(true == CooldownFragment->CanApplyCooldown());
 	
-	MCOPRINT(TEXT("Applied Cooldown: %s (%f)"), *AbilityTags.First().GetTagName().ToString(), CooldownFragment->CooldownTime);
+	MCOLOG_C(MCOAbility, TEXT("Cooldown Effect : %s [%.1f]sec"), *AbilityTags.First().GetTagName().ToString(), CooldownFragment->CooldownTime);
 	
 	const FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
 	ISTRUE(true == HandleForCooldown.IsValid());
@@ -182,11 +210,10 @@ void UMCOGameplayAbility::UpdateAttributeFragment(const UMCOActionFragment_Attri
 
 bool UMCOGameplayAbility::CheckCanActivateWithStamina() const
 {
-	const IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ISTRUE_F(CharacterInterface);
-	if (nullptr != AttributeFragment)
+	if (nullptr != AttributeFragment && true == AttributeFragment->CanApply(FMCOCharacterTags::Get().GameplayEffect_StaminaTag))
 	{
-		ISTRUE_F(CharacterInterface->GetCurrentStamina() + AttributeFragment->GetStaminaAdditiveValue() >= 0.0f);
+		const UMCOAbilitySystemComponent* MCOASC = GetMCOAbilitySystemComponent();
+		ISTRUE_F(0.0f <= MCOASC->GetStamina() + AttributeFragment->GetStaminaAdditiveValue());
 	}
 	
 	return true;
@@ -222,7 +249,12 @@ void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle 
 		FMCOCharacterTags::Get().GameplayEffect_StiffnessTag
 	);
 
-
+	MCOLOG_C(MCOAbility, TEXT("Attribute Effect +Health:[%.1f], +Stamina:[%.1f], +Stiffness:[%.1f]"),
+		AttributeFragment->GetHealthAdditiveValue(),
+		AttributeFragment->GetStaminaAdditiveValue(),
+		AttributeFragment->GetStiffnessAdditiveValue()
+	);
+	
 	if (NewInstantHandle.Data->DynamicGrantedTags.Num() > 0)
 	{
 		ASC->ApplyGameplayEffectSpecToSelf(
@@ -232,6 +264,8 @@ void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle 
 	}
 	if (NewInfiniteHandle.Data->DynamicGrantedTags.Num() > 0)
 	{
+		MCOLOG_C(MCOAbility, TEXT("InfiniteHandle used"));
+		
 		ASC->ApplyGameplayEffectSpecToSelf(
 			*NewInfiniteHandle.Data.Get(),
 			ASC->GetPredictionKeyForNewAction()
@@ -239,10 +273,9 @@ void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle 
 	}
 }
 
-void UMCOGameplayAbility::StopAttributeEffect()
+void UMCOGameplayAbility::StopAttributeEffect() const
 {
 	ISTRUE(nullptr != AttributeFragment);
-
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 		
@@ -252,6 +285,8 @@ void UMCOGameplayAbility::StopAttributeEffect()
 	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
 
 	ASC->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
+
+	MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
 }
 
 void UMCOGameplayAbility::ActivateStaminaChargeAbility()
@@ -265,7 +300,7 @@ void UMCOGameplayAbility::CancelAllAbility()
 	ISTRUE(nullptr != ASC);
 
 	FGameplayTagContainer AbilityTypesToIgnore;
-	// AbilityTypesToIgnore.AddTag(FMCOCharacterTags::Get().Ability_Behavior_SurvivesDeath);
+	AbilityTypesToIgnore.AddTag(FMCOCharacterTags::Get().DeadTag);
 
 	// Cancel all abilities and block others from starting.
 	ASC->CancelAbilities(nullptr, &AbilityTypesToIgnore, this);
@@ -286,11 +321,11 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
 }
 
-void UMCOGameplayAbility::MakeCharacterMove() const
+void UMCOGameplayAbility::StopCharacter(const bool& InStop) const
 {
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
+	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
-	CharacterInterface->StopCharacter(false);
+	CharacterInterface->StopCharacter(InStop);
 }
 
 void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, const FName& SectionName)

@@ -16,15 +16,19 @@ public:
 	UMCOGameplayAbility_Jump();
 
 protected:
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags = nullptr, const FGameplayTagContainer* TargetTags = nullptr, OUT FGameplayTagContainer* OptionalRelevantTags = nullptr) const override;
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) override;
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+// --- Ability end delay
 protected:
 	void EndAbilityAfterDelay();
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|End Delay")
+	float AbilityEndDelayTime; 
 	
-protected:	
+	FTimerHandle AbilityEndDelayTimer;
+	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
 	TObjectPtr<UMCOActionData> Data;
 	

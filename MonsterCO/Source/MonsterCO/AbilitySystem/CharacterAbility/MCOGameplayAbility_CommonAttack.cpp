@@ -8,7 +8,6 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_Damage.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Physics/MCOPhysics.h"
-#include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOAttackedInterface.h"
 #include "Interface/MCOHUDInterface.h"
 
@@ -19,6 +18,7 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 	
 	// Setting 
 	bIsUsingCollision = false;
+	bAutoStopCharacter = true;
 
 }
 
@@ -32,14 +32,6 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 // 	// Cancel these
 // 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 // }
-
-void UMCOGameplayAbility_CommonAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-	
-	ActivateStaminaChargeAbility();
-	MakeCharacterMove();
-}
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
                                                                     const UMCOActionFragment_Timer* InTimerFragment,
@@ -58,9 +50,6 @@ void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage
 	// Damage Timer
 	SetDamageTimer();
 
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(CurrentActorInfo->AvatarActor.Get());
-	ISTRUE(nullptr != CharacterInterface);
-	CharacterInterface->StopCharacter(true);
 }
 
 void UMCOGameplayAbility_CommonAttack::OnTaskCompleted()

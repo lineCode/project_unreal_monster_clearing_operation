@@ -20,7 +20,7 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 	
 	Strength = 500.0f;
 	Duration = 0.5f;
-	
+	bAutoActivateChargingStaminaAbility = false;
 }
 
 // void UMCOGameplayAbility_Dodge::DoneAddingNativeTags()
@@ -38,23 +38,9 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 // 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);	
 // }
 
-bool UMCOGameplayAbility_Dodge::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
-{
-	//MCOLOG(TEXT("------ CanActivateAbility : Dodge"))
-	
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
-
-	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(PlayerInterface);
-	ISTRUE_F(PlayerInterface->CanDodgeAction());
-
-	return true;
-}
 
 void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	//MCOLOG(TEXT("------ ActivateAbility : Dodge"))
-	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
@@ -84,7 +70,7 @@ void UMCOGameplayAbility_Dodge::ActivateAbility(const FGameplayAbilitySpecHandle
 void UMCOGameplayAbility_Dodge::OnTaskFinished()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
-
+	
 	if (true == bIsDodgeForward)
 	{
 		HandleGameplayEventWithTag(FMCOCharacterTags::Get().GameplayEvent_AfterDodgeTag);

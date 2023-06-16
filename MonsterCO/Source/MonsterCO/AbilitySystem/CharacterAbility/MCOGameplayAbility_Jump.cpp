@@ -4,7 +4,6 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
-#include "Interface/MCOCharacterInterface.h"
 
 
 UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
@@ -16,7 +15,6 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	UpdateCooldownFragment(Cooldown);
 	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
 	UpdateAttributeFragment(Stamina);
-	
 }
 
 // void UMCOGameplayAbility_Jump::DoneAddingNativeTags()
@@ -36,24 +34,9 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 // 	ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);	
 // }
 
-bool UMCOGameplayAbility_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
-{
-	ISTRUE_F(Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags));
-
-	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE_F(PlayerInterface);
-	ISTRUE_F(PlayerInterface->CanJumpAction());
-
-	return true;
-}
-
 void UMCOGameplayAbility_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
-
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(ActorInfo->AvatarActor.Get());
-	ISTRUE(CharacterInterface);
-	CharacterInterface->StopCharacter(true);
 	
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->Jump();
@@ -66,14 +49,16 @@ void UMCOGameplayAbility_Jump::InputReleased(const FGameplayAbilitySpecHandle Ha
 	
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->StopJumping();
+
+	StopCharacter(true);
 	
-	if (0.0f < AbilityEndDelay && GetWorld()->GetTimerManager().GetTimerRemaining(AbilityEndDelayTimer) <= 0.0f)
+	if (0.0f < AbilityEndDelayTime && GetWorld()->GetTimerManager().GetTimerRemaining(AbilityEndDelayTimer) <= 0.0f)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
 			AbilityEndDelayTimer,
 			this,
 			&ThisClass::EndAbilityAfterDelay,
-			AbilityEndDelay,
+			AbilityEndDelayTime,
 			false
 		);
 		return;
@@ -82,16 +67,10 @@ void UMCOGameplayAbility_Jump::InputReleased(const FGameplayAbilitySpecHandle Ha
 	EndAbilityAfterDelay();
 }
 
-void UMCOGameplayAbility_Jump::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-		
-	ActivateStaminaChargeAbility();
-	MakeCharacterMove();
-}
-
 void UMCOGameplayAbility_Jump::EndAbilityAfterDelay()
-{	
+{
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+	
+	StopCharacter(false);
 }
 
