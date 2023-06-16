@@ -2,7 +2,7 @@
 
 #include "MonsterCO.h"
 #include "GameFramework/Actor.h"
-#include "MCOMonsterSpawner.generated.h"
+#include "MCOSpawner.generated.h"
 
 class UBoxComponent;
 class UMCOMonstersData;
@@ -11,12 +11,12 @@ class AMCOCharacter;
 class AMCOItem;
 
 UCLASS()
-class MONSTERCO_API AMCOMonsterSpawner : public AActor
+class MONSTERCO_API AMCOSpawner : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
-	AMCOMonsterSpawner();
+	AMCOSpawner();
 	virtual void BeginPlay() override;
 
 protected:
