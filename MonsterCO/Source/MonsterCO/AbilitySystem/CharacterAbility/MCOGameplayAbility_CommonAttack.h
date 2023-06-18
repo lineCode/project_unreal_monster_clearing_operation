@@ -7,8 +7,7 @@
 
 class UGameplayEffect;
 class UMCOMontageData;
-class UMCOActionFragment_Timer;
-class UMCOActionFragment_Damage;
+class UMCOActionFragment_AttackTiming;
 class UMCOActionFragment_Collision;
 
 
@@ -24,20 +23,21 @@ public:
 // --- Ability
 protected:
 	void StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-		const UMCOActionFragment_Timer* InTimerFragment,
-		const UMCOActionFragment_Damage* InDamageFragment,
+		const UMCOActionFragment_AttackTiming* InTimerFragment,
 		const UMCOActionFragment_Collision* InCollisionFragment
 	);
 
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
+	
 	void BeginDamaging();
 	void EndDamaging();
 
-	virtual void BeginDamaging_Channel();
-	virtual void BeginDamaging_Collision();
-	virtual void EndDamaging_Channel();
-	virtual void EndDamaging_Collision();
+private:
+	void BeginDamaging_Channel();
+	void EndDamaging_Channel();
+	void BeginDamaging_Collision();
+	void EndDamaging_Collision();
 
 // --- Attack
 protected:
@@ -45,9 +45,11 @@ protected:
 	float CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog = false) const;
 	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const;
 
+// --- Attack/Overlap
 	UFUNCTION()
 	void OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult);
 
+// --- Attack/Channel
 	void AttackHitCheckByChannel();
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
@@ -69,16 +71,13 @@ private:
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
-	uint8 bIsUsingCollision : 1;
+	uint8 bUseOverlapEvent : 1;
 	
-	UPROPERTY()
-	TObjectPtr<const UMCOActionFragment_Damage> DamageFragment;
-
 	UPROPERTY()
 	TObjectPtr<const UMCOActionFragment_Collision> CollisionFragment;
 	
 	UPROPERTY()
-	TObjectPtr<const UMCOActionFragment_Timer> TimerFragment;
+	TObjectPtr<const UMCOActionFragment_AttackTiming> TimerFragment;
 	
 	
 private:

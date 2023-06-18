@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "MCOActionDefinition.h"
-#include "MCOActionFragment_Timer.generated.h"
+#include "MCOActionFragment_AttackTiming.generated.h"
 
 
 class UNiagaraSystem;
 
 
 USTRUCT(BlueprintType)
-struct FMCOFrameCount
+struct FMCOAttackTimingData
 {
 	GENERATED_BODY()
 
@@ -22,11 +22,17 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Stiffness = 0.0f;
+		
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Damage = 0.0f;
 };
 
 
 UCLASS()
-class MONSTERCO_API UMCOActionFragment_Timer : public UMCOActionFragment
+class MONSTERCO_API UMCOActionFragment_AttackTiming : public UMCOActionFragment
 {
 	GENERATED_BODY()
 	
@@ -35,7 +41,7 @@ public:
 	float MontageFrameRate = 30.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FMCOFrameCount> DamageTimings;
+	TArray<FMCOAttackTimingData> DamageTimings;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float NextComboFrameCount = 0.0f;
@@ -45,6 +51,8 @@ public:
 	float GetDamageExistTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
 	float GetComboCheckTime(float SpeedRate = 1.0f) const;
 	UNiagaraSystem* GetDamageNiagara(uint8 InDamageIdx) const;
+	float GetStiffness(uint8 InDamageIdx) const;
+	float GetDamage(uint8 InDamageIdx) const;
 
 protected:
 	float CalculateTime(float FrameCount, float SpeedRate = 1.0f) const;

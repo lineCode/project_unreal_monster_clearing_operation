@@ -4,8 +4,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Damage.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Physics/MCOPhysics.h"
 #include "Interface/MCOAttackedInterface.h"
@@ -17,9 +16,8 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 	GETCLASS(AttributeEffect, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveDamage.GE_GiveDamage_C"));
 	
 	// Setting 
-	bIsUsingCollision = false;
+	bUseOverlapEvent = false;
 	bAutoStopCharacter = true;
-
 }
 
 // void UMCOGameplayAbility_CommonAttack::DoneAddingNativeTags()
@@ -34,12 +32,10 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 // }
 
 void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-                                                                    const UMCOActionFragment_Timer* InTimerFragment,
-                                                                    const UMCOActionFragment_Damage* InDamageFragment,
+                                                                    const UMCOActionFragment_AttackTiming* InTimerFragment,
                                                                     const UMCOActionFragment_Collision* InCollisionFragment)
 {
 	TimerFragment = InTimerFragment;
-	DamageFragment = InDamageFragment;
 	CollisionFragment = InCollisionFragment;
 	
 	DamagedCharacters.Reset();
@@ -70,7 +66,7 @@ void UMCOGameplayAbility_CommonAttack::BeginDamaging()
 {
 	StartDamageEndTimer();
 
-	if (true == bIsUsingCollision)
+	if (true == bUseOverlapEvent)
 	{
 		BeginDamaging_Collision();
 	}
@@ -86,7 +82,7 @@ void UMCOGameplayAbility_CommonAttack::EndDamaging()
 	DamagedCharacters.Reset();
 	StartDamageBeginTimer();
 	
-	if (true == bIsUsingCollision)
+	if (true == bUseOverlapEvent)
 	{
 		EndDamaging_Collision();
 	}
@@ -101,16 +97,30 @@ void UMCOGameplayAbility_CommonAttack::BeginDamaging_Channel()
 	AttackHitCheckByChannel();
 }
 
-void UMCOGameplayAbility_CommonAttack::BeginDamaging_Collision()
-{
-}
-
 void UMCOGameplayAbility_CommonAttack::EndDamaging_Channel()
 {
 }
 
+void UMCOGameplayAbility_CommonAttack::BeginDamaging_Collision()
+{
+	ensure(nullptr != CollisionFragment);
+		
+	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
+	ensure(nullptr != CharacterInterface);
+	
+	CharacterInterface->GetAttachmentBeginOverlapDelegate().AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+	CharacterInterface->TurnOnCollision(CollisionFragment->SocketName);
+}
+
 void UMCOGameplayAbility_CommonAttack::EndDamaging_Collision()
 {
+	ensure(nullptr != CollisionFragment);
+		
+	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
+	ensure(nullptr != CharacterInterface);
+	
+	CharacterInterface->GetAttachmentBeginOverlapDelegate().Clear();
+	CharacterInterface->TurnOffCollision(CollisionFragment->SocketName);
 }
 
 void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter)
@@ -135,17 +145,23 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAtt
 	
 	HandleForAttributes.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_DamageTag,
-		-DamageFragment->Damage // minus!!!!!
+		-TimerFragment->GetDamage(CurrentDamageTimingIdx) // minus!!!!!
 	);
 	HandleForAttributes.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_StiffnessTag,
-		DamageFragment->Stiffness
+		TimerFragment->GetStiffness(CurrentDamageTimingIdx)
 	);
 	
 	AttackedASC->ApplyGameplayEffectSpecToSelf(
 		*HandleForAttributes.Data.Get(),
 		AttackedASC->GetPredictionKeyForNewAction()
 	);
+
+	
+	MCOLOG_C(MCOAbility, TEXT("Damage Effect +Health:[%.1f], +Stiffness:[%.1f]"),
+		-TimerFragment->GetDamage(CurrentDamageTimingIdx), TimerFragment->GetStiffness(CurrentDamageTimingIdx)
+	)
+	
 
 	// // For Damaged Ability 
 	// FGameplayEffectSpecHandle StiffnessHandle = GetMCOAbilitySystemComponent()->MakeOutgoingSpec(
@@ -217,8 +233,10 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 	ISTRUE(nullptr != InAttacker);
 	ISTRUE(nullptr != InAttackCauser);
 	ISTRUE(nullptr != InAttackedCharacter);
-	
 	ISTRUE(false == DamagedCharacters.Contains(InAttackedCharacter));
+
+	const IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(InAttackedCharacter);
+	ISTRUE(nullptr != AttackedInterface);
 	
 	DamagedCharacters.Emplace(InAttackedCharacter);
 			
@@ -237,7 +255,7 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 
 void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 {
-	ACharacter* Attacker = Cast<ACharacter>(CurrentActorInfo->AvatarActor.Get());
+	ACharacter* Attacker = GetCharacter();
 	ISTRUE(nullptr != Attacker);
 
 	TArray<FHitResult> OutHitResults;
@@ -249,18 +267,16 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 	
 	IMCOCharacterInterface* AttackerInterface = Cast<IMCOCharacterInterface>(Attacker);
 	ISTRUE(nullptr != AttackerInterface);
-	const float Radius = AttackerInterface->GetCapsuleRadius();
 
+	const FVector Start = AttackerInterface->GetSocketLocation(CollisionFragment->SocketName);
+	// const FVector Start = Attacker->GetActorLocation() +
+	// 	(Attacker->GetActorForwardVector() * Radius) +
+	// 	(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);
+	
 	const FVector AttackDirection = CollisionFragment->GetAttackDirection(Attacker);
-	
-	const FVector Start = Attacker->GetActorLocation() +
-		(Attacker->GetActorForwardVector() * Radius) +
-		(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);
-	
 	const FVector End = Start + AttackDirection * CollisionFragment->AttackLength;
 	
 	const FCollisionShape Shape = FCollisionShape::MakeSphere(CollisionFragment->AttackRadius);
-	
 	const bool HitDetected = GetWorld()->SweepMultiByChannel(
 		OutHitResults,
 		Start,
@@ -270,7 +286,6 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 		Shape,
 		Params
 	);
-	
 	ISTRUE(true == HitDetected);
 
 	for (const FHitResult & Result : OutHitResults)

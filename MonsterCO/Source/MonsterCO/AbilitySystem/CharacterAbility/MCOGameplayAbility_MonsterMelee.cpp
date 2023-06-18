@@ -1,5 +1,6 @@
 #include "MCOGameplayAbility_MonsterMelee.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Interface/MCOMonsterAIInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
@@ -7,7 +8,7 @@
 
 UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 {
-	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Claw.DA_Dragon_Claw"));
+	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Melee.DA_Dragon_Melee"));
 	
 	ensure(nullptr != Data->ActionDefinition);
 	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
@@ -64,7 +65,6 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 		Data->GetMontage(AttackDegree),
 		Data->MontageSectionName,
 		Data->ActionDefinition->GetTimerFragment(), 
-		Data->ActionDefinition->GetDamageFragment(),
 		Data->GetCollisionFragment(AttackDegree)
 	);
 }
@@ -86,42 +86,3 @@ void UMCOGameplayAbility_MonsterMelee::OnTaskCancelled()
 	
 	Super::OnTaskCancelled();
 }
-
-void UMCOGameplayAbility_MonsterMelee::BeginDamaging_Collision()
-{
-	Super::BeginDamaging_Collision();
-
-	ISTRUE(nullptr != Data);
-	
-	IMCOMonsterAIInterface* Monster = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(Monster);
-	
-	// UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
-	// ensure(Mode);
-	//
-	// AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
-	// ensure(Attachment);
-	//
-	// Attachment->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-	// Attachment->TurnOnCollision(CurrentData->CollisionData.SocketName);
-}
-
-void UMCOGameplayAbility_MonsterMelee::EndDamaging_Collision()
-{
-	Super::EndDamaging_Collision();
-	
-	ISTRUE(nullptr != Data);
-	
-	IMCOMonsterAIInterface* Monster = Cast<IMCOMonsterAIInterface>(CurrentActorInfo->AvatarActor.Get());
-	ensure(Monster);
-	
-	// UMCOMonsterModeComponent* Mode = Monster->GetModeComponent();
-	// ensure(Mode);
-	//
-	// AMCOMonsterAttachment* Attachment = Mode->GetAttachment();
-	// ensure(Attachment);
-	//
-	// Attachment->OnAttachmentBeginOverlapDelegate.Clear();
-	// Attachment->TurnOffCollision(CurrentData->CollisionData.SocketName);
-}
-

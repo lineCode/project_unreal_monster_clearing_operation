@@ -1,6 +1,6 @@
 #include "MCOMonsterModeComponent.h"
 #include "GameFramework/Character.h"
-#include "MCOMonsterAttachment.h"
+#include "Attachment/MCOMonsterAttachment.h"
 
 
 UMCOMonsterModeComponent::UMCOMonsterModeComponent()
@@ -16,10 +16,5 @@ void UMCOMonsterModeComponent::BeginPlay()
 
 void UMCOMonsterModeComponent::SpawnAttachment(ACharacter* InOwner)
 {
-	FTransform transform;
-
-	Attachment = InOwner->GetWorld()->SpawnActorDeferred<AMCOMonsterAttachment>(AttachmentClass, transform, InOwner);
-	ISTRUE(Attachment);
-
-	UGameplayStatics::FinishSpawningActor(Attachment, transform);
+	SpawnAttachmentByClass(InOwner, AttachmentClass);
 }

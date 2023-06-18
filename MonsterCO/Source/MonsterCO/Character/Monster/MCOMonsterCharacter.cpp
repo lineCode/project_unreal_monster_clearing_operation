@@ -9,7 +9,7 @@
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "CharacterAttachment/MCOMonsterModeComponent.h"
-#include "CharacterAttachment/MCOMonsterAttachment.h"
+#include "CharacterAttachment/Attachment/MCOAttachment.h"
 
 
 AMCOMonsterCharacter::AMCOMonsterCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -51,6 +51,7 @@ void AMCOMonsterCharacter::BeginPlay()
 {
 	Super::BeginPlay(); 
 	
+	ModeComponent->SetCurrentMode(static_cast<int32>(EMCOMonsterMode::Normal));
 	ModeComponent->SpawnAttachment(this);
 
 	// OnDamagedBegin.BindUObject(this, &ThisClass::StopAI);
@@ -163,11 +164,4 @@ void AMCOMonsterCharacter::StopAI()
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
 	ISTRUE(nullptr != AIController);
 	AIController->StopAI();
-}
-
-void AMCOMonsterCharacter::DisableAllCollision()
-{
-	Super::DisableAllCollision();
-
-	GetModeComponent()->GetAttachment()->TurnOffAllCollision();
 }

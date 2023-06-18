@@ -5,9 +5,8 @@
 
 class UMCOActionFragment_Collision;
 class UMCOActionFragment_Cooldown;
-class UMCOActionFragment_Damage;
 class UMCOActionFragment_Montage;
-class UMCOActionFragment_Timer;
+class UMCOActionFragment_AttackTiming;
 class UMCOActionFragment_Attribute;
 
 
@@ -30,9 +29,8 @@ protected:
 public:
 	const UMCOActionFragment_Collision* GetCollisionFragment() const;
 	const UMCOActionFragment_Cooldown* GetCooldownFragment() const;
-	const UMCOActionFragment_Damage* GetDamageFragment() const;
 	const UMCOActionFragment_Montage* GetMontageFragment() const;
-	const UMCOActionFragment_Timer* GetTimerFragment() const;
+	const UMCOActionFragment_AttackTiming* GetTimerFragment() const;
 	const UMCOActionFragment_Attribute* GetAttributeFragment() const;
 
 protected:

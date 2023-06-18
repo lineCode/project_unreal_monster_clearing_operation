@@ -1,14 +1,14 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "Components/ActorComponent.h"
+#include "MCOModeComponent.h"
 #include "MCOMonsterModeComponent.generated.h"
 
 class AMCOMonsterAttachment;
 
 
 UCLASS()
-class MONSTERCO_API UMCOMonsterModeComponent : public UActorComponent
+class MONSTERCO_API UMCOMonsterModeComponent : public UMCOModeComponent
 {
 	GENERATED_BODY()
 
@@ -19,13 +19,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	FORCEINLINE AMCOMonsterAttachment* GetAttachment() { return Attachment; }
-	void SpawnAttachment(ACharacter* InOwner);
+	virtual void SpawnAttachment(ACharacter* InOwner) override;
 	
-protected:
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<AMCOMonsterAttachment> Attachment;
-	
+protected:	
 	UPROPERTY()
 	TSubclassOf<AMCOMonsterAttachment> AttachmentClass;
 };

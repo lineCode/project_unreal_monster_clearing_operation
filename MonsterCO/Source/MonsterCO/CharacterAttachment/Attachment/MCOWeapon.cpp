@@ -9,6 +9,8 @@ AMCOWeapon::AMCOWeapon()
 	
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMesh->SetupAttachment(Scene);
+	
+	bControlCollision = true;
 }
 
 void AMCOWeapon::BeginPlay()
@@ -16,6 +18,8 @@ void AMCOWeapon::BeginPlay()
 	Super::BeginPlay();
 
 	AttachActorToSocket(HolsterSocketName);
+
+	bIsEquipped = false;
 }
 
 void AMCOWeapon::SwitchEquipUnequip(bool bInToEquip)

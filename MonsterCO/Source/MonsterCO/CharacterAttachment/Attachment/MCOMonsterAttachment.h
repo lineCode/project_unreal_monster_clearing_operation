@@ -15,13 +15,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
-public:
-	UFUNCTION()
-	void TurnOnCollision(const FName& InName);
-
-	UFUNCTION()
-	void TurnOffCollision(const FName& InName);
 
 public:
 	virtual ACharacter* GetAttackedCharacter() override;

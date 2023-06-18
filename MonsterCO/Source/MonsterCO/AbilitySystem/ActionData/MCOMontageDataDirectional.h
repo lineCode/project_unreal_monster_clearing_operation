@@ -24,9 +24,6 @@ public:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
-	EMCOCharacterDirectionOption Option;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
 	TMap<EMCOCharacterDirection, TObjectPtr<UMCOActionFragment_Montage>> MontageFragments;
 
 public:
@@ -34,9 +31,12 @@ public:
 	TObjectPtr<UMCOActionDefinition> ActionDefinition;
 	
 public:
-	UAnimMontage* GetMontage(const float InDegree, bool bIsLog = false);
+	UAnimMontage* GetMontage(const float InDegree, bool bIsLog = true);
 	const UMCOActionFragment_Collision* GetCollisionFragment(const float InDegree, bool bIsLog = false);
 	
 protected:
 	EMCOCharacterDirection GetDirectionFromDegree(const float InDegree) const;
+
+private:
+	EMCOCharacterDirection GetClosestDirectionFromDegree(const float InDegree) const;
 };

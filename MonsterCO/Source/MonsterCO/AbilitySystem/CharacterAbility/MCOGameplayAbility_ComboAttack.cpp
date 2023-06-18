@@ -1,8 +1,9 @@
 #include "MCOGameplayAbility_ComboAttack.h"
 #include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Timer.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -55,7 +56,6 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 		MontageFragment->GetMontage(),
 		Data->MontageSectionName,
 		MontageFragment->ActionDefinition->GetTimerFragment(),
-		MontageFragment->ActionDefinition->GetDamageFragment(),
 		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
 
@@ -87,39 +87,11 @@ void UMCOGameplayAbility_ComboAttack::OnTaskCancelled()
 	Super::OnTaskCancelled();
 }
 
-void UMCOGameplayAbility_ComboAttack::BeginDamaging_Collision()
-{
-	Super::BeginDamaging_Collision();
-
-	//AMCOPlayerCharacter* Owner = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
-	//ensure(Owner);
-	
-	//AMCOWeapon* Weapon = Owner->GetWeapon();
-	//ensure(Weapon);
-	
-	//Weapon->OnAttachmentBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-	//Weapon->TurnOnAllCollision();
-}
-
-void UMCOGameplayAbility_ComboAttack::EndDamaging_Collision()
-{
-	Super::EndDamaging_Collision();
-
-	//AMCOPlayerCharacter* Owner = Cast<AMCOPlayerCharacter>(GetMCOCharacter());
-	//ensure(Owner);
-	
-	//AMCOWeapon* Weapon = Owner->GetWeapon();
-	//ensure(Weapon);
-	
-	//Weapon->OnAttachmentBeginOverlapDelegate.Clear();
-	//Weapon->TurnOffAllCollision();
-}
-
 void UMCOGameplayAbility_ComboAttack::SetComboTimer()
 {
 	ComboTimerHandle.Invalidate();
 	
-	float ComboCheckTime = TimerFragment->GetComboCheckTime();
+	const float ComboCheckTime = TimerFragment->GetComboCheckTime();
 	ISTRUE(ComboCheckTime > 0.0f);
 	
 	// MCOLOG_C(MCOAbility, TEXT("[Combo] SetComboTimer: %f"), ComboCheckTime);
@@ -167,7 +139,6 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 		MontageFragment->GetMontage(),
 		Data->MontageSectionName,
 		MontageFragment->ActionDefinition->GetTimerFragment(),
-		MontageFragment->ActionDefinition->GetDamageFragment(),
 		MontageFragment->ActionDefinition->GetCollisionFragment()
 	);
 

@@ -25,9 +25,9 @@ public:
 	
 // --- Weapon
 public:
-	virtual EMCOModeType GetModeType() const = 0;
+	virtual EMCOPlayerMode GetModeType() const = 0;
 	virtual bool IsEquipped() = 0;
-	virtual void SetEquippedWithoutAnimation() = 0;
+	virtual void EquipInstantly() = 0;
 	virtual void SwitchEquipUnequip() = 0;
 	virtual void BeginAnimation_Equip() = 0;
 	virtual void EndAnimation_Equip() = 0;

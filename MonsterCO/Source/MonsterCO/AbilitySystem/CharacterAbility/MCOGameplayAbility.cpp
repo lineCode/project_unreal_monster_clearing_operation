@@ -264,7 +264,7 @@ void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle 
 	}
 	if (NewInfiniteHandle.Data->DynamicGrantedTags.Num() > 0)
 	{
-		MCOLOG_C(MCOAbility, TEXT("InfiniteHandle used"));
+		//MCOLOG_C(MCOAbility, TEXT("InfiniteHandle used"));
 		
 		ASC->ApplyGameplayEffectSpecToSelf(
 			*NewInfiniteHandle.Data.Get(),

@@ -23,6 +23,11 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void BeginPlay() override;
 
+protected:
+	UPROPERTY(VisibleAnywhere, Category = MCO)
+	TObjectPtr<UCapsuleComponent> Body;
+
+	
 // --- Ability
 public:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
@@ -57,17 +62,5 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = MCO)
 	TObjectPtr<UMCOMonsterAIData> MonsterAIData;
-
-// --- Mode
-public:
-	FORCEINLINE UMCOMonsterModeComponent* GetModeComponent() { return ModeComponent; }
-
-	virtual void DisableAllCollision() override;
 	
-protected:
-	UPROPERTY(VisibleAnywhere, Category = MCO)
-	TObjectPtr<UMCOMonsterModeComponent> ModeComponent;
-	
-	UPROPERTY(VisibleAnywhere, Category = MCO)
-	TObjectPtr<UCapsuleComponent> Body;
 };

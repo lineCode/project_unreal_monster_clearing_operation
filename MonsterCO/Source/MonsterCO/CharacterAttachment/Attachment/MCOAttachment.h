@@ -3,21 +3,11 @@
 #include "MonsterCO.h"
 #include "GameFramework/Actor.h"
 #include "Engine/EngineTypes.h"
+#include "Interface/MCOCharacterInterface.h"
 #include "MCOAttachment.generated.h"
 
 
-
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAttachmentBeginOverlapDelegate,
-												class ACharacter*, InAttacker,
-												class AActor*, InAttackCauser,
-												class ACharacter*, InOtherCharacter,
-												const FHitResult&, SweepResult);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttachmentEndOverlapDelegate,
-												class ACharacter*, InAttacker,
-												class AActor*, InAttackCauser,
-												class ACharacter*, InOtherCharacter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAllCollisionChangedDelegate, const FName&, InName);
 
 
 
@@ -32,13 +22,40 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+protected:
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "MCO|Character")
+	TObjectPtr<ACharacter> OwnerCharacter;
+
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	TObjectPtr<USceneComponent> Scene;
+
+// --- Equip
+public:
+	bool GetIsEquipped() const { return bIsEquipped; }
+
+protected:
+	UPROPERTY()
+	uint8 bIsEquipped:1;
+
+// --- Collision
 public:
 	UFUNCTION()
-	void TurnOnAllCollision();
+	void TurnOnAllCollision() const;
+
+	UFUNCTION()
+	void TurnOffAllCollision() const;
 	
 	UFUNCTION()
-	void TurnOffAllCollision();
-	
+	void TurnOnCollision(const FName& InName);
+
+	UFUNCTION()
+	void TurnOffCollision(const FName& InName);
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	TMap<FName, TObjectPtr<UShapeComponent>> ShapeComponentsMap;
+
+// --- Overlap
 protected:
 	UFUNCTION()
 	virtual void OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -51,24 +68,15 @@ protected:
 
 	UFUNCTION()
 	virtual void AttachCollisionToSocket(UShapeComponent* InComponent, const FName& InSocketName);
-	
+
 public:
 	UPROPERTY()
 	FAttachmentBeginOverlapDelegate OnAttachmentBeginOverlapDelegate;
 	
 	UPROPERTY()
 	FAttachmentEndOverlapDelegate OnAttachmentEndOverlapDelegate;
-	
+
 protected:
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "MCO|Character")
-	TObjectPtr<ACharacter> OwnerCharacter;
-
-	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
-	TObjectPtr<USceneComponent> Scene;
-
 	UPROPERTY()
-	TArray<TObjectPtr<UShapeComponent>> ShapeComponents;
-	
-	UPROPERTY(BlueprintReadOnly)
-	TMap<FName, TObjectPtr<UShapeComponent>> ShapeComponentsMap;
+	uint8 bControlCollision:1;
 };

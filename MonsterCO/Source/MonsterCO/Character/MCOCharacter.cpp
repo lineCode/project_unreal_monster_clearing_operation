@@ -8,6 +8,8 @@
 #include "UI/Widgets/MCOHpWidget.h"
 #include "UI/Widgets/MCOAttributeWidget.h"
 #include "MCOPlayerState.h"
+#include "CharacterAttachment/MCOModeComponent.h"
+#include "CharacterAttachment/Attachment/MCOAttachment.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -83,6 +85,9 @@ void AMCOCharacter::DisableAllCollision()
 	ensure(nullptr != CapsuleComp);
 	CapsuleComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CapsuleComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	ISTRUE(ModeComponent);
+	ModeComponent->GetCurrentAttachment()->TurnOffAllCollision();
 }
 
 void AMCOCharacter::DestroyAllAttachedActors() const
@@ -267,6 +272,26 @@ int32 AMCOCharacter::GetTagCount(const FGameplayTag& InTag) const
 	return GetAbilitySystemComponent()->GetTagCount(InTag);
 }
 
+void AMCOCharacter::TurnOnCollision(const FName& InName)
+{
+	ensure(ModeComponent);
+
+	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
+	ensure(Attachment);
+	
+	Attachment->TurnOnCollision(InName);
+}
+
+void AMCOCharacter::TurnOffCollision(const FName& InName)
+{
+	ensure(ModeComponent);
+
+	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
+	ensure(Attachment);
+	
+	Attachment->TurnOffCollision(InName);
+}
+
 void AMCOCharacter::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage)
 {
 	
@@ -282,6 +307,12 @@ float AMCOCharacter::GetCapsuleRadius() const
 	UCapsuleComponent* Capsule = GetCapsuleComponent();
 
 	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleRadius() : 0.0f;
+}
+
+FAttachmentBeginOverlapDelegate& AMCOCharacter::GetAttachmentBeginOverlapDelegate()
+{
+	ensure(nullptr != ModeComponent);
+	return ModeComponent->GetAttachmentBeginOverlapDelegate();
 }
 
 void AMCOCharacter::Die()

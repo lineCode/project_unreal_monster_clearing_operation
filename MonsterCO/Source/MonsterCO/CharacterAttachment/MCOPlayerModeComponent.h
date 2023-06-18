@@ -1,40 +1,35 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "Components/ActorComponent.h"
+#include "MCOModeComponent.h"
 #include "MCOPlayerModeComponent.generated.h"
 
 class AMCOWeapon;
 class UMCOPlayerModeData; 
 
 UCLASS()
-class MONSTERCO_API UMCOPlayerModeComponent : public UActorComponent
+class MONSTERCO_API UMCOPlayerModeComponent : public UMCOModeComponent
 {
 	GENERATED_BODY()
 
 public:	
 	UMCOPlayerModeComponent();
 
+// --- Spawn
 public:
-	FORCEINLINE AMCOWeapon* GetWeapon() { return CurrentWeaponActor; }
-	FORCEINLINE const EMCOModeType GetModeType() const { return CurrentModeType; }
-	bool IsEquipped() const;
-	
-	void SpawnWeapon(ACharacter* InOwner);
-	void SetMode(const EMCOModeType InModeType);
-	void SetEquip();
-	void SwitchEquipUnequip();
+	virtual void SpawnAttachment(ACharacter* InOwner) override;
+
+protected:
+	UPROPERTY()
+	TObjectPtr<UMCOPlayerModeData> ModeData;
+
+// --- Equip
+public:
+	virtual void SetEquipUnequipInstantly(const bool bEquip) override;
+	virtual void SwitchEquipUnequip() override;
 
 protected:
 	UPROPERTY()
 	uint8 bIsToEquip:1;
 
-	UPROPERTY()
-	TObjectPtr<UMCOPlayerModeData> ModeData;
-	
-	UPROPERTY()
-	TObjectPtr<AMCOWeapon> CurrentWeaponActor;
-	
-	UPROPERTY()
-	EMCOModeType CurrentModeType;
 };

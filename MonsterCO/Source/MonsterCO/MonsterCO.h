@@ -28,6 +28,7 @@ const int32 MAX_STAGE = 2;
 // --- Log
 DECLARE_LOG_CATEGORY_EXTERN(MCOLog, Display, All);
 DECLARE_LOG_CATEGORY_EXTERN(MCOAbility, Display, All);
+DECLARE_LOG_CATEGORY_EXTERN(MCOAttachment, Display, All);
 
 
 class MONSTERCO_API FLog
@@ -111,7 +112,14 @@ enum class EMCOMonsterAttack : uint8
 };
 
 UENUM(BlueprintType)
-enum class EMCOModeType : uint8
+enum class EMCOMonsterMode : uint8
+{
+	Normal         UMETA(DisplayName = "Normal"),
+	Max            UMETA(DisplayName = "Max")
+};
+
+UENUM(BlueprintType)
+enum class EMCOPlayerMode : uint8
 {
 	TwoHand        UMETA(DisplayName = "TwoHand"),
 	Max            UMETA(DisplayName = "Max")
@@ -136,20 +144,9 @@ enum class EMCOCharacterDirection : uint8
 	Back_Right     UMETA(DisplayName = "Back_Right"),
 	Right          UMETA(DisplayName = "Right"),
 	Front_Right    UMETA(DisplayName = "Front_Right"),
-	Max,
-	None
+	Max
 };
 
-UENUM(BlueprintType)
-enum class EMCOCharacterDirectionOption : uint8
-{
-	FrontBack      UMETA(DisplayName = "FrontBack"),
-	LeftRight      UMETA(DisplayName = "RightLeft"),
-	FourSide       UMETA(DisplayName = "FourSide"),
-	SixSide        UMETA(DisplayName = "SixSide"),
-	EightSide      UMETA(DisplayName = "EightSide"),
-};
-	
 UENUM(BlueprintType)
 enum class EMCOAbilityActivationPolicy : uint8
 {

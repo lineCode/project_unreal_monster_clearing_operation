@@ -18,8 +18,9 @@
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOAttributeSet.h"
+#include "CharacterAttachment/Attachment/MCOAttachment.h"
 #include "CharacterAttachment/MCOPlayerModeComponent.h"
-#include "CharacterAttachment/MCOWeapon.h"
+#include "CharacterAttachment/Attachment/MCOWeapon.h"
 #include "UI/MCOHUDWidget.h"
 #include "UI/MCOWidgetComponent.h"
 #include "UI/Widgets/MCOStaminaWidget.h"
@@ -110,8 +111,8 @@ void AMCOPlayerCharacter::BeginPlay()
 	ISTRUE(nullptr != GameModeInterface);
 	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
 	
-	ModeComponent->SpawnWeapon(this);
-	ModeComponent->SetMode(EMCOModeType::TwoHand);
+	ModeComponent->SetCurrentMode(static_cast<int32>(EMCOPlayerMode::TwoHand));
+	ModeComponent->SpawnAttachment(this);
 }
 
 void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
@@ -215,16 +216,10 @@ bool AMCOPlayerCharacter::IsInputForward() const
 	return GetInputWorldDirection().Equals(GetActorForwardVector(), 0.05f);
 }
 
-EMCOModeType AMCOPlayerCharacter::GetModeType() const
+EMCOPlayerMode AMCOPlayerCharacter::GetModeType() const
 {
-	return ModeComponent->GetModeType();
-}
-
-void AMCOPlayerCharacter::DisableAllCollision()
-{
-	Super::DisableAllCollision();
-
-	ModeComponent->GetWeapon()->TurnOnAllCollision();
+	ensure(ModeComponent);
+	return static_cast<EMCOPlayerMode>(ModeComponent->GetCurrentMode());
 }
 
 bool AMCOPlayerCharacter::IsEquipped()
@@ -234,10 +229,10 @@ bool AMCOPlayerCharacter::IsEquipped()
 	return ModeComponent->IsEquipped();
 }
 
-void AMCOPlayerCharacter::SetEquippedWithoutAnimation()
+void AMCOPlayerCharacter::EquipInstantly()
 {
 	ISTRUE(nullptr != ModeComponent);
-	ModeComponent->SetEquip();
+	ModeComponent->SetEquipUnequipInstantly(true);
 }
 
 void AMCOPlayerCharacter::SwitchEquipUnequip()
@@ -249,15 +244,27 @@ void AMCOPlayerCharacter::SwitchEquipUnequip()
 void AMCOPlayerCharacter::BeginAnimation_Equip()
 {
 	ISTRUE(nullptr != ModeComponent);
-	ISTRUE(nullptr != ModeComponent->GetWeapon());
-	ModeComponent->GetWeapon()->BeginAnimation_Equip();
+
+	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
+	ISTRUE(nullptr != Attachment);
+
+	AMCOWeapon* Weapon = Cast<AMCOWeapon>(Attachment);
+	ISTRUE(nullptr != Weapon);
+	
+	Weapon->BeginAnimation_Equip();
 }
 
 void AMCOPlayerCharacter::EndAnimation_Equip()
 {
 	ISTRUE(nullptr != ModeComponent);
-	ISTRUE(nullptr != ModeComponent->GetWeapon());
-	ModeComponent->GetWeapon()->EndAnimation_Equip();
+	
+	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
+	ISTRUE(nullptr != Attachment);
+
+	AMCOWeapon* Weapon = Cast<AMCOWeapon>(Attachment);
+	ISTRUE(nullptr != Weapon);
+	
+	Weapon->EndAnimation_Equip();
 }
 
 

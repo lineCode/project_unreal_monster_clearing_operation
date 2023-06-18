@@ -102,18 +102,12 @@ public:
 	
 // --- Mode & Weapon 
 public:
-	EMCOModeType GetModeType() const;
-	
-	virtual void DisableAllCollision() override;
+	virtual EMCOPlayerMode GetModeType() const override;
 	virtual bool IsEquipped() override;
-	virtual void SetEquippedWithoutAnimation() override;
+	virtual void EquipInstantly() override;
 	virtual void SwitchEquipUnequip() override;
 	virtual void BeginAnimation_Equip() override;
 	virtual void EndAnimation_Equip() override;
-
-protected:
-	UPROPERTY(VisibleAnywhere, Category = "MCO|Weapon")
-	TObjectPtr<UMCOPlayerModeComponent> ModeComponent;
 
 // --- Components
 protected:

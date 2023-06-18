@@ -14,5 +14,5 @@ class MONSTERCO_API UMCOPlayerModeData : public UPrimaryDataAsset
 	
 public:
 	UPROPERTY(EditAnywhere, Category = Weapon)
-	TMap<EMCOModeType, TSubclassOf<AMCOWeapon>> WeaponClasses;
+	TMap<EMCOPlayerMode, TSubclassOf<AMCOWeapon>> WeaponClasses;
 };

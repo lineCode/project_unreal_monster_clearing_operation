@@ -21,7 +21,7 @@ protected:
 	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
-	EMCOModeType ModeType; 
+	EMCOPlayerMode ModeType; 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	uint32 bIsDodging:1;

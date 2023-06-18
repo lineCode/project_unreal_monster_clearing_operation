@@ -34,7 +34,7 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	if (nullptr != PlayerInterface)
 	{
-		PlayerInterface->SetEquippedWithoutAnimation();
+		PlayerInterface->EquipInstantly();
 	}
 	
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();

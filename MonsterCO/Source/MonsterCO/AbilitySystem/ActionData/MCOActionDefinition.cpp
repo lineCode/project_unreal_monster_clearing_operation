@@ -1,10 +1,9 @@
 #include "MCOActionDefinition.h"
 #include "MCOActionFragment_Collision.h"
 #include "MCOActionFragment_Cooldown.h"
-#include "MCOActionFragment_Damage.h"
 #include "MCOActionFragment_Montage.h"
 #include "MCOActionFragment_Attribute.h"
-#include "MCOActionFragment_Timer.h"
+#include "MCOActionFragment_AttackTiming.h"
 
 
 const UMCOActionFragment_Collision* UMCOActionDefinition::GetCollisionFragment() const
@@ -17,19 +16,14 @@ const UMCOActionFragment_Cooldown* UMCOActionDefinition::GetCooldownFragment() c
 	return Cast<UMCOActionFragment_Cooldown>(FindFragmentByClass(UMCOActionFragment_Cooldown::StaticClass()));
 }
 
-const UMCOActionFragment_Damage* UMCOActionDefinition::GetDamageFragment() const
-{
-	return Cast<UMCOActionFragment_Damage>(FindFragmentByClass(UMCOActionFragment_Damage::StaticClass()));
-}
-
 const UMCOActionFragment_Montage* UMCOActionDefinition::GetMontageFragment() const
 {
 	return Cast<UMCOActionFragment_Montage>(FindFragmentByClass(UMCOActionFragment_Montage::StaticClass()));
 }
 
-const UMCOActionFragment_Timer* UMCOActionDefinition::GetTimerFragment() const
+const UMCOActionFragment_AttackTiming* UMCOActionDefinition::GetTimerFragment() const
 {
-	return Cast<UMCOActionFragment_Timer>(FindFragmentByClass(UMCOActionFragment_Timer::StaticClass()));
+	return Cast<UMCOActionFragment_AttackTiming>(FindFragmentByClass(UMCOActionFragment_AttackTiming::StaticClass()));
 }
 
 const UMCOActionFragment_Attribute* UMCOActionDefinition::GetAttributeFragment() const

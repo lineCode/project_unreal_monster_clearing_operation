@@ -18,6 +18,7 @@ class UMCOCharacterData;
 class UMCOHpWidget;
 class UMCOAttributeWidget;
 class UMCOItemData;
+class UMCOModeComponent;
 
 
 DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, const UMCOItemData* /*InItemData*/);
@@ -63,9 +64,9 @@ protected:
 public:
 	virtual void StopCharacter(bool bToStop) override;
 	void DisableMovement() const;
-	virtual void DisableAllCollision() override;
+	void DisableAllCollision();
 	void DestroyAllAttachedActors() const;
-	virtual FVector GetSocketLocation(const FName& InSocketName);
+	virtual FVector GetSocketLocation(const FName& InSocketName) override;
 
 	
 // --- Ability
@@ -118,8 +119,17 @@ public:
 	bool HasTag(const FGameplayTag& InTag) const;
 	int32 GetTagCount(const FGameplayTag& InTag) const;
 
+// --- Mode
+public:
+	FORCEINLINE UMCOModeComponent* GetModeComponent() { return ModeComponent; }
+	virtual void TurnOnCollision(const FName& InName) override;
+	virtual void TurnOffCollision(const FName& InName) override;
 	
-// --- Damage
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "MCO|Mode")
+	TObjectPtr<UMCOModeComponent> ModeComponent;
+	
+// --- Attack
 public:
 	UFUNCTION()
 	void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage);
@@ -129,6 +139,7 @@ public:
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;
+	virtual FAttachmentBeginOverlapDelegate& GetAttachmentBeginOverlapDelegate() override;
 	
 protected:
 	UPROPERTY()

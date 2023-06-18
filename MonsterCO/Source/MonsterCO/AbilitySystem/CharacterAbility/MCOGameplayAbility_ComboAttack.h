@@ -21,9 +21,6 @@ protected:
 protected:
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
-
-	virtual void BeginDamaging_Collision() override;
-	virtual void EndDamaging_Collision() override;
 	
 // --- Combo
 protected:
