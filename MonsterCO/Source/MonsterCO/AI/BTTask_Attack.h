@@ -15,5 +15,5 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, Category = Attack)
-	EMCOMonsterAttack AttackType;
+	FGameplayTag AttackTag;
 };

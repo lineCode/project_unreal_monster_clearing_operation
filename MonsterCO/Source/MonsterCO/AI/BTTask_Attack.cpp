@@ -25,12 +25,6 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	{
 		return EBTNodeResult::Failed;
 	}
-
-	IMCOCharacterInterface* MCOCharacter = Cast<IMCOCharacterInterface>(ControllingPawn);
-	if (false == MCOCharacter->CanActivateAbility(FMCOCharacterTags::Get().AttackTag))
-	{
-		return EBTNodeResult::Failed;
-	}
 	
 	FAICharacterAITaskFinishedDelegate OnAttackFinished;
 	OnAttackFinished.BindLambda(
@@ -41,7 +35,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	);
 
 	AIPawn->SetAIAttackDelegate(OnAttackFinished);
-	AIPawn->AttackByAI();
+	AIPawn->Attack(AttackTag);
 
 	return EBTNodeResult::InProgress;
 }

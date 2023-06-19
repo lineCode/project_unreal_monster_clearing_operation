@@ -45,6 +45,7 @@ public:
 	
 	// Dragon
 	FGameplayTag DragonAbility_Claw;
+	FGameplayTag DragonAbility_Breath;
 
 private:
 	static FMCOCharacterTags CharacterTags;

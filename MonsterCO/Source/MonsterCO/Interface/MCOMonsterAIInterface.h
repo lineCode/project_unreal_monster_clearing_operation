@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "MonsterCO.h"
+#include "GameplayTagContainer.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
 #include "UObject/Interface.h"
 #include "MCOMonsterAIInterface.generated.h"
@@ -28,7 +29,8 @@ public:
 	
 	virtual float GetAIPatrolRadius() = 0;
 	virtual float GetAIDetectRange() = 0;
-	virtual float GetAIMeleeRange() = 0;
+	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) = 0;
+	virtual float GetAIAttackRangeMax(const FGameplayTag& InTag) = 0;
 	virtual float GetAITurnSpeed() = 0;
 	virtual FVector GetAITurnVector() = 0;
 
@@ -36,5 +38,5 @@ public:
 	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) = 0;
 	virtual void SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished) = 0;
 
-	virtual void AttackByAI() = 0;
+	virtual void Attack(const FGameplayTag& InTag) = 0;
 };

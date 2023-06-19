@@ -54,7 +54,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	);
 
 #if ENABLE_DRAW_DEBUG
-	// DrawDebugSphere(World, Center, DetectRadius, 16, (HitDetected == true) ? FColor::Green : FColor::Red, false, 0.2f);
+	DrawDebugSphere(World, Center, DetectRadius, 16, (HitDetected == true) ? FColor::Blue : FColor::Yellow, false, 0.2f);
 #endif
 
 	if (true == HitDetected)

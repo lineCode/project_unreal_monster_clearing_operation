@@ -7,7 +7,7 @@
 
 UBTDecorator_AttackInRange::UBTDecorator_AttackInRange()
 {
-	NodeName = TEXT("CanAttack");
+	NodeName = TEXT("Check Attack In Range");
 }
 
 bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
@@ -32,9 +32,16 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 		return false;
 	}
 
-	float AttackRangeWithRadius = AIPawn->GetAIMeleeRange();
-	float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
-	bResult = (DistanceToTarget <= AttackRangeWithRadius);
+	const float AttackRangeMin = AIPawn->GetAIAttackRangeMin(AttackTag);
+	const float AttackRangeMax = AIPawn->GetAIAttackRangeMax(AttackTag);
+	const float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
+	bResult = (DistanceToTarget <= AttackRangeMax) && (AttackRangeMin <= DistanceToTarget);
+
+	
+#if ENABLE_DRAW_DEBUG
+	DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMin, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
+	DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMax, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
+#endif
 	
 	return bResult;
 }

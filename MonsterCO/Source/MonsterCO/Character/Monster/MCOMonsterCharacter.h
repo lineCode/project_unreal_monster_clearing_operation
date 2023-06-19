@@ -38,7 +38,9 @@ protected:
 	
 	virtual float GetAIPatrolRadius() override;
 	virtual float GetAIDetectRange() override;
-	virtual float GetAIMeleeRange() override;
+	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) override;
+	virtual float GetAIAttackRangeMax(const FGameplayTag& InTag) override;
+	
 	virtual float GetAITurnSpeed() override;
 	virtual FVector GetAITurnVector() override;
 	
@@ -46,7 +48,7 @@ protected:
 	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) override;
 	virtual void SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished) override;
 
-	virtual void AttackByAI() override;
+	virtual void Attack(const FGameplayTag& InTag) override;
 	virtual void StopCharacter(bool bToStop) override;
 
 protected:

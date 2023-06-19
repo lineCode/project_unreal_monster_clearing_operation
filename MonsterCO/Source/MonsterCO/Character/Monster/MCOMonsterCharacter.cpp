@@ -69,16 +69,23 @@ void AMCOMonsterCharacter::BeginPlay()
 bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
 {
 	ISTRUE_F(true == Super::CanActivateAbility(InTag));
+	ISTRUE_F(nullptr != GetAbilitySystemComponent());
 
 	if (InTag == FMCOCharacterTags::Get().JumpTag)
 	{
-		ISTRUE_F(nullptr != GetAbilitySystemComponent());
-	
 		FGameplayTagContainer ActivationBlockedTags;
 		ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().AttackTag);
 		ActivationBlockedTags.AddTag(FMCOCharacterTags::Get().DamagedTag);
 	
 		return GetAbilitySystemComponent()->HasAnyMatchingGameplayTags(ActivationBlockedTags) == false;
+	}
+	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Claw)
+	{
+		
+	}
+	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Breath)
+	{
+		
 	}
 
 	return true;
@@ -101,9 +108,14 @@ float AMCOMonsterCharacter::GetAIDetectRange()
 	return MonsterAIData->DetectRange;
 }
 
-float AMCOMonsterCharacter::GetAIMeleeRange()
+float AMCOMonsterCharacter::GetAIAttackRangeMin(const FGameplayTag& InTag)
 {
-	return MonsterAIData->AttackRange_Melee + GetCapsuleRadius(); // Diff from attack data
+	return MonsterAIData->GetAbilityRangeMin(InTag) + GetCapsuleRadius();
+}
+
+float AMCOMonsterCharacter::GetAIAttackRangeMax(const FGameplayTag& InTag)
+{
+	return MonsterAIData->GetAbilityRangeMax(InTag) + GetCapsuleRadius();
 }
 
 float AMCOMonsterCharacter::GetAITurnSpeed()
@@ -132,12 +144,12 @@ void AMCOMonsterCharacter::SetTurnVector(const bool InIsTurning, const FVector& 
 	TurnVector = InTurnVector;
 }
 
-void AMCOMonsterCharacter::AttackByAI()
+void AMCOMonsterCharacter::Attack(const FGameplayTag& InTag)
 {
 	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 
-	ASC->TryActivateAbilityByTag(FMCOCharacterTags::Get().DragonAbility_Claw);
+	ASC->TryActivateAbilityByTag(InTag);
 }
 
 void AMCOMonsterCharacter::StopCharacter(bool bToStop)
