@@ -6,7 +6,13 @@
 UMCOGameplayAbility_ChargeStamina::UMCOGameplayAbility_ChargeStamina()
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Character/DA_Character_ChargeStamina.DA_Character_ChargeStamina"));
-	Data->UpdateDefinition(CurrentDefinition);
+	
+}
+
+void UMCOGameplayAbility_ChargeStamina::SetDefaultDefinition()
+{
+	ensure(nullptr != Data);
+	Data->UpdateDefinition(CurrentDefinition);	
 }
 
 // void UMCOGameplayAbility_ChargeStamina::DoneAddingNativeTags()

@@ -7,6 +7,11 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Dash.DA_Twohand_Dash"));
 
+}
+
+void UMCOGameplayAbility_Dash::SetDefaultDefinition()
+{
+	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);
 }
 

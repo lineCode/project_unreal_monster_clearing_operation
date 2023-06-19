@@ -10,11 +10,15 @@
 UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& ObjectInitializer)
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Dodge.DA_Player_Dodge"));
-	Data->UpdateDefinition(CurrentDefinition);
 	
 	Strength = 500.0f;
 	Duration = 0.5f;
 	bAutoActivateChargingStaminaAbility = false;
+}
+
+void UMCOGameplayAbility_Dodge::SetDefaultDefinition()
+{
+	Data->UpdateDefinition(CurrentDefinition);
 }
 
 // void UMCOGameplayAbility_Dodge::DoneAddingNativeTags()

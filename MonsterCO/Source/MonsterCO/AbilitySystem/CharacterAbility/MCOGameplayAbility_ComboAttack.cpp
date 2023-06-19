@@ -9,7 +9,12 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 	GETASSET(Data, UMCOMontageDataCombo, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Combo.DA_Twohand_Combo"));
 	
 	CurrentCombo = 1;
-	Data->UpdateComboDefinition(CurrentDefinition);
+}
+
+void UMCOGameplayAbility_ComboAttack::SetDefaultDefinition()
+{
+	ensure(nullptr != Data);
+	Data->UpdateComboDefinition(CurrentDefinition, CurrentCombo - 1);
 }
 
 // void UMCOGameplayAbility_ComboAttack::DoneAddingNativeTags()
@@ -101,6 +106,7 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 
 	bIsDoingCombo = true;
 
+	ensure(nullptr != Data);
 	Data->UpdateComboDefinition(CurrentDefinition, CurrentCombo - 1);
 	
 	if (false == CheckCanActivateWithStamina())

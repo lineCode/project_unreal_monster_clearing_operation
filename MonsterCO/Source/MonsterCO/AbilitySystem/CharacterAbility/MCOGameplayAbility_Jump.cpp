@@ -11,6 +11,12 @@ UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 	Data->UpdateDefinition(CurrentDefinition);
 }
 
+void UMCOGameplayAbility_Jump::SetDefaultDefinition()
+{
+	ensure(nullptr != Data);
+	Data->UpdateDefinition(CurrentDefinition);
+}
+
 // void UMCOGameplayAbility_Jump::DoneAddingNativeTags()
 // {
 // 	Super::DoneAddingNativeTags();

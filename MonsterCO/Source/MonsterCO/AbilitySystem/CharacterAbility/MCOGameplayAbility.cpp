@@ -46,6 +46,8 @@ void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
+	SetDefaultDefinition();
+	
 	if (bActivateAbilityOnGranted == true)
 	{
 		ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);

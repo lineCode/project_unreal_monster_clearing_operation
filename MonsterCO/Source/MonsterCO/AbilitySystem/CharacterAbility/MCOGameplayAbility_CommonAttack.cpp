@@ -59,12 +59,13 @@ void UMCOGameplayAbility_CommonAttack::OnTaskCancelled()
 
 void UMCOGameplayAbility_CommonAttack::BeginDamaging()
 {
-	StartDamageEndTimer();
-
 	if (CurrentDefinition->AttackTimingFragment->IsMovableWhileGivingDamage(CurrentDamageTimingIdx))
 	{
+		MCOLOG_C(MCOAbility, TEXT("Move Character !"));
 		StopCharacter(false);
 	}
+	
+	StartDamageEndTimer();
 	
 	if (true == bUseOverlapEvent)
 	{
@@ -78,13 +79,14 @@ void UMCOGameplayAbility_CommonAttack::BeginDamaging()
 
 void UMCOGameplayAbility_CommonAttack::EndDamaging()
 {
-	CurrentDamageTimingIdx++;
-	StartDamageBeginTimer();
-
 	if (CurrentDefinition->AttackTimingFragment->IsMovableWhileGivingDamage(CurrentDamageTimingIdx))
 	{
+		MCOLOG_C(MCOAbility, TEXT("Stop Character !"));
 		StopCharacter(true);
 	}
+	
+	CurrentDamageTimingIdx++;
+	StartDamageBeginTimer();
 	
 	if (true == bUseOverlapEvent)
 	{
@@ -423,6 +425,9 @@ void UMCOGameplayAbility_CommonAttack::StartDamageBeginTimer()
 	ResetDamageTimer();
 	
 	const float FrameCount = GetCurrentDamageBeginFrameCount();
+
+	MCOLOG_C(MCOAbility, TEXT("... To Start : %f sec later "), FrameCount);
+	
 	ISTRUE(FrameCount > 0.0f);
 		
 	GetWorld()->GetTimerManager().SetTimer(
@@ -439,6 +444,9 @@ void UMCOGameplayAbility_CommonAttack::StartDamageEndTimer()
 	ResetDamageTimer();
 
 	const float FrameCount = GetCurrentDamageEndFrameCount();
+
+	MCOLOG_C(MCOAbility, TEXT("... To End : %f sec later "), FrameCount);
+	
 	ISTRUE(FrameCount > 0.0f);
 	
 	GetWorld()->GetTimerManager().SetTimer(

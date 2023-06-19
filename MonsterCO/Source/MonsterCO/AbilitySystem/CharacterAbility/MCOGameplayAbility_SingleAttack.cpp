@@ -5,6 +5,11 @@
 UMCOGameplayAbility_SingleAttack::UMCOGameplayAbility_SingleAttack()
 {
 	GETASSET(Data, UMCOMontageDataSingle, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_WhirlWind.DA_Twohand_WhirlWind"));
+}
+
+void UMCOGameplayAbility_SingleAttack::SetDefaultDefinition()
+{
+	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);
 }
 
