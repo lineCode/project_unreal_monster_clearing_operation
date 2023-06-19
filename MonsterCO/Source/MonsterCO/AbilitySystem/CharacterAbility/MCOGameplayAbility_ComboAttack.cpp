@@ -1,9 +1,7 @@
 #include "MCOGameplayAbility_ComboAttack.h"
 #include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Montage.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -11,14 +9,7 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 	GETASSET(Data, UMCOMontageDataCombo, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Combo.DA_Twohand_Combo"));
 	
 	CurrentCombo = 1;
-	ensure(nullptr != Data);
-	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
-	ensure(nullptr != MontageFragment);
-	ensure(nullptr != MontageFragment->ActionDefinition);
-	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
-	const UMCOActionFragment_Attribute* Stamina = MontageFragment->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
-	
+	Data->UpdateComboDefinition(CurrentDefinition);
 }
 
 // void UMCOGameplayAbility_ComboAttack::DoneAddingNativeTags()
@@ -42,21 +33,13 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	ComboTimerHandle.Invalidate();
 	
 	ensure(nullptr != Data);
-	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
-	ensure(nullptr != MontageFragment);
-	ensure(nullptr != MontageFragment->ActionDefinition);
-	UpdateCooldownFragment(MontageFragment->ActionDefinition->GetCooldownFragment());
-	const UMCOActionFragment_Attribute* Stamina = MontageFragment->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
-	
+	Data->UpdateComboDefinition(CurrentDefinition);
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
-		MontageFragment->GetMontage(),
-		Data->MontageSectionName,
-		MontageFragment->ActionDefinition->GetTimerFragment(),
-		MontageFragment->ActionDefinition->GetCollisionFragment()
+		Data->GetMontage(CurrentCombo - 1),
+		Data->MontageSectionName
 	);
 
 	SetComboTimer();
@@ -91,7 +74,7 @@ void UMCOGameplayAbility_ComboAttack::SetComboTimer()
 {
 	ComboTimerHandle.Invalidate();
 	
-	const float ComboCheckTime = TimerFragment->GetComboCheckTime();
+	const float ComboCheckTime = CurrentDefinition->AttackTimingFragment->GetComboCheckTime();
 	ISTRUE(ComboCheckTime > 0.0f);
 	
 	// MCOLOG_C(MCOAbility, TEXT("[Combo] SetComboTimer: %f"), ComboCheckTime);
@@ -117,29 +100,20 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	ISTRUE(CurrentCombo <= MaxCombo);
 
 	bIsDoingCombo = true;
-	
-	const UMCOActionFragment_Montage* MontageFragment = Data->GetMontageFragment(CurrentCombo - 1);
-	ensure(MontageFragment);
-	ensure(MontageFragment->ActionDefinition);
 
-	const UMCOActionFragment_Attribute* CurrentAttributeFragment = MontageFragment->ActionDefinition->GetAttributeFragment();
-	ensure(CurrentAttributeFragment);
-	
-	UpdateAttributeFragment(CurrentAttributeFragment);
+	Data->UpdateComboDefinition(CurrentDefinition, CurrentCombo - 1);
 	
 	if (false == CheckCanActivateWithStamina())
 	{
-		UpdateAttributeFragment(Data->GetMontageFragment(0)->ActionDefinition->GetAttributeFragment());
+		Data->UpdateComboDefinition(CurrentDefinition);
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}
 	
 	// Play next Montage
 	StartActivation_CommonAttack(
-		MontageFragment->GetMontage(),
-		Data->MontageSectionName,
-		MontageFragment->ActionDefinition->GetTimerFragment(),
-		MontageFragment->ActionDefinition->GetCollisionFragment()
+		Data->GetMontage(CurrentCombo - 1),
+		Data->MontageSectionName
 	);
 
 	ApplyAttributeEffect(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);

@@ -22,18 +22,20 @@ class MONSTERCO_API UMCOActionDefinition : public UObject
 {
 	GENERATED_BODY()
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
-	TSet<TObjectPtr<UMCOActionFragment>> Fragments;
-
 public:
-	const UMCOActionFragment_Collision* GetCollisionFragment() const;
-	const UMCOActionFragment_Cooldown* GetCooldownFragment() const;
-	const UMCOActionFragment_Montage* GetMontageFragment() const;
-	const UMCOActionFragment_AttackTiming* GetTimerFragment() const;
-	const UMCOActionFragment_Attribute* GetAttributeFragment() const;
-
-protected:
-	const UMCOActionFragment* FindFragmentByClass(TSubclassOf<UMCOActionFragment> FragmentClass) const;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TObjectPtr<UMCOActionFragment_Cooldown> CooldownFragment;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TObjectPtr<UMCOActionFragment_Attribute> AttributeFragment;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TObjectPtr<UMCOActionFragment_AttackTiming> AttackTimingFragment;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
+	TObjectPtr<UMCOActionFragment_Collision> CollisionFragment;
+	
+// protected:
+// 	const UMCOActionFragment* FindFragmentByClass(TSubclassOf<UMCOActionFragment> FragmentClass) const;
 	
 };

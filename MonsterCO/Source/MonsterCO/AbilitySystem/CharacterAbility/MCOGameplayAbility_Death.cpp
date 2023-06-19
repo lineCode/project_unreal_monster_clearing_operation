@@ -26,14 +26,17 @@ UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
 
 void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
+	ISTRUE(SetAndCommitAbility(false, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(nullptr != CharacterInterface);
 	CharacterInterface->Die();
 	
 	CancelAllAbility();
-	StartActivationWithMontage(Data->GetMontage(CharacterInterface->GetDamagedData().DamagedDegree));
+
+	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedData().DamagedDegree);
+	
+	StartActivationWithMontage(Data->GetMontage(Direction));
 }
 
 void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

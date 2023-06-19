@@ -1,19 +1,88 @@
 #include "MCOMontageDataCombo.h"
 #include "MCOActionFragment_Montage.h"
 
-const UMCOActionFragment_Montage* UMCOMontageDataCombo::GetMontageFragment(const uint8 InComboIdx)
-{
-	ensure(MontageFragments.IsValidIndex(InComboIdx));
-	return MontageFragments[InComboIdx];
-}
 
-UAnimMontage* UMCOMontageDataCombo::GetMontage(const uint8 InComboIdx)
+UAnimMontage* UMCOMontageDataCombo::GetMontage(const uint8& InComboIdx)
 {
 	ensure(MontageFragments.IsValidIndex(InComboIdx));
-	return MontageFragments[InComboIdx]->GetMontage();;
+	return MontageFragments[InComboIdx]->Montage;
 }
 
 uint8 UMCOMontageDataCombo::GetMaxCombo() const
 {
 	return MontageFragments.Num();
+}
+
+void UMCOMontageDataCombo::UpdateComboDefinition(UMCOActionDefinition* OutDefinition, const uint8& InComboIdx) const
+{
+	OutDefinition->CooldownFragment = GetCooldownFragment(InComboIdx);
+	OutDefinition->AttributeFragment = GetAttributeFragment(InComboIdx);
+	OutDefinition->AttackTimingFragment = GetAttackTimingFragment(InComboIdx);
+	OutDefinition->CollisionFragment = GetCollisionFragment(InComboIdx);
+}
+
+UMCOActionFragment_Cooldown* UMCOMontageDataCombo::GetCooldownFragment(const uint8& InComboIdx) const
+{
+	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InComboIdx);
+	if (nullptr != MontageFragment)
+	{
+		UMCOActionFragment_Cooldown* Fragment = MontageFragment->GetCooldownFragment();
+		if (nullptr != Fragment)
+		{
+			return Fragment;
+		}
+	}
+	
+	return Super::GetCooldownFragment();
+}
+
+UMCOActionFragment_Attribute* UMCOMontageDataCombo::GetAttributeFragment(const uint8& InComboIdx) const
+{
+	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InComboIdx);
+	if (nullptr != MontageFragment)
+	{
+		UMCOActionFragment_Attribute* Fragment = MontageFragment->GetAttributeFragment();
+		if (nullptr != Fragment)
+		{
+			return Fragment;
+		}
+	}
+	
+	return Super::GetAttributeFragment();
+}
+
+UMCOActionFragment_AttackTiming* UMCOMontageDataCombo::GetAttackTimingFragment(const uint8& InComboIdx) const
+{
+	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InComboIdx);
+	if (nullptr != MontageFragment)
+	{
+		UMCOActionFragment_AttackTiming* Fragment = MontageFragment->GetAttackTimingFragment();
+		if (nullptr != Fragment)
+		{
+			return Fragment;
+		}
+	}
+	
+	return Super::GetAttackTimingFragment();
+}
+
+UMCOActionFragment_Collision* UMCOMontageDataCombo::GetCollisionFragment(const uint8& InComboIdx) const
+{
+	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InComboIdx);
+	if (nullptr != MontageFragment)
+	{
+		UMCOActionFragment_Collision* Fragment = MontageFragment->GetCollisionFragment();
+		if (nullptr != Fragment)
+		{
+			return Fragment;
+		}
+	}
+	
+	return Super::GetCollisionFragment();
+}
+
+UMCOActionFragment_Montage* UMCOMontageDataCombo::GetMontageFragment(const uint8& InComboIdx) const
+{
+	ISTRUE_N(MontageFragments.IsValidIndex(InComboIdx));
+	return MontageFragments[InComboIdx];
 }

@@ -6,6 +6,7 @@
 #include "GameplayEffectTypes.h"
 #include "MCOGameplayAbility.generated.h"
 
+class UMCOActionDefinition;
 class AMCOCharacter;
 class AController;
 class UMCOAbilitySystemComponent;
@@ -26,6 +27,7 @@ protected:
 	void SetTriggerTag(const FGameplayTag& InTag);
 
 protected:
+	// To check character condition
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MCO|Ability")
 	FGameplayTag AbilityTag;
 
@@ -74,10 +76,12 @@ protected:
 // 	UPROPERTY()
 // 	TSubclassOf<UGameplayEffect> TagEffectClass;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MCO|Fragment")
+	UMCOActionDefinition* CurrentDefinition;
 	
 // --- Cooldown
 protected:
-	void UpdateCooldownFragment(const UMCOActionFragment_Cooldown* InCooldownFragment);
 	virtual void ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const override;
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 	void StartCooldownWidget() const;
@@ -85,15 +89,10 @@ protected:
 protected:
 	UPROPERTY()
 	TSubclassOf<UGameplayEffect> CooldownEffectClass;
-
-private:
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "MCO|Fragment")
-	TObjectPtr<const UMCOActionFragment_Cooldown> CooldownFragment;
-
+	
 	
 // --- Attribute Effect
 protected:
-	void UpdateAttributeFragment(const UMCOActionFragment_Attribute* InAttributeFragment);
 	bool CheckCanActivateWithStamina() const;
 	void ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
 	
@@ -107,10 +106,6 @@ protected:
 	UPROPERTY()
 	TSubclassOf<UGameplayEffect> InfiniteAttributeEffectClass;
 	
-private:
-	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"), Category = "MCO|Fragment")
-	TObjectPtr<const UMCOActionFragment_Attribute> AttributeFragment;
-
 	
 // --- Stamina charge
 protected:

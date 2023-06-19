@@ -1,18 +1,12 @@
 #include "AbilitySystem/CharacterAbility/MCOGameplayAbility_ChargeStamina.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
-#include "AbilitySystem/ActionData/MCOActionDefinition.h"
-#include "Interface/MCOCharacterInterface.h"
 
 
 UMCOGameplayAbility_ChargeStamina::UMCOGameplayAbility_ChargeStamina()
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Character/DA_Character_ChargeStamina.DA_Character_ChargeStamina"));
-
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
-	
+	Data->UpdateDefinition(CurrentDefinition);
 }
 
 // void UMCOGameplayAbility_ChargeStamina::DoneAddingNativeTags()

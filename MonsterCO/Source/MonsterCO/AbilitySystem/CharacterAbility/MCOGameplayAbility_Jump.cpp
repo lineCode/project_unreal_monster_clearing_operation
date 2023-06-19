@@ -3,18 +3,12 @@
 #include "Interface/MCOPlayerInterface.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
-#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 
 
 UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Jump.DA_Player_Jump"));
-
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
-	UpdateCooldownFragment(Cooldown);
-	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
+	Data->UpdateDefinition(CurrentDefinition);
 }
 
 // void UMCOGameplayAbility_Jump::DoneAddingNativeTags()

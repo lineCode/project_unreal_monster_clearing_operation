@@ -79,4 +79,7 @@ public:
 protected:
 	UPROPERTY()
 	uint8 bControlCollision:1;
+	
+	UPROPERTY()
+	uint8 bAttachToSocket:1;
 };

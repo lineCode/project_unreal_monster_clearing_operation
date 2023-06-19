@@ -1,5 +1,4 @@
 #include "MCOGameplayAbility_Equip.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOPlayerInterface.h"
 
 

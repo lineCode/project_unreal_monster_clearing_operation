@@ -24,13 +24,14 @@ protected:
 	
 //--- Equip
 public:
-	void SwitchEquipUnequip(bool bInToEquip);
+	void SetEquipUnequipInstantly(bool bEquip);
+	void SwitchEquipUnequip(bool bEquip);
 	void BeginAnimation_Equip();
 	void EndAnimation_Equip();
 
 protected:
 	UPROPERTY()
-	uint8 bIsToEquip:1;
+	uint8 bToEquip:1;
 	
 //--- Socket
 protected:

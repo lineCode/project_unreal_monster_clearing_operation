@@ -11,14 +11,17 @@ class MONSTERCO_API UMCOActionFragment_Montage : public UMCOActionFragment
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UAnimMontage> Montage;
 
-public:
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TObjectPtr<UMCOActionDefinition> ActionDefinition;
-	
+
 public:
-	UAnimMontage* GetMontage() const;
+	UMCOActionFragment_Cooldown* GetCooldownFragment() const;
+	UMCOActionFragment_Attribute* GetAttributeFragment() const;
+	UMCOActionFragment_AttackTiming* GetAttackTimingFragment() const;
+	UMCOActionFragment_Collision* GetCollisionFragment() const;
 };

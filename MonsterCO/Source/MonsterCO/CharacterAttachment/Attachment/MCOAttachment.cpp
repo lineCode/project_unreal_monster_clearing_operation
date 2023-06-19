@@ -12,6 +12,7 @@ AMCOAttachment::AMCOAttachment()
 	SetRootComponent(Scene);
 
 	bControlCollision = false;
+	bAttachToSocket = false;
 }
 
 void AMCOAttachment::BeginPlay()
@@ -26,16 +27,19 @@ void AMCOAttachment::BeginPlay()
 	
 	for (UShapeComponent* Shape : ShapeComponents)
 	{
-		//Shape->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-		//Shape->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttachmentEndOverlap);
+		// Shape->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+		// Shape->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttachmentEndOverlap);
 
 		// Set this in BP
 		// Shape->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
 		// Shape->SetHiddenInGame(false);
 
 		ShapeComponentsMap.Emplace(*Shape->GetName(), Shape);
-		AttachCollisionToSocket(Shape, *Shape->GetName());
 
+		if (true == bAttachToSocket)
+		{
+			AttachCollisionToSocket(Shape, *Shape->GetName());
+		}
 		if (true == bControlCollision)
 		{
 			Shape->SetCollisionEnabled(ECollisionEnabled::NoCollision);

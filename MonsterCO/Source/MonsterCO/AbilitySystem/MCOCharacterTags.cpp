@@ -12,7 +12,6 @@ void FMCOCharacterTags::InitializeTags()
 	CharacterTags.LookTag = FGameplayTag::RequestGameplayTag(FName("Input.Look"), bErrorIfNotFound);
 	
 	CharacterTags.GameplayEffect_CooldownTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"),     bErrorIfNotFound);
-	  
 	CharacterTags.GameplayEffect_DamageTag       = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"),       bErrorIfNotFound);
 	CharacterTags.GameplayEffect_StaminaTag      = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stamina"),      bErrorIfNotFound);
 	CharacterTags.GameplayEffect_StiffnessTag    = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stiffness"),    bErrorIfNotFound);
@@ -24,19 +23,19 @@ void FMCOCharacterTags::InitializeTags()
 	CharacterTags.GameplayEvent_DeadTag          = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Dead"),          bErrorIfNotFound);
 	CharacterTags.GameplayEvent_DamagedTag       = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.Damaged"),       bErrorIfNotFound);
 	
-	CharacterTags.EffectRemoveOnDeathTag  = FGameplayTag::RequestGameplayTag(FName("Ability.RemoveOnDeath"), bErrorIfNotFound);
-	CharacterTags.CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("Ability.CancelOnStaminaEmpty"), bErrorIfNotFound);
-
-	CharacterTags.DamagedTag    = FGameplayTag::RequestGameplayTag(FName("State.Damaged"),     bErrorIfNotFound);
-	CharacterTags.DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),        bErrorIfNotFound);
-	
-	CharacterTags.TakeItemTag   = FGameplayTag::RequestGameplayTag(FName("State.TakeItem"), bErrorIfNotFound);
-	CharacterTags.ChargingTag   = FGameplayTag::RequestGameplayTag(FName("State.Charging"), bErrorIfNotFound);
-	
 	CharacterTags.JumpTag       = FGameplayTag::RequestGameplayTag(FName("State.Jump"),     bErrorIfNotFound);
 	CharacterTags.EquipTag      = FGameplayTag::RequestGameplayTag(FName("State.Equip"),    bErrorIfNotFound);
 	CharacterTags.DodgeTag      = FGameplayTag::RequestGameplayTag(FName("State.Dodge"),    bErrorIfNotFound);
 	CharacterTags.DashTag       = FGameplayTag::RequestGameplayTag(FName("State.Dash"),     bErrorIfNotFound);
 	CharacterTags.AttackTag     = FGameplayTag::RequestGameplayTag(FName("State.Attack"),   bErrorIfNotFound);
+	CharacterTags.DamagedTag    = FGameplayTag::RequestGameplayTag(FName("State.Damaged"),     bErrorIfNotFound);
+	CharacterTags.DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),        bErrorIfNotFound);
+	CharacterTags.TakeItemTag   = FGameplayTag::RequestGameplayTag(FName("State.TakeItem"), bErrorIfNotFound);
+	CharacterTags.ChargingTag   = FGameplayTag::RequestGameplayTag(FName("State.Charging"), bErrorIfNotFound);
+
+	CharacterTags.EffectRemoveOnDeathTag  = FGameplayTag::RequestGameplayTag(FName("Ability.RemoveOnDeath"), bErrorIfNotFound);
+	CharacterTags.CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("Ability.CancelOnStaminaEmpty"), bErrorIfNotFound);
+	
+	CharacterTags.DragonAbility_Claw = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Claw"), bErrorIfNotFound);
 }
 

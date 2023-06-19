@@ -6,7 +6,6 @@
 #include "MCOGameplayAbility_CommonAttack.generated.h"
 
 class UGameplayEffect;
-class UMCOMontageData;
 class UMCOActionFragment_AttackTiming;
 class UMCOActionFragment_Collision;
 
@@ -22,10 +21,7 @@ public:
 	
 // --- Ability
 protected:
-	void StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-		const UMCOActionFragment_AttackTiming* InTimerFragment,
-		const UMCOActionFragment_Collision* InCollisionFragment
-	);
+	void StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName);
 
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
@@ -61,24 +57,18 @@ protected:
 // --- Damage Timer
 protected:
 	void SetDamageTimer();
-	void ResetTimer();
+	void ResetDamageTimer();
 	
 private:
 	float GetCurrentDamageBeginFrameCount() const;
 	float GetCurrentDamageEndFrameCount() const;
+	float GetCurrentDamageCheckRate() const;
 	void StartDamageBeginTimer();
 	void StartDamageEndTimer();
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
 	uint8 bUseOverlapEvent : 1;
-	
-	UPROPERTY()
-	TObjectPtr<const UMCOActionFragment_Collision> CollisionFragment;
-	
-	UPROPERTY()
-	TObjectPtr<const UMCOActionFragment_AttackTiming> TimerFragment;
-	
 	
 private:
 	UPROPERTY()
@@ -87,5 +77,7 @@ private:
 	int32 CurrentDamageTimingIdx = 0;
 	FTimerHandle DamageTimerHandle;
 	FMCODamagedData CurrentDamagedData;
+	
+	FTimerHandle DamageByChannelTimerHandle;
 	
 };

@@ -3,7 +3,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
 #include "GameFramework/RootMotionSource.h"
 #include "Interface/MCOPlayerInterface.h"
 
@@ -11,12 +10,7 @@
 UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& ObjectInitializer)
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Dodge.DA_Player_Dodge"));
-	
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Cooldown = Data->ActionDefinition->GetCooldownFragment();
-	UpdateCooldownFragment(Cooldown);
-	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
+	Data->UpdateDefinition(CurrentDefinition);
 	
 	Strength = 500.0f;
 	Duration = 0.5f;

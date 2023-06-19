@@ -6,6 +6,7 @@
 
 AMCOMonsterAttachment::AMCOMonsterAttachment()
 {
+	bAttachToSocket = true;
 }
 
 void AMCOMonsterAttachment::BeginPlay()

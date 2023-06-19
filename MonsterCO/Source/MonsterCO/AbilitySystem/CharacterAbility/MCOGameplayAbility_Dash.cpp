@@ -1,17 +1,13 @@
 #include "MCOGameplayAbility_Dash.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "AbilitySystem/ActionData/MCOActionData.h"
-#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 
 
 UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/TwohandAction/DA_Twohand_Dash.DA_Twohand_Dash"));
 
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
-	
+	Data->UpdateDefinition(CurrentDefinition);
 }
 
 // void UMCOGameplayAbility_Dash::DoneAddingNativeTags()

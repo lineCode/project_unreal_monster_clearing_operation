@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CoreMinimal.h"
+#include "MonsterCO.h"
 #include "MCOActionDefinition.h"
 #include "MCOActionFragment_AttackTiming.generated.h"
 
@@ -14,11 +14,19 @@ struct FMCOAttackTimingData
 	GENERATED_BODY()
 
 public:
+	FMCOAttackTimingData() : bIsMovableWhileGivingDamage(false) {};
+	
+	UPROPERTY(EditAnywhere)
+	uint8 bIsMovableWhileGivingDamage : 1;
+	
 	UPROPERTY(EditAnywhere)
 	float Begin = 0.0f;
 		
 	UPROPERTY(EditAnywhere)
 	float End = 0.0f;
+	
+	UPROPERTY(EditAnywhere)
+	float CheckRate = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
@@ -36,10 +44,10 @@ class MONSTERCO_API UMCOActionFragment_AttackTiming : public UMCOActionFragment
 {
 	GENERATED_BODY()
 	
-public:
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MontageFrameRate = 30.0f;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FMCOAttackTimingData> DamageTimings;
 
@@ -47,13 +55,15 @@ public:
 	float NextComboFrameCount = 0.0f;
 	
 public:
-	float GetDamageBeginTimeAfterPrevEndTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
-	float GetDamageExistTime(uint8 InDamageIdx, float SpeedRate = 1.0f) const;
-	float GetComboCheckTime(float SpeedRate = 1.0f) const;
-	UNiagaraSystem* GetDamageNiagara(uint8 InDamageIdx) const;
-	float GetStiffness(uint8 InDamageIdx) const;
-	float GetDamage(uint8 InDamageIdx) const;
+	bool IsMovableWhileGivingDamage(const uint8& InDamageIdx) const;
+	float GetDamageCheckRate(const uint8& InDamageIdx) const;
+	float GetDamageBeginTimeAfterPrevEndTime(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
+	float GetDamageExistTime(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
+	float GetComboCheckTime(const float& SpeedRate = 1.0f) const;
+	UNiagaraSystem* GetDamageNiagara(const uint8& InDamageIdx) const;
+	float GetStiffness(const uint8& InDamageIdx) const;
+	float GetDamage(const uint8& InDamageIdx) const;
 
 protected:
-	float CalculateTime(float FrameCount, float SpeedRate = 1.0f) const;
+	float CalculateTime(const float& FrameCount, const float& SpeedRate = 1.0f) const;
 };

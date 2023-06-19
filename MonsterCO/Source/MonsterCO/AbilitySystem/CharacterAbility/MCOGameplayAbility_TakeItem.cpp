@@ -24,8 +24,8 @@ void UMCOGameplayAbility_TakeItem::ActivateAbility(const FGameplayAbilitySpecHan
 {
 	IMCOCharacterItemInterface* CharacterItemInterface = Cast<IMCOCharacterItemInterface>(ActorInfo->AvatarActor.Get());
 	ISTRUE(nullptr != CharacterItemInterface);
-	
-	UpdateAttributeFragment(CharacterItemInterface->GetItemAttributeFragment());
+
+	CurrentDefinition->AttributeFragment = CharacterItemInterface->GetItemAttributeFragment();
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 }

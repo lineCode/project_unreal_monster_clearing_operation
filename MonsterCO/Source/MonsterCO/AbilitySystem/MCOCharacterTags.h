@@ -16,7 +16,6 @@ public:
 
 	// Effect
 	FGameplayTag GameplayEffect_CooldownTag;
-	
 	FGameplayTag GameplayEffect_DamageTag;
 	FGameplayTag GameplayEffect_StiffnessTag;
 	FGameplayTag GameplayEffect_HealthTag;
@@ -28,21 +27,6 @@ public:
 	FGameplayTag GameplayEvent_StaminaChargeTag;
 	FGameplayTag GameplayEvent_DamagedTag;
 	FGameplayTag GameplayEvent_DeadTag;
-
-	// Cue
-	
-
-	// Ability 
-	FGameplayTag EffectRemoveOnDeathTag;
-	FGameplayTag CancelOnStaminaEmptyTag;
-	
-	// Debuff
-	FGameplayTag DamagedTag;
-	FGameplayTag DeadTag;
-
-	// Action
-	FGameplayTag TakeItemTag;
-	FGameplayTag ChargingTag;
 	
 	// State
 	FGameplayTag JumpTag;
@@ -50,6 +34,17 @@ public:
 	FGameplayTag DodgeTag;
 	FGameplayTag DashTag;
 	FGameplayTag AttackTag;
+	FGameplayTag TakeItemTag;
+	FGameplayTag ChargingTag;
+	FGameplayTag DamagedTag;
+	FGameplayTag DeadTag;
+	
+	// Ability 
+	FGameplayTag EffectRemoveOnDeathTag;
+	FGameplayTag CancelOnStaminaEmptyTag;
+	
+	// Dragon
+	FGameplayTag DragonAbility_Claw;
 
 private:
 	static FMCOCharacterTags CharacterTags;

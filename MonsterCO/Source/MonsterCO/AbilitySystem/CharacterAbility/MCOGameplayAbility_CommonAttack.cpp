@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
+#include "AbilitySystem/ActionData/MCOActionDefinition.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Physics/MCOPhysics.h"
@@ -31,13 +32,8 @@ UMCOGameplayAbility_CommonAttack::UMCOGameplayAbility_CommonAttack()
 // 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 // }
 
-void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName,
-                                                                    const UMCOActionFragment_AttackTiming* InTimerFragment,
-                                                                    const UMCOActionFragment_Collision* InCollisionFragment)
+void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName)
 {
-	TimerFragment = InTimerFragment;
-	CollisionFragment = InCollisionFragment;
-	
 	DamagedCharacters.Reset();
 
 	// Play Montage
@@ -45,42 +41,50 @@ void UMCOGameplayAbility_CommonAttack::StartActivation_CommonAttack(UAnimMontage
 
 	// Damage Timer
 	SetDamageTimer();
-
 }
 
 void UMCOGameplayAbility_CommonAttack::OnTaskCompleted()
 {
 	Super::OnTaskCompleted();
 	
-	ResetTimer();
+	ResetDamageTimer();
 }
 
 void UMCOGameplayAbility_CommonAttack::OnTaskCancelled()
 {
 	Super::OnTaskCancelled();
 	
-	ResetTimer();
+	ResetDamageTimer();
 }
 
 void UMCOGameplayAbility_CommonAttack::BeginDamaging()
 {
 	StartDamageEndTimer();
 
+	if (CurrentDefinition->AttackTimingFragment->IsMovableWhileGivingDamage(CurrentDamageTimingIdx))
+	{
+		StopCharacter(false);
+	}
+	
 	if (true == bUseOverlapEvent)
 	{
 		BeginDamaging_Collision();
 	}
 	else
 	{
-		BeginDamaging_Channel();
+		BeginDamaging_Channel();	
 	}
 }
 
 void UMCOGameplayAbility_CommonAttack::EndDamaging()
 {
 	CurrentDamageTimingIdx++;
-	DamagedCharacters.Reset();
 	StartDamageBeginTimer();
+
+	if (CurrentDefinition->AttackTimingFragment->IsMovableWhileGivingDamage(CurrentDamageTimingIdx))
+	{
+		StopCharacter(true);
+	}
 	
 	if (true == bUseOverlapEvent)
 	{
@@ -93,8 +97,22 @@ void UMCOGameplayAbility_CommonAttack::EndDamaging()
 }
 
 void UMCOGameplayAbility_CommonAttack::BeginDamaging_Channel()
-{	
-	AttackHitCheckByChannel();
+{
+	const float Rate = GetCurrentDamageCheckRate();
+	if (Rate <= 0.0f)
+	{
+		AttackHitCheckByChannel();
+		return;
+	}
+		
+	GetWorld()->GetTimerManager().SetTimer(
+		DamageByChannelTimerHandle,
+		this,
+		&ThisClass::AttackHitCheckByChannel,
+		Rate,
+		true,
+		0.0f
+	);
 }
 
 void UMCOGameplayAbility_CommonAttack::EndDamaging_Channel()
@@ -103,24 +121,24 @@ void UMCOGameplayAbility_CommonAttack::EndDamaging_Channel()
 
 void UMCOGameplayAbility_CommonAttack::BeginDamaging_Collision()
 {
-	ensure(nullptr != CollisionFragment);
+	ensure(nullptr != CurrentDefinition->CollisionFragment);
 		
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(nullptr != CharacterInterface);
 	
 	CharacterInterface->GetAttachmentBeginOverlapDelegate().AddUniqueDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-	CharacterInterface->TurnOnCollision(CollisionFragment->SocketName);
+	CharacterInterface->TurnOnCollision(CurrentDefinition->CollisionFragment->SocketName);
 }
 
 void UMCOGameplayAbility_CommonAttack::EndDamaging_Collision()
 {
-	ensure(nullptr != CollisionFragment);
+	ensure(nullptr != CurrentDefinition->CollisionFragment);
 		
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(nullptr != CharacterInterface);
 	
 	CharacterInterface->GetAttachmentBeginOverlapDelegate().Clear();
-	CharacterInterface->TurnOffCollision(CollisionFragment->SocketName);
+	CharacterInterface->TurnOffCollision(CurrentDefinition->CollisionFragment->SocketName);
 }
 
 void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter)
@@ -145,11 +163,11 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAtt
 	
 	HandleForAttributes.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_DamageTag,
-		-TimerFragment->GetDamage(CurrentDamageTimingIdx) // minus!!!!!
+		-CurrentDefinition->AttackTimingFragment->GetDamage(CurrentDamageTimingIdx) // minus!!!!!
 	);
 	HandleForAttributes.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_StiffnessTag,
-		TimerFragment->GetStiffness(CurrentDamageTimingIdx)
+		CurrentDefinition->AttackTimingFragment->GetStiffness(CurrentDamageTimingIdx)
 	);
 	
 	AttackedASC->ApplyGameplayEffectSpecToSelf(
@@ -159,7 +177,7 @@ void UMCOGameplayAbility_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAtt
 
 	
 	MCOLOG_C(MCOAbility, TEXT("Damage Effect +Health:[%.1f], +Stiffness:[%.1f]"),
-		-TimerFragment->GetDamage(CurrentDamageTimingIdx), TimerFragment->GetStiffness(CurrentDamageTimingIdx)
+		-CurrentDefinition->AttackTimingFragment->GetDamage(CurrentDamageTimingIdx), CurrentDefinition->AttackTimingFragment->GetStiffness(CurrentDamageTimingIdx)
 	)
 	
 
@@ -243,14 +261,16 @@ void UMCOGameplayAbility_CommonAttack::OnAttachmentBeginOverlap(ACharacter* InAt
 	CurrentDamagedData.DamagedDegree = CalculateDegree(
 		InAttackedCharacter->GetActorLocation(),
 		InAttackedCharacter->GetActorForwardVector(),
-		-CollisionFragment->GetAttackDirection(InAttacker)
+		-CurrentDefinition->CollisionFragment->GetAttackDirection(InAttacker)
 	);
 
 	CurrentDamagedData.DamagedLocation = SweepResult.ImpactPoint;
-	CurrentDamagedData.DamagedNiagara = TimerFragment->GetDamageNiagara(CurrentDamageTimingIdx);
+	CurrentDamagedData.DamagedNiagara = CurrentDefinition->AttackTimingFragment->GetDamageNiagara(CurrentDamageTimingIdx);
 	
 	SendDamagedDataToTarget(InAttackedCharacter);
 	ApplyDamageAndStiffness(InAttackedCharacter);
+	
+	DamagedCharacters.Reset();
 }
 
 void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
@@ -268,15 +288,15 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 	IMCOCharacterInterface* AttackerInterface = Cast<IMCOCharacterInterface>(Attacker);
 	ISTRUE(nullptr != AttackerInterface);
 
-	const FVector Start = AttackerInterface->GetSocketLocation(CollisionFragment->SocketName);
+	const FVector Start = AttackerInterface->GetSocketLocation(CurrentDefinition->CollisionFragment->SocketName);
 	// const FVector Start = Attacker->GetActorLocation() +
 	// 	(Attacker->GetActorForwardVector() * Radius) +
 	// 	(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);
 	
-	const FVector AttackDirection = CollisionFragment->GetAttackDirection(Attacker);
-	const FVector End = Start + AttackDirection * CollisionFragment->AttackLength;
+	const FVector AttackDirection = CurrentDefinition->CollisionFragment->GetAttackDirection(Attacker);
+	const FVector End = Start + AttackDirection * CurrentDefinition->CollisionFragment->AttackLength;
 	
-	const FCollisionShape Shape = FCollisionShape::MakeSphere(CollisionFragment->AttackRadius);
+	const FCollisionShape Shape = FCollisionShape::MakeSphere(CurrentDefinition->CollisionFragment->AttackRadius);
 	const bool HitDetected = GetWorld()->SweepMultiByChannel(
 		OutHitResults,
 		Start,
@@ -286,6 +306,11 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 		Shape,
 		Params
 	);
+	
+#if ENABLE_DRAW_DEBUG
+	DrawDebug(AttackDirection, Start, End, HitDetected);
+#endif
+	
 	ISTRUE(true == HitDetected);
 
 	for (const FHitResult & Result : OutHitResults)
@@ -309,11 +334,6 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 			continue;
 		}
 		
-		
-#if ENABLE_DRAW_DEBUG
-		DrawDebug(AttackDirection, Start, End, HitDetected);
-#endif
-		
 		DamagedCharacters.Emplace(AttackedCharacter);
 			
 		CurrentDamagedData.DamagedDegree = CalculateDegree(
@@ -323,11 +343,13 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 		);
 
 		CurrentDamagedData.DamagedLocation = Result.ImpactPoint;
-		CurrentDamagedData.DamagedNiagara = TimerFragment->GetDamageNiagara(CurrentDamageTimingIdx);
+		CurrentDamagedData.DamagedNiagara = CurrentDefinition->AttackTimingFragment->GetDamageNiagara(CurrentDamageTimingIdx);
 		
 		SendDamagedDataToTarget(AttackedCharacter);
 		ApplyDamageAndStiffness(AttackedCharacter);
 	}
+	
+	DamagedCharacters.Reset();
 
 	// FGameplayAbilityTargetDataHandle TargetDataHandle;
 	// FGameplayAbilityTargetData_SingleTargetHit* HitData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
@@ -354,18 +376,18 @@ void UMCOGameplayAbility_CommonAttack::AttackHitCheckByChannel()
 void UMCOGameplayAbility_CommonAttack::DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const
 {
 	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	const float CapsuleHalfHeight = CollisionFragment->AttackLength * 0.5f;
+	const float CapsuleHalfHeight = CurrentDefinition->CollisionFragment->AttackLength * 0.5f;
 	const FColor DrawColor = bHitDetected == true ? FColor::Green : FColor::Red;
 
 	DrawDebugCapsule(
 		GetWorld(), 
 		CapsuleOrigin,
 		CapsuleHalfHeight,
-		CollisionFragment->AttackRadius,
+		CurrentDefinition->CollisionFragment->AttackRadius,
 		FRotationMatrix::MakeFromZ(AttackForward).ToQuat(), 
 		DrawColor,
 		false, 
-		5.0f 
+		0.5f 
 	);
 }
 
@@ -375,27 +397,31 @@ void UMCOGameplayAbility_CommonAttack::SetDamageTimer()
 	StartDamageBeginTimer();
 }
 
-void UMCOGameplayAbility_CommonAttack::ResetTimer()
+void UMCOGameplayAbility_CommonAttack::ResetDamageTimer()
 {
-	DamageTimerHandle.Invalidate();
+	GetWorld()->GetTimerManager().ClearTimer(DamageTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(DamageByChannelTimerHandle);
 }
 
 float UMCOGameplayAbility_CommonAttack::GetCurrentDamageBeginFrameCount() const
 {
-	return TimerFragment->GetDamageBeginTimeAfterPrevEndTime(CurrentDamageTimingIdx);
+	return CurrentDefinition->AttackTimingFragment->GetDamageBeginTimeAfterPrevEndTime(CurrentDamageTimingIdx);
 }
 
 float UMCOGameplayAbility_CommonAttack::GetCurrentDamageEndFrameCount() const
 {
-	return TimerFragment->GetDamageExistTime(CurrentDamageTimingIdx);
+	return CurrentDefinition->AttackTimingFragment->GetDamageExistTime(CurrentDamageTimingIdx);
+}
+
+float UMCOGameplayAbility_CommonAttack::GetCurrentDamageCheckRate() const
+{
+	return CurrentDefinition->AttackTimingFragment->GetDamageCheckRate(CurrentDamageTimingIdx);
 }
 
 void UMCOGameplayAbility_CommonAttack::StartDamageBeginTimer()
 {
-	ResetTimer();
+	ResetDamageTimer();
 	
-	ISTRUE(CurrentDamageTimingIdx < TimerFragment->DamageTimings.Num());
-
 	const float FrameCount = GetCurrentDamageBeginFrameCount();
 	ISTRUE(FrameCount > 0.0f);
 		
@@ -410,10 +436,8 @@ void UMCOGameplayAbility_CommonAttack::StartDamageBeginTimer()
 
 void UMCOGameplayAbility_CommonAttack::StartDamageEndTimer()
 {
-	ResetTimer();
-	
-	ISTRUE(CurrentDamageTimingIdx < TimerFragment->DamageTimings.Num());
-	
+	ResetDamageTimer();
+
 	const float FrameCount = GetCurrentDamageEndFrameCount();
 	ISTRUE(FrameCount > 0.0f);
 	

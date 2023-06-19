@@ -22,14 +22,27 @@ void AMCOWeapon::BeginPlay()
 	bIsEquipped = false;
 }
 
-void AMCOWeapon::SwitchEquipUnequip(bool bInToEquip)
+void AMCOWeapon::SetEquipUnequipInstantly(bool bEquip)
 {
-	bIsToEquip = bInToEquip;
+	if (bEquip == true)
+	{
+		AttachActorToSocket(HandSocketName);
+	}
+	else
+	{
+		AttachActorToSocket(HolsterSocketName);
+	}
+	bIsEquipped = bEquip;
+}
+
+void AMCOWeapon::SwitchEquipUnequip(bool bEquip)
+{
+	bToEquip = bEquip;
 }
 
 void AMCOWeapon::BeginAnimation_Equip()
 {
-	if (bIsToEquip == true)
+	if (bToEquip == true)
 	{
 		AttachActorToSocket(HandSocketName);
 	}
@@ -37,10 +50,10 @@ void AMCOWeapon::BeginAnimation_Equip()
 
 void AMCOWeapon::EndAnimation_Equip()
 {
-	if (bIsToEquip == false)
+	if (bToEquip == false)
 	{
 		AttachActorToSocket(HolsterSocketName);
 	}
 
-	bIsEquipped = bIsToEquip;
+	bIsEquipped = bToEquip;
 }

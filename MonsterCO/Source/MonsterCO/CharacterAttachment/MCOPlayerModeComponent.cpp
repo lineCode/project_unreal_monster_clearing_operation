@@ -29,16 +29,7 @@ void UMCOPlayerModeComponent::SetEquipUnequipInstantly(const bool bEquip)
 	AMCOWeapon* Weapon = Cast<AMCOWeapon>(Attachment);
 	ISTRUE(Weapon);
 	
-	Weapon->SwitchEquipUnequip(bEquip);
-
-	if (true == bEquip)
-	{
-		Weapon->BeginAnimation_Equip();
-	}
-	else
-	{
-		Weapon->EndAnimation_Equip();
-	}
+	Weapon->SetEquipUnequipInstantly(bEquip);
 	
 	bIsToEquip = bEquip == false;
 }

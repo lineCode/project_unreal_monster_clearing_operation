@@ -3,19 +3,12 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Interface/MCOMonsterAIInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
 
 
 UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 {
 	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Melee.DA_Dragon_Melee"));
-	
-	ensure(nullptr != Data->ActionDefinition);
-	const UMCOActionFragment_Cooldown* Fragment = Data->ActionDefinition->GetCooldownFragment();
-	UpdateCooldownFragment(Fragment);
-	const UMCOActionFragment_Attribute* Stamina = Data->ActionDefinition->GetAttributeFragment();
-	UpdateAttributeFragment(Stamina);
-	
+	Data->UpdateDirectionalDefinition(CurrentDefinition);
 }
 
 bool UMCOGameplayAbility_MonsterMelee::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const
@@ -57,15 +50,15 @@ void UMCOGameplayAbility_MonsterMelee::ActivateAbility(const FGameplayAbilitySpe
 	);
 	
 	ensure(nullptr != Data);
-	ensure(nullptr != Data->ActionDefinition);
+
+	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(AttackDegree);
+	Data->UpdateDirectionalDefinition(CurrentDefinition, Direction);
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
 	StartActivation_CommonAttack(
-		Data->GetMontage(AttackDegree),
-		Data->MontageSectionName,
-		Data->ActionDefinition->GetTimerFragment(), 
-		Data->GetCollisionFragment(AttackDegree)
+		Data->GetMontage(Direction),
+		Data->MontageSectionName
 	);
 }
 

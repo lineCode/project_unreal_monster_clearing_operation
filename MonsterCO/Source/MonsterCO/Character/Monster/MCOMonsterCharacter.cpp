@@ -137,7 +137,7 @@ void AMCOMonsterCharacter::AttackByAI()
 	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 
-	ASC->TryActivateAbilityByTag(FMCOCharacterTags::Get().AttackTag);
+	ASC->TryActivateAbilityByTag(FMCOCharacterTags::Get().DragonAbility_Claw);
 }
 
 void AMCOMonsterCharacter::StopCharacter(bool bToStop)
