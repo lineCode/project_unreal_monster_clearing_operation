@@ -81,9 +81,9 @@ void AMCOAttachment::TurnOffCollision(const FName& InName)
 
 void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	MCOLOG_C(MCOAttachment, TEXT("++++ OnAttachmentBeginOverlap"));
+	MCOLOG_C(MCOCollision, TEXT("++++ OnAttachmentBeginOverlap"));
 	
-	ISTRUE(true == OnAttachmentBeginOverlapDelegate.IsBound());
+	ISTRUE(true == OnCollisionBeginOverlapDelegate.IsBound());
 	ISTRUE(OwnerCharacter != OtherActor);
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
 
@@ -99,7 +99,7 @@ void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedCom
 		OutHitResults,
 		OverlappedComponent->GetComponentLocation(),
 		OtherActor->GetActorLocation(),
-		CHANNEL_MCOACTION_TRACE,
+		CHANNEL_ACTION_TRACE,
 		Params
 	);
 	
@@ -144,7 +144,7 @@ void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedCom
 	
 #endif			
 	
-		OnAttachmentBeginOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Result.GetActor()), Result);
+		OnCollisionBeginOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Result.GetActor()), Result);
 	}
 }
 
@@ -152,9 +152,9 @@ void AMCOAttachment::OnAttachmentEndOverlap(UPrimitiveComponent* OverlappedCompo
 {
 	ISTRUE(OwnerCharacter != OtherActor);
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
-	ISTRUE(true == OnAttachmentEndOverlapDelegate.IsBound());
+	ISTRUE(true == OnCollisionEndOverlapDelegate.IsBound());
 
-	OnAttachmentEndOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(OtherActor));
+	OnCollisionEndOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(OtherActor));
 }
 
 // Attach weapon to character

@@ -28,7 +28,7 @@ const int32 MAX_STAGE = 2;
 // --- Log
 DECLARE_LOG_CATEGORY_EXTERN(MCOLog, Display, All);
 DECLARE_LOG_CATEGORY_EXTERN(MCOAbility, Display, All);
-DECLARE_LOG_CATEGORY_EXTERN(MCOAttachment, Display, All);
+DECLARE_LOG_CATEGORY_EXTERN(MCOCollision, Display, All);
 
 
 class MONSTERCO_API FLog

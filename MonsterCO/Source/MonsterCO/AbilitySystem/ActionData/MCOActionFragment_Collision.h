@@ -16,8 +16,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EMCOCharacterDirection AttackDirection = EMCOCharacterDirection::Front;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FVector AdditiveLocationFromFront = FVector(0.0f, 0.0f, 0.0f);
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// FVector AdditiveLocationFromFront = FVector(0.0f, 0.0f, 0.0f);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float AttackLength = 0.0f;

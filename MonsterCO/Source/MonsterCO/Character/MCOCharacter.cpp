@@ -309,7 +309,7 @@ float AMCOCharacter::GetCapsuleRadius() const
 	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleRadius() : 0.0f;
 }
 
-FAttachmentBeginOverlapDelegate& AMCOCharacter::GetAttachmentBeginOverlapDelegate()
+FCollisionBeginOverlapDelegate& AMCOCharacter::GetCollisionBeginOverlapDelegate()
 {
 	ensure(nullptr != ModeComponent);
 	return ModeComponent->GetAttachmentBeginOverlapDelegate();

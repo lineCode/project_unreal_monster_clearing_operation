@@ -71,10 +71,10 @@ protected:
 
 public:
 	UPROPERTY()
-	FAttachmentBeginOverlapDelegate OnAttachmentBeginOverlapDelegate;
+	FCollisionBeginOverlapDelegate OnCollisionBeginOverlapDelegate;
 	
 	UPROPERTY()
-	FAttachmentEndOverlapDelegate OnAttachmentEndOverlapDelegate;
+	FCollisionEndOverlapDelegate OnCollisionEndOverlapDelegate;
 
 protected:
 	UPROPERTY()

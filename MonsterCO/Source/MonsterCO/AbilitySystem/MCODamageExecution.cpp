@@ -76,7 +76,7 @@ void UMCODamageExecution::Execute_Implementation(
 
 	
 	// Check Dodge
-	if (AdditiveDamage < 0.0f)
+	if (AdditiveDamage < 0.0f || AdditiveHealth < 0.0f)
 	{		
 		if (true == TargetASC->HasMatchingGameplayTag(FMCOCharacterTags::Get().DodgeTag))
 		{

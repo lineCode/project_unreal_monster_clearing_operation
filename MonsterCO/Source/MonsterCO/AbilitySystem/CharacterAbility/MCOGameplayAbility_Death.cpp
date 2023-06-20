@@ -1,5 +1,6 @@
 #include "MCOGameplayAbility_Death.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 
@@ -33,6 +34,13 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 	CharacterInterface->Die();
 	
 	CancelAllAbility();
+	
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
+		
+	FGameplayTagContainer Tags;
+	Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+	ASC->RemoveActiveEffectsWithGrantedTags(Tags);
 
 	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedData().DamagedDegree);
 	

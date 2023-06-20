@@ -7,7 +7,7 @@
 
 UMCOGameplayAbility_MonsterMelee::UMCOGameplayAbility_MonsterMelee()
 {
-	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Melee.DA_Dragon_Melee"));
+	GETASSET(Data, UMCOMontageDataDirectional, TEXT("/Game/Data/Monster/Dragon/Action/DA_Dragon_Claw.DA_Dragon_Claw"));
 }
 
 void UMCOGameplayAbility_MonsterMelee::SetDefaultDefinition()

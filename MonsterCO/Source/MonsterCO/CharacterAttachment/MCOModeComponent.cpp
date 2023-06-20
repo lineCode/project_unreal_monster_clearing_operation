@@ -17,11 +17,11 @@ AMCOAttachment* UMCOModeComponent::GetCurrentAttachment() const
 	return Attachments[CurrentAttachmentIdx];
 }
 
-FAttachmentBeginOverlapDelegate& UMCOModeComponent::GetAttachmentBeginOverlapDelegate() const
+FCollisionBeginOverlapDelegate& UMCOModeComponent::GetAttachmentBeginOverlapDelegate() const
 {
 	AMCOAttachment* Attachment = GetCurrentAttachment();
 	ensure(nullptr != Attachment);
-	return Attachment->OnAttachmentBeginOverlapDelegate;
+	return Attachment->OnCollisionBeginOverlapDelegate;
 }
 
 int32 UMCOModeComponent::GetCurrentMode() const

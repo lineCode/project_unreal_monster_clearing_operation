@@ -1,14 +1,18 @@
 #pragma once
 
 // --- Channel
-#define CHANNEL_MCOACTION_TRACE ECC_GameTraceChannel5
+#define CHANNEL_PROJECTILE_OBJECT ECC_GameTraceChannel1
+#define CHANNEL_WEAPON_OBJECT     ECC_GameTraceChannel2
+#define CHANNEL_CAPSULE_OBJECT    ECC_GameTraceChannel3
+#define CHANNEL_PARTS_OBJECT      ECC_GameTraceChannel4
+#define CHANNEL_ACTION_TRACE      ECC_GameTraceChannel5
 
 
 // ---- Profile
-#define PROFILE_MCOCAPSULE TEXT("MCOCapsuleCollision") // only for player?
+#define PROFILE_PROJECTILE TEXT("MCOProjectileCollision")
+#define PROFILE_WEAPON     TEXT("MCOWeaponCollision")
+#define PROFILE_CAPSULE    TEXT("MCOCapsuleCollision")
+#define PROFILE_PARTS      TEXT("MCOPartsCollision")
+#define PROFILE_TRIGGER    TEXT("MCOTrigger")
 
-#define PROFILE_MCOWEAPON TEXT("MCOWeaponCollision")
-#define PROFILE_MCOPARTS TEXT("MCOPartsCollision")
-
-#define PROFILE_ABTRIGGER TEXT("MCOTrigger")
 

@@ -6,22 +6,24 @@
 #include "MCOCharacterInterface.generated.h"
 
 
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAttachmentBeginOverlapDelegate,
-												class ACharacter*, InAttacker,
-												class AActor*, InAttackCauser,
-												class ACharacter*, InOtherCharacter,
-												const FHitResult&, SweepResult);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAttachmentEndOverlapDelegate,
-												class ACharacter*, InAttacker,
-												class AActor*, InAttackCauser,
-												class ACharacter*, InOtherCharacter);
-
-
 class UMCOHpWidget;
 class UMCOAttributeWidget;
 class UNiagaraSystem;
+class ACharacter;
+class AActor;
+
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCollisionBeginOverlapDelegate,
+												ACharacter*, InAttacker,
+												AActor*, InAttackCauser,
+												ACharacter*, InOtherCharacter,
+												const FHitResult&, SweepResult);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCollisionEndOverlapDelegate,
+												ACharacter*, InAttacker,
+												AActor*, InAttackCauser,
+												ACharacter*, InOtherCharacter);
 
 
 
@@ -31,6 +33,8 @@ struct FMCODamagedData
 	GENERATED_BODY()
 
 public:
+	FMCODamagedData() : bHasDuration(false) {}
+	
 	UPROPERTY()
 	float DamagedDegree = 0.0f;
 
@@ -39,6 +43,9 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
+	
+	UPROPERTY()
+	uint8 bHasDuration : 1;
 };
 
 
@@ -58,7 +65,7 @@ public:
 	virtual void StopCharacter(bool InToStop) = 0;
 	virtual FVector GetSocketLocation(const FName& InSocketName) = 0;
 	virtual float GetCapsuleRadius() const = 0;
-	virtual FAttachmentBeginOverlapDelegate& GetAttachmentBeginOverlapDelegate() = 0;
+	virtual FCollisionBeginOverlapDelegate& GetCollisionBeginOverlapDelegate() = 0;
 	virtual void TurnOnCollision(const FName& InName) = 0;
 	virtual void TurnOffCollision(const FName& InName) = 0;
 

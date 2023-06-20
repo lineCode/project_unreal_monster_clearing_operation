@@ -53,6 +53,7 @@ bool UMCOActionFragment_Attribute::ApplyAttributeAdditiveValue(const FGameplayEf
 
 	FGameplayTagContainer Tags;
 	Tags.AddTag(InTag);
+	Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
 	Handle.Data->DynamicGrantedTags = Tags;
 
 	return true;

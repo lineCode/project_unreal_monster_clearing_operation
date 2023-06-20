@@ -8,10 +8,20 @@ public class MonsterCO : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "EnhancedInput", "UMG", "NavigationSystem", "AIModule", "GameplayTasks", "Niagara" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", 
+			"EnhancedInput", "UMG", "NavigationSystem", "AIModule", "GameplayTasks", "Niagara"
+		});
 		
-		PrivateDependencyModuleNames.AddRange(new string[] { "GameplayAbilities", "GameplayTags", "GameplayTasks", "ModularGameplay", "GameFeatures", "AnimGraphRuntime" });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"GameplayAbilities", "GameplayTags", "GameplayTasks", "ModularGameplay", "GameFeatures", "AnimGraphRuntime"
+		});
 
-        PublicIncludePaths.AddRange(new string[] { "MonsterCO" });
+        PublicIncludePaths.AddRange(new string[]
+        {
+	        "MonsterCO"
+        });
     }
 }

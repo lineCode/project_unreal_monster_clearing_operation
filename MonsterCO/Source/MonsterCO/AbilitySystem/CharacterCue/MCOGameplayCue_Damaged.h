@@ -21,6 +21,9 @@ protected:
 	virtual void HandleGameplayCue(AActor* MyTarget, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters) override;
 
 protected:
-	UPROPERTY()
-	TObjectPtr<UNiagaraComponent> NiagaraComponent;	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UNiagaraComponent> NiagaraComponent;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UAudioComponent> AudioComponent;
 };

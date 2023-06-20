@@ -26,7 +26,7 @@ AMCOItem::AMCOItem()
 	SkeletalMesh->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
 	SkeletalMesh->SetRelativeLocation(FVector(0.0f, 0.0f, -45.0f));
 	
-	Trigger->SetCollisionProfileName(PROFILE_ABTRIGGER);
+	Trigger->SetCollisionProfileName(PROFILE_TRIGGER);
 	SkeletalMesh->SetCollisionProfileName(TEXT("NoCollision"));
 	
 	Trigger->SetBoxExtent(FVector(45.0f, 45.0f, 45.0f));

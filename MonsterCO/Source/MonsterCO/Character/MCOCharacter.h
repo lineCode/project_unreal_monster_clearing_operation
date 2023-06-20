@@ -139,7 +139,7 @@ public:
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;
-	virtual FAttachmentBeginOverlapDelegate& GetAttachmentBeginOverlapDelegate() override;
+	virtual FCollisionBeginOverlapDelegate& GetCollisionBeginOverlapDelegate() override;
 	
 protected:
 	UPROPERTY()

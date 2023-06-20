@@ -1,14 +1,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MCOGameplayAbility_CommonAttack.h"
+#include "MCOGA_CommonAttack.h"
 #include "MCOGameplayAbility_MonsterMelee.generated.h"
 
 class UMCOMontageDataDirectional;
 
 
 UCLASS()
-class MONSTERCO_API UMCOGameplayAbility_MonsterMelee : public UMCOGameplayAbility_CommonAttack
+class MONSTERCO_API UMCOGameplayAbility_MonsterMelee : public UMCOGA_CommonAttack
 {
 	GENERATED_BODY()
 	

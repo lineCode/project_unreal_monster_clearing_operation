@@ -7,7 +7,7 @@ IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, MonsterCO, "MonsterCO" );
  
 DEFINE_LOG_CATEGORY(MCOLog);
 DEFINE_LOG_CATEGORY(MCOAbility);
-DEFINE_LOG_CATEGORY(MCOAttachment);
+DEFINE_LOG_CATEGORY(MCOCollision);
 
 void FLog::Print(int32 InValue, int32 InKey, float Duration, FColor InColor)
 {

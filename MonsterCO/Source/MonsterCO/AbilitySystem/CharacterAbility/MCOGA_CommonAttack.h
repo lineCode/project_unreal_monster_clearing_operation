@@ -3,20 +3,28 @@
 #include "MonsterCO.h"
 #include "MCOGameplayAbility.h"
 #include "Interface/MCOCharacterInterface.h"
-#include "MCOGameplayAbility_CommonAttack.generated.h"
+#include "MCOGA_CommonAttack.generated.h"
+
+
 
 class UGameplayEffect;
 class UMCOActionFragment_AttackTiming;
 class UMCOActionFragment_Collision;
 
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileCollisionEndDelegate);
+
+
+
+
 UCLASS()
-class MONSTERCO_API UMCOGameplayAbility_CommonAttack : public UMCOGameplayAbility
+class MONSTERCO_API UMCOGA_CommonAttack : public UMCOGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	UMCOGameplayAbility_CommonAttack();
+	UMCOGA_CommonAttack();
 
 	
 // --- Ability
@@ -41,17 +49,25 @@ protected:
 	float CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog = false) const;
 	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const;
 
+	void Attack();
+	
 // --- Attack/Overlap
 	UFUNCTION()
-	void OnAttachmentBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult);
+	void OnCollisionBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult);
 
 // --- Attack/Channel
-	void AttackHitCheckByChannel();
+	void AttackByProjectile();
+	void AttackByInstantCheck();
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
 protected:
+	FOnProjectileCollisionEndDelegate OnProjectileCollisionEndDelegate;
+	
 	UPROPERTY()
-	TSubclassOf<UGameplayEffect> AttributeEffect;
+	TSubclassOf<UGameplayEffect> GiveInstantDamageEffect;
+	
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> GiveDurationDamageEffect;
 	
 
 // --- Damage Timer

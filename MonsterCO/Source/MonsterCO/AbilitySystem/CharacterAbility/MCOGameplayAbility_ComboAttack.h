@@ -1,13 +1,13 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "MCOGameplayAbility_CommonAttack.h"
+#include "MCOGA_CommonAttack.h"
 #include "MCOGameplayAbility_ComboAttack.generated.h"
 
 class UMCOMontageDataCombo;
 
 UCLASS()
-class MONSTERCO_API UMCOGameplayAbility_ComboAttack : public UMCOGameplayAbility_CommonAttack
+class MONSTERCO_API UMCOGameplayAbility_ComboAttack : public UMCOGA_CommonAttack
 {
 	GENERATED_BODY()
 	

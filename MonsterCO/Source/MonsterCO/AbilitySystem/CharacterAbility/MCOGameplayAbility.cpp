@@ -71,7 +71,7 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
+	//MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
@@ -124,7 +124,7 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
-	MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
+	//MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
 
 	ApplyAttributeEffect(Handle, ActorInfo, ActivationInfo);
 
@@ -167,11 +167,11 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	ISTRUE(nullptr != CurrentDefinition->CooldownFragment);
 	ISTRUE(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
-	MCOLOG_C(MCOAbility, TEXT("Cooldown Effect : %s [%.1f]sec"), *AbilityTags.First().GetTagName().ToString(), CurrentDefinition->CooldownFragment->CooldownTime);
+	//MCOLOG_C(MCOAbility, TEXT("Cooldown Effect : %s [%.1f]sec"), *AbilityTags.First().GetTagName().ToString(), CurrentDefinition->CooldownFragment->CooldownTime);
 	
 	const FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
 	ISTRUE(true == HandleForCooldown.IsValid());
-	
+
 	HandleForCooldown.Data->SetSetByCallerMagnitude(
 		FMCOCharacterTags::Get().GameplayEffect_CooldownTag,
 		CurrentDefinition->CooldownFragment->CooldownTime
@@ -282,7 +282,7 @@ void UMCOGameplayAbility::StopAttributeEffect() const
 
 	ASC->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
 
-	MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
+	//MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
 }
 
 void UMCOGameplayAbility::ActivateStaminaChargeAbility()

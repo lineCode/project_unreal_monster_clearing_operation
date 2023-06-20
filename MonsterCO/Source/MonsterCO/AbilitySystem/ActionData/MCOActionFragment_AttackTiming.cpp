@@ -48,6 +48,32 @@ UNiagaraSystem* UMCOActionFragment_AttackTiming::GetDamageNiagara(const uint8& I
 	return DamageTimings[InDamageIdx].DamagedNiagara;
 }
 
+bool UMCOActionFragment_AttackTiming::IsAttackByProjectile(const uint8& InDamageIdx) const
+{
+	return DamageTimings[InDamageIdx].bUseProjectile;
+}
+
+const TSubclassOf<AMCOProjectile>* UMCOActionFragment_AttackTiming::GetProjectileClass(const uint8& InDamageIdx) const
+{
+	ISTRUE_N(DamageTimings.IsValidIndex(InDamageIdx));
+	
+	return &DamageTimings[InDamageIdx].ProjectileClass;
+}
+
+float UMCOActionFragment_AttackTiming::GetProjectileSpeed(const uint8& InDamageIdx) const
+{
+	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
+	
+	return DamageTimings[InDamageIdx].ProjectileSpeed;
+}
+
+float UMCOActionFragment_AttackTiming::GetProjectileLifeSpan(const uint8& InDamageIdx) const
+{
+	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
+	
+	return DamageTimings[InDamageIdx].ProjectileLifeSpan;
+}
+
 float UMCOActionFragment_AttackTiming::GetStiffness(const uint8& InDamageIdx) const
 {
 	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
@@ -60,6 +86,13 @@ float UMCOActionFragment_AttackTiming::GetDamage(const uint8& InDamageIdx) const
 	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
 	
 	return DamageTimings[InDamageIdx].Damage;
+}
+
+float UMCOActionFragment_AttackTiming::GetDamageDurationTime(const uint8& InDamageIdx) const
+{
+	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
+	
+	return DamageTimings[InDamageIdx].DurationTime;
 }
 
 float UMCOActionFragment_AttackTiming::CalculateTime(const float& FrameCount, const float& SpeedRate) const

@@ -82,6 +82,8 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 
 	ISTRUE(Data.EvaluatedData.Magnitude != 0.0f);
 
+	//MCOLOG_C(MCOAbility, TEXT("[%s] is changed : [%.1f]"), *Data.EvaluatedData.Attribute.GetName(), Data.EvaluatedData.Magnitude);
+	
 	// Set{Attribute}() will call bound function in PlayerState
 	
 	// Additive attributes
@@ -89,12 +91,6 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	{
 		const float NewHealth = FMath::Clamp(GetHealth() + GetAdditiveDamage(), 0.0f, GetMaxHealth());
 		SetHealth(NewHealth);
-
-		if (GetHealth() <= 0.0f)
-		{
-			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag, Data);
-		}
-		
 		SetAdditiveDamage(0.0f);
 	}
 	else if (Data.EvaluatedData.Attribute == GetAdditiveHealthAttribute())
@@ -142,7 +138,11 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 		
 		SetAdditiveStamina(0.0f);
 	}
-	
+
+	if (GetHealth() <= 0.0f)
+	{
+		HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DeadTag, Data);
+	}
 }
 
 void UMCOAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
