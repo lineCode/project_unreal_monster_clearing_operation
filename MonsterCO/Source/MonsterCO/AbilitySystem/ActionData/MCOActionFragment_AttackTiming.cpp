@@ -1,10 +1,14 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 
+#include "GameplayEffect.h"
+#include "MCOActionFragment_AttributeEffect.h"
+#include "AbilitySystem/MCOCharacterTags.h"
 
-bool UMCOActionFragment_AttackTiming::IsMovableWhileGivingDamage(const uint8& InDamageIdx) const
+
+bool UMCOActionFragment_AttackTiming::IsMovable(const uint8& InDamageIdx) const
 {
 	ISTRUE_F(DamageTimings.IsValidIndex(InDamageIdx));
-	return DamageTimings[InDamageIdx].bIsMovableWhileGivingDamage;
+	return DamageTimings[InDamageIdx].bIsMovable;
 }
 
 float UMCOActionFragment_AttackTiming::GetDamageCheckRate(const uint8& InDamageIdx) const
@@ -41,14 +45,33 @@ float UMCOActionFragment_AttackTiming::GetComboCheckTime(const float& SpeedRate)
 	return CalculateTime(NextComboFrameCount, SpeedRate);
 }
 
-UNiagaraSystem* UMCOActionFragment_AttackTiming::GetDamageNiagara(const uint8& InDamageIdx) const
+float UMCOActionFragment_AttackTiming::CalculateTime(const float& FrameCount, const float& SpeedRate) const
 {
-	ISTRUE_N(DamageTimings.IsValidIndex(InDamageIdx));
-	
-	return DamageTimings[InDamageIdx].DamagedNiagara;
+	return (FrameCount / MontageFrameRate) / SpeedRate;
 }
 
-bool UMCOActionFragment_AttackTiming::IsAttackByProjectile(const uint8& InDamageIdx) const
+UMCOActionFragment_AttributeEffect* UMCOActionFragment_AttackTiming::GetAttributeFragment(const uint8& InDamageIdx) const
+{
+	return (DamageTimings.IsValidIndex(InDamageIdx)) ? DamageTimings[InDamageIdx].Attribute : nullptr;
+}
+
+UNiagaraSystem* UMCOActionFragment_AttackTiming::GetDamageNiagara(const uint8& InDamageIdx) const
+{
+	ISTRUE_N(DamageTimings.IsValidIndex(InDamageIdx))
+	ISTRUE_N(nullptr != DamageTimings[InDamageIdx].Attribute);
+	
+	return DamageTimings[InDamageIdx].Attribute->GetNiagara(EMCOEffectPolicy::Instant);
+}
+
+UNiagaraSystem* UMCOActionFragment_AttackTiming::GetDurationEffectNiagara(const uint8& InDamageIdx) const
+{
+	ISTRUE_N(DamageTimings.IsValidIndex(InDamageIdx))
+	ISTRUE_N(nullptr != DamageTimings[InDamageIdx].Attribute);
+	
+	return DamageTimings[InDamageIdx].Attribute->GetNiagara(EMCOEffectPolicy::Duration);
+}
+
+bool UMCOActionFragment_AttackTiming::IsUsingProjectile(const uint8& InDamageIdx) const
 {
 	return DamageTimings[InDamageIdx].bUseProjectile;
 }
@@ -72,30 +95,4 @@ float UMCOActionFragment_AttackTiming::GetProjectileLifeSpan(const uint8& InDama
 	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
 	
 	return DamageTimings[InDamageIdx].ProjectileLifeSpan;
-}
-
-float UMCOActionFragment_AttackTiming::GetStiffness(const uint8& InDamageIdx) const
-{
-	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
-	
-	return DamageTimings[InDamageIdx].Stiffness;
-}
-
-float UMCOActionFragment_AttackTiming::GetDamage(const uint8& InDamageIdx) const
-{
-	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
-	
-	return DamageTimings[InDamageIdx].Damage;
-}
-
-float UMCOActionFragment_AttackTiming::GetDamageDurationTime(const uint8& InDamageIdx) const
-{
-	ISTRUE_Z(DamageTimings.IsValidIndex(InDamageIdx));
-	
-	return DamageTimings[InDamageIdx].DurationTime;
-}
-
-float UMCOActionFragment_AttackTiming::CalculateTime(const float& FrameCount, const float& SpeedRate) const
-{
-	return (FrameCount / MontageFrameRate) / SpeedRate;
 }

@@ -7,7 +7,7 @@ UMCOActionFragment_Cooldown* UMCOActionFragment_Montage::GetCooldownFragment() c
 	return (nullptr != ActionDefinition) ? ActionDefinition->CooldownFragment : nullptr;
 }
 
-UMCOActionFragment_Attribute* UMCOActionFragment_Montage::GetAttributeFragment() const
+UMCOActionFragment_AttributeEffect* UMCOActionFragment_Montage::GetAttributeFragment() const
 {
 	return (nullptr != ActionDefinition) ? ActionDefinition->AttributeFragment : nullptr;
 }

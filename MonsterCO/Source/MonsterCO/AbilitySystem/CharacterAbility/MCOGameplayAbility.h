@@ -12,7 +12,7 @@ class AController;
 class UMCOAbilitySystemComponent;
 class IMCOCharacterInterface;
 class UMCOActionFragment_Cooldown;
-class UMCOActionFragment_Attribute;
+class UMCOActionFragment_AttributeEffect;
 
 
 UCLASS()
@@ -80,6 +80,15 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MCO|Fragment")
 	UMCOActionDefinition* CurrentDefinition;
+		
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> InstantEffectClass;
+	
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> DurationEffectClass;
+	
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> InfiniteEffectClass;
 	
 // --- Cooldown
 protected:
@@ -87,26 +96,19 @@ protected:
 	virtual const FGameplayTagContainer* GetCooldownTags() const override;
 	void StartCooldownWidget() const;
 
-protected:
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> CooldownEffectClass;
-	
 	
 // --- Attribute Effect
 protected:
 	bool CheckCanActivateWithStamina() const;
-	void ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
-	
-private:
-	void StopAttributeEffect() const;
-	
+
+	// Startup effect for ability (Stamina consumption, item effects...)
+	// This will be cancelled when this ability ends
+	void ApplyAbilityEffectSelf(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
+	void CancelAbilityEffectsSelf() const;
+
 protected:
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> InstantAttributeEffectClass;
-	
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> InfiniteAttributeEffectClass;
-	
+	void ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect = false) const;
+
 	
 // --- Stamina charge
 protected:

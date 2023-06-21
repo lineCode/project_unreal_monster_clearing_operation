@@ -13,7 +13,7 @@ class MONSTERCO_API UMCOMontageDataSingle : public UMCOActionData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
 	FName MontageSectionName = NAME_None;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)

@@ -33,8 +33,6 @@ struct FMCODamagedData
 	GENERATED_BODY()
 
 public:
-	FMCODamagedData() : bHasDuration(false) {}
-	
 	UPROPERTY()
 	float DamagedDegree = 0.0f;
 
@@ -45,7 +43,7 @@ public:
 	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
 	
 	UPROPERTY()
-	uint8 bHasDuration : 1;
+	TObjectPtr<UNiagaraSystem> DurationNiagara = nullptr;
 };
 
 
@@ -72,7 +70,7 @@ public:
 	
 // --- Damaged
 public:
-	virtual const FMCODamagedData GetDamagedData() = 0;
+	virtual const FMCODamagedData& GetDamagedData() = 0;
 	virtual void SetDamagedData(const FMCODamagedData& InDegree) = 0;
 
 	

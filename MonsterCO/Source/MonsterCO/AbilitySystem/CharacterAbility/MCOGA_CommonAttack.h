@@ -13,11 +13,6 @@ class UMCOActionFragment_Collision;
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnProjectileCollisionEndDelegate);
-
-
-
-
 UCLASS()
 class MONSTERCO_API UMCOGA_CommonAttack : public UMCOGameplayAbility
 {
@@ -61,13 +56,11 @@ protected:
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
 protected:
-	FOnProjectileCollisionEndDelegate OnProjectileCollisionEndDelegate;
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> InstantEffectWithCue;
 	
 	UPROPERTY()
-	TSubclassOf<UGameplayEffect> GiveInstantDamageEffect;
-	
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> GiveDurationDamageEffect;
+	TSubclassOf<UGameplayEffect> DurationEffectWithCue;
 	
 
 // --- Damage Timer

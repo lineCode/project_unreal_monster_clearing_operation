@@ -15,47 +15,38 @@ struct FMCOAttackTimingData
 	GENERATED_BODY()
 
 public:
-	FMCOAttackTimingData() : bIsMovableWhileGivingDamage(false), bCanTurnWhileGivingDamage(true), bUseProjectile(false) {};
+	FMCOAttackTimingData() : bIsMovable(false), bCanTurn(true), bUseProjectile(false) {};
 	
-	UPROPERTY(EditAnywhere)
-	uint8 bIsMovableWhileGivingDamage : 1;
+	UPROPERTY(EditAnywhere, Category = Control)
+	uint8 bIsMovable : 1;
 	
-	UPROPERTY(EditAnywhere)
-	uint8 bCanTurnWhileGivingDamage : 1;
+	UPROPERTY(EditAnywhere, Category = Control)
+	uint8 bCanTurn : 1;
 	
-	UPROPERTY(EditAnywhere)
-	uint8 bUseProjectile : 1;
-	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Timing)
 	float Begin = 0.0f;
 		
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Timing)
 	float End = 0.0f;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Timing)
 	float CheckRate = 0.0f; // Check multiple times in every check rate (from Begin time to End time)
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attribute)
+	TObjectPtr<UMCOActionFragment_AttributeEffect> Attribute;
 	
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
+	UPROPERTY(EditAnywhere, Category = Projectile)
+	uint8 bUseProjectile : 1;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = Projectile)
 	TSubclassOf<AMCOProjectile> ProjectileClass;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile)
 	float ProjectileLifeSpan = 1.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile)
 	float ProjectileSpeed = 600.0f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Stiffness = 0.0f;
-		
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Damage = 0.0f;
-
-	// Attack duration 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float DurationTime = 0.0f;
 };
 
 
@@ -65,7 +56,7 @@ class MONSTERCO_API UMCOActionFragment_AttackTiming : public UMCOActionFragment
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float MontageFrameRate = 30.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -73,22 +64,32 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float NextComboFrameCount = 0.0f;
-	
+
+// --- Control
 public:
-	bool IsMovableWhileGivingDamage(const uint8& InDamageIdx) const;
+	bool IsMovable(const uint8& InDamageIdx) const;
+
+// --- Timing
+public:
 	float GetDamageCheckRate(const uint8& InDamageIdx) const;
 	float GetDamageBeginTimeAfterPrevEndTime(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
 	float GetDamageExistTime(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
 	float GetComboCheckTime(const float& SpeedRate = 1.0f) const;
-	UNiagaraSystem* GetDamageNiagara(const uint8& InDamageIdx) const;
-	bool IsAttackByProjectile(const uint8& InDamageIdx) const;
-	const TSubclassOf<AMCOProjectile>* GetProjectileClass(const uint8& InDamageIdx) const;
-	float GetProjectileSpeed(const uint8& InDamageIdx) const;
-	float GetProjectileLifeSpan(const uint8& InDamageIdx) const;
-	float GetStiffness(const uint8& InDamageIdx) const;
-	float GetDamage(const uint8& InDamageIdx) const;
-	float GetDamageDurationTime(const uint8& InDamageIdx) const;
 
 protected:
 	float CalculateTime(const float& FrameCount, const float& SpeedRate = 1.0f) const;
+
+// --- Damage
+public:
+	UMCOActionFragment_AttributeEffect* GetAttributeFragment(const uint8& InDamageIdx) const;
+	UNiagaraSystem* GetDamageNiagara(const uint8& InDamageIdx) const;
+	UNiagaraSystem* GetDurationEffectNiagara(const uint8& InDamageIdx) const;
+
+// --- Projectile
+public:
+	bool IsUsingProjectile(const uint8& InDamageIdx) const;
+	const TSubclassOf<AMCOProjectile>* GetProjectileClass(const uint8& InDamageIdx) const;
+	float GetProjectileSpeed(const uint8& InDamageIdx) const;
+	float GetProjectileLifeSpan(const uint8& InDamageIdx) const;
+
 };

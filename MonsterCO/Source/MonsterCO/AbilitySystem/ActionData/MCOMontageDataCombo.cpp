@@ -36,12 +36,12 @@ UMCOActionFragment_Cooldown* UMCOMontageDataCombo::GetCooldownFragment(const uin
 	return Super::GetCooldownFragment();
 }
 
-UMCOActionFragment_Attribute* UMCOMontageDataCombo::GetAttributeFragment(const uint8& InComboIdx) const
+UMCOActionFragment_AttributeEffect* UMCOMontageDataCombo::GetAttributeFragment(const uint8& InComboIdx) const
 {
 	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InComboIdx);
 	if (nullptr != MontageFragment)
 	{
-		UMCOActionFragment_Attribute* Fragment = MontageFragment->GetAttributeFragment();
+		UMCOActionFragment_AttributeEffect* Fragment = MontageFragment->GetAttributeFragment();
 		if (nullptr != Fragment)
 		{
 			return Fragment;

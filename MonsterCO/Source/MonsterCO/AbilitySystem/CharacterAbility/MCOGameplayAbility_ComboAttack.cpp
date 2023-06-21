@@ -1,7 +1,7 @@
 #include "MCOGameplayAbility_ComboAttack.h"
 #include "AbilitySystem/ActionData/MCOMontageDataCombo.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_AttributeEffect.h"
 
 
 UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
@@ -122,7 +122,7 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 		Data->MontageSectionName
 	);
 
-	ApplyAttributeEffect(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+	ApplyAbilityEffectSelf(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 	
 	SetComboTimer();
 }

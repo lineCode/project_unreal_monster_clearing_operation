@@ -5,7 +5,7 @@
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_AttributeEffect.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOCharacterInterface.h"
 
@@ -14,9 +14,9 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 {
 	// Effect 
 	// GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
-	GETCLASS(CooldownEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Cooldown.GE_Cooldown_C"));
-	GETCLASS(InstantAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Instant.GE_Attribute_Instant_C"));
-	GETCLASS(InfiniteAttributeEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
+	GETCLASS(DurationEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Duration.GE_Attribute_Duration_C"));
+	GETCLASS(InstantEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Instant.GE_Attribute_Instant_C"));
+	GETCLASS(InfiniteEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
 
 	// Definition
 	CurrentDefinition = CreateDefaultSubobject<UMCOActionDefinition>(TEXT("NAME_Definition"));
@@ -71,7 +71,7 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	//MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
+	MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
@@ -79,8 +79,8 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	{
 		StopCharacter(false);
 	}
-	
-	StopAttributeEffect();
+
+	CancelAbilityEffectsSelf();
 
 	if (true == bAutoActivateChargingStaminaAbility)
 	{
@@ -124,9 +124,9 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
-	//MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
+	MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
 
-	ApplyAttributeEffect(Handle, ActorInfo, ActivationInfo);
+	ApplyAbilityEffectSelf(Handle, ActorInfo, ActivationInfo);
 
 	if (true == bAutoStopCharacter)
 	{
@@ -163,34 +163,35 @@ UMCOAbilitySystemComponent* UMCOGameplayAbility::GetMCOAbilitySystemComponent() 
 
 void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
-	ISTRUE(nullptr != CooldownEffectClass);
+	ISTRUE(nullptr != DurationEffectClass);
 	ISTRUE(nullptr != CurrentDefinition->CooldownFragment);
 	ISTRUE(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
 	//MCOLOG_C(MCOAbility, TEXT("Cooldown Effect : %s [%.1f]sec"), *AbilityTags.First().GetTagName().ToString(), CurrentDefinition->CooldownFragment->CooldownTime);
 	
-	const FGameplayEffectSpecHandle HandleForCooldown = MakeOutgoingGameplayEffectSpec(CooldownEffectClass);
-	ISTRUE(true == HandleForCooldown.IsValid());
+	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(DurationEffectClass);
+	ISTRUE(true == NewHandle.IsValid());
 
-	HandleForCooldown.Data->SetSetByCallerMagnitude(
-		FMCOCharacterTags::Get().GameplayEffect_CooldownTag,
-		CurrentDefinition->CooldownFragment->CooldownTime
-	);
+	CurrentDefinition->CooldownFragment->ApplyCooldownValue(NewHandle);
 	
-	HandleForCooldown.Data->DynamicGrantedTags = CurrentDefinition->CooldownFragment->CooldownTags;
+	// HandleForCooldown.Data->SetSetByCallerMagnitude(
+	// 	FMCOCharacterTags::Get().GameplayEffect_CooldownTag,
+	// 	CurrentDefinition->CooldownFragment->GetCooldownTime();
+	// );
+	//
+	// HandleForCooldown.Data->DynamicGrantedTags = CurrentDefinition->CooldownFragment->CooldownTags;
 
-	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, HandleForCooldown);
-
+	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, NewHandle);
 	StartCooldownWidget();
 }
 
 const FGameplayTagContainer* UMCOGameplayAbility::GetCooldownTags() const
 {
-	ISTRUE_N(nullptr != CooldownEffectClass);
+	ISTRUE_N(nullptr != DurationEffectClass);
 	ISTRUE_N(nullptr != CurrentDefinition->CooldownFragment);
 	ISTRUE_N(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
-	return &CurrentDefinition->CooldownFragment->CooldownTags;	
+	return CurrentDefinition->CooldownFragment->GetCooldownTags();	
 }
 
 void UMCOGameplayAbility::StartCooldownWidget() const
@@ -205,85 +206,66 @@ void UMCOGameplayAbility::StartCooldownWidget() const
 
 bool UMCOGameplayAbility::CheckCanActivateWithStamina() const
 {
-	if (nullptr != CurrentDefinition->AttributeFragment &&
-		true == CurrentDefinition->AttributeFragment->CanApply(FMCOCharacterTags::Get().GameplayEffect_StaminaTag))
+	const UMCOAbilitySystemComponent* MCOASC = GetMCOAbilitySystemComponent();
+	ISTRUE_F(nullptr != MCOASC);
+	
+	if (nullptr != CurrentDefinition->AttributeFragment)
 	{
-		const UMCOAbilitySystemComponent* MCOASC = GetMCOAbilitySystemComponent();
-		ISTRUE_F(0.0f <= MCOASC->GetStamina() + CurrentDefinition->AttributeFragment->GetStaminaAdditiveValue());
+		return CurrentDefinition->AttributeFragment->CanActivateAbilityWithStamina(MCOASC->GetStamina());
 	}
 	
 	return true;
 }
 
-void UMCOGameplayAbility::ApplyAttributeEffect(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+void UMCOGameplayAbility::ApplyAbilityEffectSelf(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	ISTRUE(nullptr != InstantAttributeEffectClass);
-	ISTRUE(nullptr != InfiniteAttributeEffectClass);
+	ISTRUE(nullptr != InstantEffectClass);
+	ISTRUE(nullptr != InfiniteEffectClass);
 	ISTRUE(nullptr != CurrentDefinition->AttributeFragment);
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 	
-	const FGameplayEffectSpecHandle NewInstantHandle = MakeOutgoingGameplayEffectSpec(InstantAttributeEffectClass);
-	ISTRUE(true == NewInstantHandle.IsValid());
-	
-	const FGameplayEffectSpecHandle NewInfiniteHandle = MakeOutgoingGameplayEffectSpec(InfiniteAttributeEffectClass);
-	ISTRUE(true == NewInfiniteHandle.IsValid());
-
-	CurrentDefinition->AttributeFragment->ApplyAttributeAdditiveValue(
-		NewInstantHandle, NewInfiniteHandle,
-		FMCOCharacterTags::Get().GameplayEffect_HealthTag
-	);
-
-	CurrentDefinition->AttributeFragment->ApplyAttributeAdditiveValue(
-		NewInstantHandle, NewInfiniteHandle,
-		FMCOCharacterTags::Get().GameplayEffect_StaminaTag
-	);
-	
-	CurrentDefinition->AttributeFragment->ApplyAttributeAdditiveValue(
-		NewInstantHandle, NewInfiniteHandle,
-		FMCOCharacterTags::Get().GameplayEffect_StiffnessTag
-	);
-
-	MCOLOG_C(MCOAbility, TEXT("Attribute Effect +Health:[%.1f], +Stamina:[%.1f], +Stiffness:[%.1f]"),
-		CurrentDefinition->AttributeFragment->GetHealthAdditiveValue(),
-		CurrentDefinition->AttributeFragment->GetStaminaAdditiveValue(),
-		CurrentDefinition->AttributeFragment->GetStiffnessAdditiveValue()
-	);
-	
-	if (NewInstantHandle.Data->DynamicGrantedTags.Num() > 0)
-	{
-		ASC->ApplyGameplayEffectSpecToSelf(
-			*NewInstantHandle.Data.Get(),
-			ASC->GetPredictionKeyForNewAction()
-		);
-	}
-	if (NewInfiniteHandle.Data->DynamicGrantedTags.Num() > 0)
-	{
-		//MCOLOG_C(MCOAbility, TEXT("InfiniteHandle used"));
-		
-		ASC->ApplyGameplayEffectSpecToSelf(
-			*NewInfiniteHandle.Data.Get(),
-			ASC->GetPredictionKeyForNewAction()
-		);
-	}
+	ApplyEffect(ASC, CurrentDefinition->AttributeFragment, EMCOEffectPolicy::Instant, InstantEffectClass, true);
+	ApplyEffect(ASC, CurrentDefinition->AttributeFragment, EMCOEffectPolicy::Duration, DurationEffectClass, true);
+	ApplyEffect(ASC, CurrentDefinition->AttributeFragment, EMCOEffectPolicy::Infinite, InfiniteEffectClass, true);
 }
 
-void UMCOGameplayAbility::StopAttributeEffect() const
+void UMCOGameplayAbility::CancelAbilityEffectsSelf() const
 {
-	ISTRUE(nullptr != CurrentDefinition->AttributeFragment);
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 		
 	FGameplayTagContainer Tags;
-	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_HealthTag);
-	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag);
-	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_StaminaTag);
-
-	ASC->RemoveActiveEffectsWithGrantedTags(Tags); // "Granted" tags
+	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AbilityTag);
+	ASC->RemoveActiveEffectsWithGrantedTags(Tags); // Should be "Granted" tags
 
 	//MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
 }
+
+void UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect) const
+{
+	ISTRUE(nullptr != ASC);
+	ISTRUE(nullptr != EffectClass);
+	ISTRUE(nullptr != AttributeFragment);
+	ISTRUE(true == AttributeFragment->IsEffectExistByPolicy(InPolicy));
+	
+	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(EffectClass);
+	ISTRUE(true == NewHandle.IsValid());
+
+	AttributeFragment->ApplyAttributeAdditiveValue(InPolicy, NewHandle);
+
+	if (true == IsAbilityEffect)
+	{
+		NewHandle.Data->DynamicGrantedTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AbilityTag);
+	}
+	
+	ASC->ApplyGameplayEffectSpecToSelf(
+		*NewHandle.Data.Get(),
+		ASC->GetPredictionKeyForNewAction()
+	);
+}
+
 
 void UMCOGameplayAbility::ActivateStaminaChargeAbility()
 {

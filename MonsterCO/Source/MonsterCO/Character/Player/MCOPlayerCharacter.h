@@ -129,14 +129,14 @@ public:
 	virtual void DrinkPotion(const UMCOItemData* InItemData);
 	virtual void EquipWeapon(const UMCOItemData* InItemData);
 	virtual void ReadScroll(const UMCOItemData* InItemData);
-	virtual UMCOActionFragment_Attribute* GetItemAttributeFragment() override;
+	virtual UMCOActionFragment_AttributeEffect* GetItemAttributeFragment() override;
 	virtual void EndTakeItem() override;
 	
 	UPROPERTY()
 	TMap<EMCOItemType, FTakeItemDelegateWrapper> TakeItemActions;
 	
 	UPROPERTY()
-	TObjectPtr<UMCOActionFragment_Attribute> ItemAttributeFragment;
+	TObjectPtr<UMCOActionFragment_AttributeEffect> ItemAttributeFragment;
 
 	
 // --- Widget

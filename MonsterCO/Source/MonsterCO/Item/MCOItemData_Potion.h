@@ -4,7 +4,7 @@
 #include "MCOItemData.h"
 #include "MCOItemData_Potion.generated.h"
 
-class UMCOActionFragment_Attribute;
+class UMCOActionFragment_AttributeEffect;
 
 UCLASS()
 class MONSTERCO_API UMCOItemData_Potion : public UMCOItemData
@@ -13,5 +13,5 @@ class MONSTERCO_API UMCOItemData_Potion : public UMCOItemData
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
-	TObjectPtr<UMCOActionFragment_Attribute> AttributeFragment;
+	TObjectPtr<UMCOActionFragment_AttributeEffect> AttributeFragment;
 };

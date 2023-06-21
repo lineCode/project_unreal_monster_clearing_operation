@@ -6,11 +6,14 @@ FMCOCharacterTags FMCOCharacterTags::CharacterTags;
 
 void FMCOCharacterTags::InitializeTags()
 {
-	const bool bErrorIfNotFound = EGameplayTagEventType::NewOrRemoved;
+	const bool bErrorIfNotFound = true; //EGameplayTagEventType::NewOrRemoved;
+
+	// MAKE SURE THERE IS NO TYPO !!!! 
 	
 	CharacterTags.MoveTag = FGameplayTag::RequestGameplayTag(FName("Input.Move"), bErrorIfNotFound);
 	CharacterTags.LookTag = FGameplayTag::RequestGameplayTag(FName("Input.Look"), bErrorIfNotFound);
 	
+	CharacterTags.GameplayEffect_AbilityTag      = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Ability"),      bErrorIfNotFound);
 	CharacterTags.GameplayEffect_DurationTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Duration"),     bErrorIfNotFound);
 	CharacterTags.GameplayEffect_CooldownTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"),     bErrorIfNotFound);
 	CharacterTags.GameplayEffect_DamageTag       = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"),       bErrorIfNotFound);

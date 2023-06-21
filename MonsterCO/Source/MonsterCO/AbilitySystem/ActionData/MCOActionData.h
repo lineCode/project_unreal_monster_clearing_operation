@@ -7,7 +7,7 @@
 
 class UMCOActionDefinition;
 class UMCOActionFragment_Cooldown;
-class UMCOActionFragment_Attribute;
+class UMCOActionFragment_AttributeEffect;
 class UMCOActionFragment_AttackTiming;
 class UMCOActionFragment_Collision;
 
@@ -30,7 +30,7 @@ public:
 	
 protected:
 	UMCOActionFragment_Cooldown* GetCooldownFragment() const;
-	UMCOActionFragment_Attribute* GetAttributeFragment() const;
+	UMCOActionFragment_AttributeEffect* GetAttributeFragment() const;
 	UMCOActionFragment_AttackTiming* GetAttackTimingFragment() const;
 	UMCOActionFragment_Collision* GetCollisionFragment() const;
 };

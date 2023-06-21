@@ -3,7 +3,6 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
-#include "AbilitySystem/MCOCharacterTags.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
@@ -15,8 +14,8 @@
 
 UMCOGA_CommonAttack::UMCOGA_CommonAttack()
 {
-	GETCLASS(GiveInstantDamageEffect, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveDamage.GE_GiveDamage_C"));
-	GETCLASS(GiveDurationDamageEffect, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveDurationDamage.GE_GiveDurationDamage_C"));
+	GETCLASS(InstantEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveDamage.GE_GiveDamage_C"));
+	GETCLASS(DurationEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveDurationDamage.GE_GiveDurationDamage_C"));
 	
 	// Setting 
 	bUseOverlapEvent = false;
@@ -61,7 +60,7 @@ void UMCOGA_CommonAttack::OnTaskCancelled()
 
 void UMCOGA_CommonAttack::BeginDamaging()
 {
-	if (CurrentDefinition->AttackTimingFragment->IsMovableWhileGivingDamage(CurrentDamageTimingIdx))
+	if (CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
 	{
 		MCOLOG_C(MCOAbility, TEXT("Move Character !"));
 		StopCharacter(false);
@@ -81,7 +80,7 @@ void UMCOGA_CommonAttack::BeginDamaging()
 
 void UMCOGA_CommonAttack::EndDamaging()
 {
-	if (CurrentDefinition->AttackTimingFragment->IsMovableWhileGivingDamage(CurrentDamageTimingIdx))
+	if (CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
 	{
 		MCOLOG_C(MCOAbility, TEXT("Stop Character !"));
 		StopCharacter(true);
@@ -147,6 +146,9 @@ void UMCOGA_CommonAttack::EndDamaging_Collision()
 
 void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter)
 {
+	ISTRUE(nullptr != CurrentDefinition);
+	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
+	
 	// Get ASC from AttackedCharacter
 	IAbilitySystemInterface* AttackedCharacter = Cast<IAbilitySystemInterface>(InAttackedCharacter);
 	ISTRUE(nullptr != AttackedCharacter);
@@ -161,93 +163,10 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacte
 		HUDInterface->ShowMonsterInfo(CharacterInterface);
 	}
 
-	const float Duration = CurrentDefinition->AttackTimingFragment->GetDamageDurationTime(CurrentDamageTimingIdx);
+	const UMCOActionFragment_AttributeEffect* AttributeFragment = CurrentDefinition->AttackTimingFragment->GetAttributeFragment(CurrentDamageTimingIdx);
 	
-	// Give duration damage and stiffness 
-	if (0.0f < Duration)
-	{
-		const FGameplayEffectSpecHandle HandleForDuration = MakeOutgoingGameplayEffectSpec(GiveDurationDamageEffect);
-
-		if (true == HandleForDuration.IsValid())
-		{
-			HandleForDuration.Data->SetSetByCallerMagnitude(
-				FMCOCharacterTags::Get().GameplayEffect_DurationTag,
-				Duration
-			);
-					
-			HandleForDuration.Data->SetSetByCallerMagnitude(
-				FMCOCharacterTags::Get().GameplayEffect_DamageTag,
-				-CurrentDefinition->AttackTimingFragment->GetDamage(CurrentDamageTimingIdx) // minus!!!!!
-			);
-			HandleForDuration.Data->SetSetByCallerMagnitude(
-				FMCOCharacterTags::Get().GameplayEffect_StiffnessTag,
-				CurrentDefinition->AttackTimingFragment->GetStiffness(CurrentDamageTimingIdx)
-			);
-			
-			FGameplayTagContainer Tags;
-			Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
-			HandleForDuration.Data->DynamicGrantedTags = Tags;
-			
-			MCOLOG_C(MCOAbility, TEXT("Damage Effect +Health:[%.1f], +Stiffness:[%.1f] for [%.1f]sec"),
-				-CurrentDefinition->AttackTimingFragment->GetDamage(CurrentDamageTimingIdx),
-				CurrentDefinition->AttackTimingFragment->GetStiffness(CurrentDamageTimingIdx),
-				Duration
-			)
-			
-			AttackedASC->ApplyGameplayEffectSpecToSelf(
-				*HandleForDuration.Data.Get(),
-				AttackedASC->GetPredictionKeyForNewAction()
-			);
-		}
-	}
-	else
-	{
-		// Give damage and stiffness 
-		const FGameplayEffectSpecHandle HandleForAttributes = MakeOutgoingGameplayEffectSpec(GiveInstantDamageEffect);
-
-		if (true == HandleForAttributes.IsValid())
-		{
-			HandleForAttributes.Data->SetSetByCallerMagnitude(
-				FMCOCharacterTags::Get().GameplayEffect_DamageTag,
-				-CurrentDefinition->AttackTimingFragment->GetDamage(CurrentDamageTimingIdx) // minus!!!!!
-			);
-			HandleForAttributes.Data->SetSetByCallerMagnitude(
-				FMCOCharacterTags::Get().GameplayEffect_StiffnessTag,
-				CurrentDefinition->AttackTimingFragment->GetStiffness(CurrentDamageTimingIdx)
-			);
-
-			FGameplayTagContainer Tags;
-			Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
-			HandleForAttributes.Data->DynamicGrantedTags = Tags;
-			
-			MCOLOG_C(MCOAbility, TEXT("Damage Effect +Health:[%.1f], +Stiffness:[%.1f]"),
-				-CurrentDefinition->AttackTimingFragment->GetDamage(CurrentDamageTimingIdx),
-				CurrentDefinition->AttackTimingFragment->GetStiffness(CurrentDamageTimingIdx)
-			)
-		
-			AttackedASC->ApplyGameplayEffectSpecToSelf(
-				*HandleForAttributes.Data.Get(),
-				AttackedASC->GetPredictionKeyForNewAction()
-			);
-
-		}
-	}
-		
-	// // For Damaged Ability 
-	// FGameplayEffectSpecHandle StiffnessHandle = GetMCOAbilitySystemComponent()->MakeOutgoingSpec(
-	// 	TagEffect,
-	// 	1,
-	// 	EffectContext
-	// );
-	// ISTRUE(StiffnessHandle.IsValid() == true);
-	// // Apply Stiffness Effect to Attacked Character itself
-	// // AttackedASC->RemoveActiveGameplayEffect(AttackedASC->RemoveActiveEffectsWithTags(
-	// // 	FGameplayTagContainer(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag)
-	// // ));
-	// AttackedASC->ApplyGameplayEffectSpecToSelf(
-	// 	*StiffnessHandle.Data.Get(),
-	// 	AttackedASC->GetPredictionKeyForNewAction()
-	// );
+	ApplyEffect(AttackedASC, AttributeFragment, EMCOEffectPolicy::Instant, InstantEffectWithCue);
+	ApplyEffect(AttackedASC, AttributeFragment, EMCOEffectPolicy::Duration, DurationEffectWithCue);
 }
 
 float UMCOGA_CommonAttack::CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog) const
@@ -303,7 +222,7 @@ void UMCOGA_CommonAttack::Attack()
 	ISTRUE(nullptr != CurrentDefinition);
 	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
 	
-	if (CurrentDefinition->AttackTimingFragment->IsAttackByProjectile(CurrentDamageTimingIdx))
+	if (CurrentDefinition->AttackTimingFragment->IsUsingProjectile(CurrentDamageTimingIdx))
 	{
 		AttackByProjectile();
 	}
@@ -333,7 +252,7 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor
 
 	CurrentDamagedData.DamagedLocation = SweepResult.ImpactPoint;
 	CurrentDamagedData.DamagedNiagara = CurrentDefinition->AttackTimingFragment->GetDamageNiagara(CurrentDamageTimingIdx);
-	CurrentDamagedData.bHasDuration = 0.0f < CurrentDefinition->AttackTimingFragment->GetDamageDurationTime(CurrentDamageTimingIdx);
+	CurrentDamagedData.DurationNiagara = CurrentDefinition->AttackTimingFragment->GetDurationEffectNiagara(CurrentDamageTimingIdx);
 	
 	SendDamagedDataToTarget(InAttackedCharacter);
 	ApplyDamageAndStiffness(InAttackedCharacter);
@@ -451,7 +370,7 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 
 		CurrentDamagedData.DamagedLocation = Result.ImpactPoint;
 		CurrentDamagedData.DamagedNiagara = CurrentDefinition->AttackTimingFragment->GetDamageNiagara(CurrentDamageTimingIdx);
-		CurrentDamagedData.bHasDuration = 0.0f < CurrentDefinition->AttackTimingFragment->GetDamageDurationTime(CurrentDamageTimingIdx);
+		CurrentDamagedData.DurationNiagara = CurrentDefinition->AttackTimingFragment->GetDurationEffectNiagara(CurrentDamageTimingIdx);
 		
 		SendDamagedDataToTarget(AttackedCharacter);
 		ApplyDamageAndStiffness(AttackedCharacter);

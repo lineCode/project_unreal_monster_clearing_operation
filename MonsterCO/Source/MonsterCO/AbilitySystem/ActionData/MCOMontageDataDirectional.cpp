@@ -61,12 +61,12 @@ UMCOActionFragment_Cooldown* UMCOMontageDataDirectional::GetCooldownFragment(con
 	return Super::GetCooldownFragment();
 }
 
-UMCOActionFragment_Attribute* UMCOMontageDataDirectional::GetAttributeFragment(const EMCOCharacterDirection& InDirection) const
+UMCOActionFragment_AttributeEffect* UMCOMontageDataDirectional::GetAttributeFragment(const EMCOCharacterDirection& InDirection) const
 {
 	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InDirection);
 	if (nullptr != MontageFragment)
 	{
-		UMCOActionFragment_Attribute* Fragment = MontageFragment->GetAttributeFragment();
+		UMCOActionFragment_AttributeEffect* Fragment = MontageFragment->GetAttributeFragment();
 		if (nullptr != Fragment)
 		{
 			return Fragment;

@@ -440,7 +440,7 @@ void AMCOPlayerCharacter::ReadScroll(const UMCOItemData* InItemData)
 	MCOPRINT(TEXT("Read Scroll"));
 }
 
-UMCOActionFragment_Attribute* AMCOPlayerCharacter::GetItemAttributeFragment()
+UMCOActionFragment_AttributeEffect* AMCOPlayerCharacter::GetItemAttributeFragment()
 {
 	return ItemAttributeFragment;
 }

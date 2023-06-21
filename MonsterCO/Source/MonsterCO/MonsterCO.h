@@ -169,13 +169,12 @@ enum class EMCOItemType : uint8
 };
 
 UENUM(BlueprintType)
-enum class EMCOStaminaConsumptionPolicy : uint8
+enum class EMCOEffectPolicy : uint8
 {
-	Infinite      UMETA(DisplayName = "Infinite"),
-	Instant       UMETA(DisplayName = "Instant")
+	Instant        UMETA(DisplayName = "Instant"),
+	Duration       UMETA(DisplayName = "Duration"),
+	Infinite       UMETA(DisplayName = "Infinite")
 };
-
-
 
 
 

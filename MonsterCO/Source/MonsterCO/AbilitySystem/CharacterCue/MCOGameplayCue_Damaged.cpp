@@ -22,21 +22,12 @@ void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEv
 
 	const FVector DamagedLocation = CharacterInterface->GetDamagedData().DamagedLocation;
 	UNiagaraSystem* DamageNiagara = CharacterInterface->GetDamagedData().DamagedNiagara;
-	const bool bHasDuration = CharacterInterface->GetDamagedData().bHasDuration;
-
-	CharacterInterface->SetDamagedData(FMCODamagedData());
-	
 	ISTRUE(nullptr != DamageNiagara);
 	
-	MCOLOG_C(MCOAbility, TEXT("[%s] Cue Activated: Location [%s]"), *GetName(), *DamagedLocation.ToString());
-	
-	NiagaraComponent->SetAsset(DamageNiagara);
+	MCOLOG_C(MCOAbility, TEXT("[%s] Cue Activated : [%s]"), *GetName(), *DamageNiagara->GetName());
 
-	if (false == bHasDuration)
-	{
-		NiagaraComponent->SetWorldLocation(DamagedLocation);
-	}
-	
+	NiagaraComponent->SetAsset(DamageNiagara);
+	NiagaraComponent->SetWorldLocation(DamagedLocation);
 	NiagaraComponent->SetWorldRotation(MyTarget->GetActorRotation());
 	NiagaraComponent->ActivateSystem();
 }

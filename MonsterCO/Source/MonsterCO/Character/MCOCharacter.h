@@ -11,7 +11,7 @@
 #include "MCOCharacter.generated.h"
 
 
-class UMCOActionFragment_Attribute;
+class UMCOActionFragment_AttributeEffect;
 class UMCOAbilitySystemComponent;
 class UMCOAttributeSet;
 class UMCOCharacterData;
@@ -134,7 +134,7 @@ public:
 	UFUNCTION()
 	void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage);
 
-	virtual const FMCODamagedData GetDamagedData() override  { return CurrentDamagedData; }
+	virtual const FMCODamagedData& GetDamagedData() override  { return CurrentDamagedData; }
 	virtual void SetDamagedData(const FMCODamagedData&  InDamagedData) override;
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }

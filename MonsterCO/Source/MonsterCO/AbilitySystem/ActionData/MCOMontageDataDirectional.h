@@ -15,7 +15,7 @@ class MONSTERCO_API UMCOMontageDataDirectional : public UMCOActionData
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
+	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Montage)
 	FName MontageSectionName = NAME_None;
 	
 protected:
@@ -29,7 +29,7 @@ public:
 
 protected:
 	UMCOActionFragment_Cooldown* GetCooldownFragment(const EMCOCharacterDirection& InDirection) const;
-	UMCOActionFragment_Attribute* GetAttributeFragment(const EMCOCharacterDirection& InDirection) const;
+	UMCOActionFragment_AttributeEffect* GetAttributeFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_AttackTiming* GetAttackTimingFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_Collision* GetCollisionFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_Montage* GetMontageFragment(const EMCOCharacterDirection& InDirection) const;

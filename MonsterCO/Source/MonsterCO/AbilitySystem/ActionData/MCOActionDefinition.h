@@ -3,11 +3,12 @@
 #include "CoreMinimal.h"
 #include "MCOActionDefinition.generated.h"
 
+
 class UMCOActionFragment_Collision;
 class UMCOActionFragment_Cooldown;
 class UMCOActionFragment_Montage;
 class UMCOActionFragment_AttackTiming;
-class UMCOActionFragment_Attribute;
+class UMCOActionFragment_AttributeEffect;
 
 
 UCLASS(DefaultToInstanced, EditInlineNew, Abstract)
@@ -27,7 +28,7 @@ public:
 	TObjectPtr<UMCOActionFragment_Cooldown> CooldownFragment;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
-	TObjectPtr<UMCOActionFragment_Attribute> AttributeFragment;
+	TObjectPtr<UMCOActionFragment_AttributeEffect> AttributeFragment;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced)
 	TObjectPtr<UMCOActionFragment_AttackTiming> AttackTimingFragment;

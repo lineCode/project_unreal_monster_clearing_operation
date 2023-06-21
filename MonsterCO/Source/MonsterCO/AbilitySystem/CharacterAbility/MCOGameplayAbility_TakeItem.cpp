@@ -1,7 +1,7 @@
 #include "MCOGameplayAbility_TakeItem.h"
 #include "Interface/MCOPlayerInterface.h"
 #include "Interface/MCOCharacterItemInterface.h"
-#include "AbilitySystem/ActionData/MCOActionFragment_Attribute.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_AttributeEffect.h"
 
 
 UMCOGameplayAbility_TakeItem::UMCOGameplayAbility_TakeItem()
