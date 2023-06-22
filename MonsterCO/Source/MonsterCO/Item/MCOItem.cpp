@@ -38,21 +38,22 @@ void AMCOItem::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	ensure(nullptr != Data);
-	
-	// Set skeletal mesh 
-	if (Data->SkeletalMesh.IsPending())
+	if (nullptr != Data)
 	{
-		Data->SkeletalMesh.LoadSynchronous();
-	}
-	SkeletalMesh->SetSkeletalMesh(Data->SkeletalMesh.Get());
+		// Set skeletal mesh 
+		if (Data->SkeletalMesh.IsPending())
+		{
+			Data->SkeletalMesh.LoadSynchronous();
+		}
+		SkeletalMesh->SetSkeletalMesh(Data->SkeletalMesh.Get());
 	
-	// Set material
-	if (Data->Material.IsPending())
-	{
-		Data->Material.LoadSynchronous();
-	}
-	SkeletalMesh->SetMaterial(0, Data->Material.Get());
+		// Set material
+		if (Data->Material.IsPending())
+		{
+			Data->Material.LoadSynchronous();
+		}
+		SkeletalMesh->SetMaterial(0, Data->Material.Get());
+	}	
 	
 	InitializeItem(GetActorLocation());
 }

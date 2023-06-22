@@ -12,15 +12,18 @@ void FMCOCharacterTags::InitializeTags()
 	
 	CharacterTags.MoveTag = FGameplayTag::RequestGameplayTag(FName("Input.Move"), bErrorIfNotFound);
 	CharacterTags.LookTag = FGameplayTag::RequestGameplayTag(FName("Input.Look"), bErrorIfNotFound);
-	
+
 	CharacterTags.GameplayEffectTag              = FGameplayTag::RequestGameplayTag(FName("GameplayEffect"),              bErrorIfNotFound);
+
+	CharacterTags.GameplayEffect_TakeItemTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.TakeItem"),     bErrorIfNotFound);
 	CharacterTags.GameplayEffect_AbilityTag      = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Ability"),      bErrorIfNotFound);
-	CharacterTags.GameplayEffect_DurationTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Duration"),     bErrorIfNotFound);
-	CharacterTags.GameplayEffect_CooldownTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Cooldown"),     bErrorIfNotFound);
+
 	CharacterTags.GameplayEffect_DamageTag       = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Damage"),       bErrorIfNotFound);
 	CharacterTags.GameplayEffect_StaminaTag      = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stamina"),      bErrorIfNotFound);
 	CharacterTags.GameplayEffect_StiffnessTag    = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Stiffness"),    bErrorIfNotFound);
 	CharacterTags.GameplayEffect_HealthTag       = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Health"),       bErrorIfNotFound);
+
+	CharacterTags.GameplayEffect_DurationTag     = FGameplayTag::RequestGameplayTag(FName("GameplayEffect.Duration"),     bErrorIfNotFound);
 	
 	CharacterTags.GameplayEvent_AfterDodgeTag    = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.AfterDodge"),   bErrorIfNotFound);
 	CharacterTags.GameplayEvent_TakeItemTag      = FGameplayTag::RequestGameplayTag(FName("GameplayEvent.TakeItem"),      bErrorIfNotFound);

@@ -28,6 +28,8 @@ void UMCOGameplayAbility_TakeItem::ActivateAbility(const FGameplayAbilitySpecHan
 	CurrentDefinition->AttributeFragment = CharacterItemInterface->GetItemAttributeFragment();
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
+
+	EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
 }
 
 void UMCOGameplayAbility_TakeItem::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

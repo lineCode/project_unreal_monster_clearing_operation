@@ -65,6 +65,8 @@ bool UMCOAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& 
 {
 	if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())
 	{
+		MCOLOG_C(MCOAbility, TEXT("Stamina is changed +[%.1f] => [%.1f]"), Data.EvaluatedData.Magnitude, GetStamina() + Data.EvaluatedData.Magnitude);
+		
 		if (GetStamina() + Data.EvaluatedData.Magnitude < 0.0f)
 		{
 			FGameplayTagContainer Tags;
@@ -84,6 +86,11 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 
 	//MCOLOG_C(MCOAbility, TEXT("[%s] is changed : [%.1f]"), *Data.EvaluatedData.Attribute.GetName(), Data.EvaluatedData.Magnitude);
 	
+	if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())
+	{
+		//MCOLOG_C(MCOAbility, TEXT("Stamina is changed : [%.1f]"), Data.EvaluatedData.Magnitude);
+	}
+
 	// Set{Attribute}() will call bound function in PlayerState
 	
 	// Additive attributes

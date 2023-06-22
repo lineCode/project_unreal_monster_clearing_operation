@@ -16,13 +16,19 @@ public:
 
 	// Effect
 	FGameplayTag GameplayEffectTag;
+	
+	// Effect for ability begin ~ end 
+	FGameplayTag GameplayEffect_TakeItemTag;
 	FGameplayTag GameplayEffect_AbilityTag;
-	FGameplayTag GameplayEffect_DurationTag;
-	FGameplayTag GameplayEffect_CooldownTag;
+
+	// Effect for giving
 	FGameplayTag GameplayEffect_DamageTag;
 	FGameplayTag GameplayEffect_StiffnessTag;
 	FGameplayTag GameplayEffect_HealthTag;
 	FGameplayTag GameplayEffect_StaminaTag;
+
+	// Effect for setting 
+	FGameplayTag GameplayEffect_DurationTag;
 
 	// Event
 	FGameplayTag GameplayEvent_AfterDodgeTag;

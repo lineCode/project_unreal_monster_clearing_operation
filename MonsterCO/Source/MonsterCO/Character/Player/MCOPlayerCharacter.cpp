@@ -121,13 +121,13 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	{
 		bIsMonsterInfoShowed = false;
 	}
-	else if (InState == EMCOGameState::NEXT)
-	{
-		if (nullptr != GetMCOAbilitySystemComponent())
-		{
-			GetMCOAbilitySystemComponent()->CancelAbilityByTag(FMCOCharacterTags::Get().TakeItemTag);
-		}
-	}
+	// else if (InState == EMCOGameState::NEXT)
+	// {
+	// 	if (nullptr != GetMCOAbilitySystemComponent())
+	// 	{
+	// 		GetMCOAbilitySystemComponent()->CancelAbilityByTag(FMCOCharacterTags::Get().TakeItemTag);
+	// 	}
+	// }
 	else if (InState == EMCOGameState::RESULT_WIN)
 	{
 		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())

@@ -247,7 +247,7 @@ void UMCOGameplayAbility::CancelAbilityEffectsSelf() const
 	ISTRUE(nullptr != ASC);
 		
 	FGameplayTagContainer Tags;
-	Tags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AbilityTag);
+	Tags.AddTag(EffectTag);
 	ASC->RemoveActiveEffectsWithGrantedTags(Tags); // Should be "Granted" tags
 
 	//MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
@@ -267,7 +267,7 @@ void UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOAc
 
 	if (true == IsAbilityEffect)
 	{
-		NewHandle.Data->DynamicGrantedTags.AddTag(FMCOCharacterTags::Get().GameplayEffect_AbilityTag);
+		NewHandle.Data->DynamicGrantedTags.AddTag(EffectTag);
 	}
 	
 	ASC->ApplyGameplayEffectSpecToSelf(
@@ -311,7 +311,7 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 
 void UMCOGameplayAbility::StopCharacterFromMoving(const bool& bStopMoving) const
 {
-	MCOLOG_C(MCOAbility, TEXT("Stop Character : %s"), bStopMoving ? TEXT("STOP") : TEXT("MOVE"));
+	//MCOLOG_C(MCOAbility, TEXT("Stop Character : %s"), bStopMoving ? TEXT("STOP") : TEXT("MOVE"));
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
 	CharacterInterface->StopCharacterFromMoving(bStopMoving);
