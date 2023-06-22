@@ -75,11 +75,11 @@ void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)
 {
 	if (true == bToStop)
 	{
-		//StopAI();
+		StopAI();
 	}
 	else
 	{
-		//ContinueAI();
+		ContinueAI();
 	}
 }
 
@@ -92,10 +92,7 @@ void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::RESULT_LOSE)
 	{
-		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())
-		{
-			GetMCOAbilitySystemComponent()->CancelAllEffects();
-		}
+		RemoveEffectsOnResult();
 	}
 }
 

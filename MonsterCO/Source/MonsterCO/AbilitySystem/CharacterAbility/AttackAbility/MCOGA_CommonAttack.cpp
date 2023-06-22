@@ -430,15 +430,13 @@ void UMCOGA_CommonAttack::SetMovementOnBeginDamaging() const
 	ensure(nullptr != CurrentDefinition);
 	ensure(nullptr != CurrentDefinition->AttackTimingFragment);
 
-	if (!bAutoStopCharacter != CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
+	if (bAutoStopCharacter == CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
 	{
-		MCOLOG_C(MCOAbility, TEXT("Can Move"));
-		StopCharacterFromMoving(false);
+		StopCharacterFromMoving(false == CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx));
 	}
 
 	if (false == CurrentDefinition->AttackTimingFragment->CanTurn(CurrentDamageTimingIdx))
 	{
-		MCOLOG_C(MCOAbility, TEXT("Stop Turn"));
 		StopCharacterFromTurning(true);
 	}
 }
@@ -448,15 +446,13 @@ void UMCOGA_CommonAttack::SetMovementOnEndDamaging() const
 	ensure(nullptr != CurrentDefinition);
 	ensure(nullptr != CurrentDefinition->AttackTimingFragment);
 
-	if (!bAutoStopCharacter != CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
+	if (bAutoStopCharacter == CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
 	{
-		MCOLOG_C(MCOAbility, TEXT("Stop Move"));
-		StopCharacterFromMoving(true);
+		StopCharacterFromMoving(CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx));
 	}
 	
 	if (false == CurrentDefinition->AttackTimingFragment->CanTurn(CurrentDamageTimingIdx))
 	{
-		MCOLOG_C(MCOAbility, TEXT("Can Turn"));
 		StopCharacterFromTurning(false);
 	}
 }

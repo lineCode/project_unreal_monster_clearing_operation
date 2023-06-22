@@ -41,9 +41,12 @@ protected:
 	UPROPERTY()
 	TWeakObjectPtr<AMCOMonsterCharacter> SpawnedMonster;
 	
+	UPROPERTY()
+	FVector MonsterDiedLocation;
+	
 // --- Item
 public:
-	void FindSpawnLocation(const AMCOCharacter* InCharacter);
+	void FindSpawnLocationThenSpawnItem();
 	void PickRandomItem(const FVector& InSpawnLocation);
 	void RespawnItem(const int32& RandomIndex, const FVector& InSpawnLocation);
 	void SpawnNewItem(const int32& RandomIndex, const FVector& InSpawnLocation, const FSoftObjectPtr& AssetPtr);

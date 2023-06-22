@@ -54,7 +54,7 @@ void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 
 bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
-	MCOLOG_C(MCOAbility, TEXT("---- [%s] Check CanActivate"), *AbilityTag.GetTagName().ToString());
+	//MCOLOG_C(MCOAbility, TEXT("---- [%s] Check CanActivate"), *AbilityTag.GetTagName().ToString());
 	
 	ISTRUE_F(nullptr != ActorInfo);
 	ISTRUE_F(true == ActorInfo->AvatarActor.IsValid());
@@ -75,10 +75,7 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
-	if (true == bAutoStopCharacter)
-	{
-		StopCharacterFromMoving(false);
-	}
+	StopCharacterFromMoving(false);
 
 	CancelAbilityEffectsSelf();
 
@@ -314,6 +311,7 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 
 void UMCOGameplayAbility::StopCharacterFromMoving(const bool& bStopMoving) const
 {
+	MCOLOG_C(MCOAbility, TEXT("Stop Character : %s"), bStopMoving ? TEXT("STOP") : TEXT("MOVE"));
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
 	CharacterInterface->StopCharacterFromMoving(bStopMoving);

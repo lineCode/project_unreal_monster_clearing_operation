@@ -43,6 +43,7 @@ void AMCOSpawner::OnGameStateChanged(const EMCOGameState& InState)
 	}
 	else if (InState == EMCOGameState::REWARD)
 	{
+		FindSpawnLocationThenSpawnItem();
 	}
 }
 
@@ -70,23 +71,23 @@ void AMCOSpawner::SpawnMonster()
 
 void AMCOSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 {
+	MonsterDiedLocation = InCharacter->GetActorLocation();
+	
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->OnChangeGameState(EMCOGameState::REWARD);
-	
-	FindSpawnLocation(InCharacter);	
+	GameModeInterface->OnChangeGameState(EMCOGameState::MONSTER_DIED);
 }
 
-void AMCOSpawner::FindSpawnLocation(const AMCOCharacter* InCharacter)
+void AMCOSpawner::FindSpawnLocationThenSpawnItem()
 {
 	TArray<FHitResult> TraceResults;
-	const FVector StartLocation = InCharacter->GetActorLocation();
+	const FVector StartLocation = MonsterDiedLocation;
 	const FVector EndLocation = StartLocation + FVector(0.0f, 0.0f, -1000.0f); 
 
 	const FCollisionQueryParams Params(
 		SCENE_QUERY_STAT(ItemSpawn),
 		false,
-		InCharacter
+		SpawnedMonster.Get()
 	);
 	
 	const bool bResult = GetWorld()->LineTraceMultiByObjectType(
@@ -96,7 +97,11 @@ void AMCOSpawner::FindSpawnLocation(const AMCOCharacter* InCharacter)
 		ECC_WorldStatic,
 		Params
 	);
-
+	
+#if ENABLE_DRAW_DEBUG
+	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.0f);
+#endif
+	
 	ISTRUE(true == bResult);
 
 	for (FHitResult& HiResult : TraceResults)
@@ -106,7 +111,11 @@ void AMCOSpawner::FindSpawnLocation(const AMCOCharacter* InCharacter)
 			continue;
 		}
 		
-		PickRandomItem(HiResult.Location);
+#if ENABLE_DRAW_DEBUG
+		DrawDebugPoint(GetWorld(), HiResult.ImpactPoint, 10.0f, FColor::Blue, false, 2.0f);
+#endif
+		
+		PickRandomItem(HiResult.ImpactPoint);
 		break;
 	}
 }

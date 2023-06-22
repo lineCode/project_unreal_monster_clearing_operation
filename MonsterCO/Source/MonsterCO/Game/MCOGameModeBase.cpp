@@ -63,13 +63,21 @@ void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)
 
 		return;
 	}
-	else if (InState == EMCOGameState::REWARD)
+	else if (InState == EMCOGameState::MONSTER_DIED)
 	{
 		if (MAX_STAGE <= CurrentStage)
 		{
 			OnChangeGameState(EMCOGameState::RESULT_WIN);
-			return;
 		}
+		else
+		{
+			OnChangeGameState(EMCOGameState::REWARD);
+		}		
+		return;
+	}
+	else if (InState == EMCOGameState::REWARD)
+	{
+		
 	}
 
 	ISTRUE(true == OnGameStateChangedDelegate.IsBound());

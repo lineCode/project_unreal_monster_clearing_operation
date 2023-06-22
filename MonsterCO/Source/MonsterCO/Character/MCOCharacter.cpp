@@ -66,6 +66,26 @@ void AMCOCharacter::StopCharacterFromTurning(bool bStopTuring)
 	
 }
 
+void AMCOCharacter::RemoveEffectsOnNextGame() const
+{
+	ISTRUE(nullptr != GetMCOAbilitySystemComponent());
+	ISTRUE(true == IsAlive());
+	
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+	GetMCOAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(TagContainer);
+}
+
+void AMCOCharacter::RemoveEffectsOnResult() const
+{
+	ISTRUE(nullptr != GetMCOAbilitySystemComponent());
+	ISTRUE(true == IsAlive());
+	
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(FMCOCharacterTags::Get().GameplayEffectTag);
+	GetMCOAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(TagContainer);
+}
+
 void AMCOCharacter::DisableMovement() const
 {
 	// ignore input

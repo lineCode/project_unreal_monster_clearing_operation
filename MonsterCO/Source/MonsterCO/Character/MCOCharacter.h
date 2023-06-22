@@ -65,6 +65,8 @@ public:
 	virtual void StopCharacterFromMoving(bool bToStop) override;
 	virtual void StopCharacterFromTurning(bool bStopTuring) override;
 
+	void RemoveEffectsOnNextGame() const;
+	void RemoveEffectsOnResult() const;
 	void DisableMovement() const;
 	void DisableAllCollision();
 	void DestroyAllAttachedActors() const;

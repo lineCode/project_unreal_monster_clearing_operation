@@ -123,10 +123,7 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	}
 	else if (InState == EMCOGameState::REWARD)
 	{
-		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())
-		{
-			GetMCOAbilitySystemComponent()->CancelAllEffects();
-		}
+		RemoveEffectsOnNextGame();
 	}
 	else if (InState == EMCOGameState::NEXT)
 	{
@@ -146,7 +143,7 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 
 			DisableMovement();
 			GetMCOAbilitySystemComponent()->CancelAbilities();
-			GetMCOAbilitySystemComponent()->CancelAllEffects();
+			RemoveEffectsOnResult();
 			GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
 		}
 	}
