@@ -93,12 +93,14 @@ public:
 	void Look(const FInputActionValue& Value);
 	
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const override; 
-	virtual void StopCharacter(bool bToStop) override;
+	virtual void StopCharacterFromMoving(bool bStopMoving) override;
+	virtual void StopCharacterFromTurning(bool bStopTuring) override;
 	
 	virtual FVector GetInputWorldDirection() const override;
 	virtual bool IsInputForward() const override;
 	
-	bool bIsGettingInput;
+	bool bCanMoveByInput;
+	bool bCanTurnByInput;
 	
 // --- Mode & Weapon 
 public:

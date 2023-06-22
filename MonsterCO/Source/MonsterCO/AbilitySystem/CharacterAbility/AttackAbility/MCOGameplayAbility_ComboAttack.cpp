@@ -13,6 +13,8 @@ UMCOGameplayAbility_ComboAttack::UMCOGameplayAbility_ComboAttack()
 
 void UMCOGameplayAbility_ComboAttack::SetDefaultDefinition()
 {
+	Super::SetDefaultDefinition();
+	
 	ensure(nullptr != Data);
 	Data->UpdateComboDefinition(CurrentDefinition, CurrentCombo - 1);
 }

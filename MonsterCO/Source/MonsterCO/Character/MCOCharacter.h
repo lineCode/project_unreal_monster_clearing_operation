@@ -62,7 +62,9 @@ protected:
 	FName CharacterName;
 
 public:
-	virtual void StopCharacter(bool bToStop) override;
+	virtual void StopCharacterFromMoving(bool bToStop) override;
+	virtual void StopCharacterFromTurning(bool bStopTuring) override;
+
 	void DisableMovement() const;
 	void DisableAllCollision();
 	void DestroyAllAttachedActors() const;

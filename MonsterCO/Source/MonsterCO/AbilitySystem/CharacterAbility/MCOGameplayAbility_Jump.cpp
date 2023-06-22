@@ -8,11 +8,12 @@
 UMCOGameplayAbility_Jump::UMCOGameplayAbility_Jump()
 {
 	GETASSET(Data, UMCOActionData, TEXT("/Game/Data/Player/CommonAction/DA_Player_Jump.DA_Player_Jump"));
-	Data->UpdateDefinition(CurrentDefinition);
 }
 
 void UMCOGameplayAbility_Jump::SetDefaultDefinition()
 {
+	Super::SetDefaultDefinition();
+	
 	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);
 }
@@ -50,7 +51,7 @@ void UMCOGameplayAbility_Jump::InputReleased(const FGameplayAbilitySpecHandle Ha
 	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
 	Character->StopJumping();
 
-	StopCharacter(true);
+	StopCharacterFromMoving(true);
 	
 	if (0.0f < AbilityEndDelayTime && GetWorld()->GetTimerManager().GetTimerRemaining(AbilityEndDelayTimer) <= 0.0f)
 	{
@@ -71,6 +72,6 @@ void UMCOGameplayAbility_Jump::EndAbilityAfterDelay()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 	
-	StopCharacter(false);
+	StopCharacterFromMoving(false);
 }
 

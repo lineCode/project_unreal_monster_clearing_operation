@@ -66,6 +66,23 @@ void AMCOMonsterCharacter::BeginPlay()
 	// Body->SetRelativeLocationAndRotation(FVector(-30.0f, 0.0f, -60.0f), FRotator(-90.0f, 180.0f, 180.0f));
 }
 
+void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)
+{
+	if (true == bToStop)
+	{
+		//StopAI();
+	}
+	else
+	{
+		//ContinueAI();
+	}
+}
+
+void AMCOMonsterCharacter::StopCharacterFromTurning(bool bStopTuring)
+{
+	
+}
+
 bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
 {
 	ISTRUE_F(true == Super::CanActivateAbility(InTag));
@@ -98,44 +115,49 @@ UObject* AMCOMonsterCharacter::GetTarget()
 	return AIController->GetTarget();
 }
 
-float AMCOMonsterCharacter::GetAIPatrolRadius()
+float AMCOMonsterCharacter::GetAIPatrolRadius() const
 {
 	return MonsterAIData->PatrolRadius;
 }
 
-float AMCOMonsterCharacter::GetAIDetectRange()
+float AMCOMonsterCharacter::GetAIDetectRange() const
 {
 	return MonsterAIData->DetectRange;
 }
 
-float AMCOMonsterCharacter::GetAIAttackRangeMin(const FGameplayTag& InTag)
+float AMCOMonsterCharacter::GetAIAttackRangeMin(const FGameplayTag& InTag) const
 {
 	return MonsterAIData->GetAbilityRangeMin(InTag) + GetCapsuleRadius();
 }
 
-float AMCOMonsterCharacter::GetAIAttackRangeMax(const FGameplayTag& InTag)
+float AMCOMonsterCharacter::GetAIAttackRangeMax(const FGameplayTag& InTag) const
 {
 	return MonsterAIData->GetAbilityRangeMax(InTag) + GetCapsuleRadius();
 }
 
-float AMCOMonsterCharacter::GetAITurnSpeed()
+float AMCOMonsterCharacter::GetAITurnSpeed() const
 {
 	return MonsterAIData->TurnSpeed;
 }
 
-FVector AMCOMonsterCharacter::GetAITurnVector()
+FVector AMCOMonsterCharacter::GetAITurnVector() const
 {
 	return TurnVector;
 }
 
-bool AMCOMonsterCharacter::IsTurning()
+bool AMCOMonsterCharacter::IsTurning() const
 {
 	return bIsTurning;
 }
 
-void AMCOMonsterCharacter::SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished)
+void AMCOMonsterCharacter::SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnAttackFinished)
 {
-	OnAttackFinished = InOnAttackFinished;
+	OnAttackFinishedDelegate = InOnAttackFinished;
+}
+
+void AMCOMonsterCharacter::OnActionFinished(const EBTNodeResult::Type& InResult) const
+{
+	OnAttackFinishedDelegate.ExecuteIfBound(InResult);
 }
 
 void AMCOMonsterCharacter::SetTurnVector(const bool InIsTurning, const FVector& InTurnVector)
@@ -144,7 +166,7 @@ void AMCOMonsterCharacter::SetTurnVector(const bool InIsTurning, const FVector& 
 	TurnVector = InTurnVector;
 }
 
-void AMCOMonsterCharacter::Attack(const FGameplayTag& InTag)
+void AMCOMonsterCharacter::Attack(const FGameplayTag& InTag) const
 {
 	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
@@ -152,26 +174,14 @@ void AMCOMonsterCharacter::Attack(const FGameplayTag& InTag)
 	ASC->TryActivateAbilityByTag(InTag);
 }
 
-void AMCOMonsterCharacter::StopCharacter(bool bToStop)
-{
-	if (true == bToStop)
-	{
-		StopAI();
-	}
-	else
-	{
-		ContinueAI();
-	}
-}
-
-void AMCOMonsterCharacter::ContinueAI()
+void AMCOMonsterCharacter::ContinueAI() const
 {
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
 	ISTRUE(nullptr != AIController);
 	AIController->ContinueAI();
 }
 
-void AMCOMonsterCharacter::StopAI()
+void AMCOMonsterCharacter::StopAI() const
 {
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
 	ISTRUE(nullptr != AIController);

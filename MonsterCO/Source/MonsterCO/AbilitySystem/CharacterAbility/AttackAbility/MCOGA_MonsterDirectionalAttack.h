@@ -2,27 +2,23 @@
 
 #include "CoreMinimal.h"
 #include "MCOGA_CommonAttack.h"
-#include "MCOGameplayAbility_MonsterMelee.generated.h"
+#include "MCOGA_MonsterDirectionalAttack.generated.h"
 
 class UMCOMontageDataDirectional;
 
 
 UCLASS()
-class MONSTERCO_API UMCOGameplayAbility_MonsterMelee : public UMCOGA_CommonAttack
+class MONSTERCO_API UMCOGA_MonsterDirectionalAttack : public UMCOGA_CommonAttack
 {
 	GENERATED_BODY()
 	
 public:
-	UMCOGameplayAbility_MonsterMelee();
+	UMCOGA_MonsterDirectionalAttack();
 
 protected:
 	virtual void SetDefaultDefinition() override;
-	virtual bool CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, FGameplayTagContainer* OptionalRelevantTags) const override;
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-	virtual void OnTaskCompleted() override;
-	virtual void OnTaskCancelled() override;
-	
 protected:	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
 	TObjectPtr<UMCOMontageDataDirectional> Data;

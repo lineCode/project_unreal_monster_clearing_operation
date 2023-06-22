@@ -40,6 +40,8 @@ UAnimMontage* UMCOMontageDataDirectional::GetMontage(const EMCOCharacterDirectio
 
 void UMCOMontageDataDirectional::UpdateDirectionalDefinition(UMCOActionDefinition* OutDefinition, const EMCOCharacterDirection& InDirection) const
 {
+	ensure(nullptr != OutDefinition);
+
 	OutDefinition->CooldownFragment = GetCooldownFragment(InDirection);
 	OutDefinition->AttributeFragment = GetAttributeFragment(InDirection);
 	OutDefinition->AttackTimingFragment = GetAttackTimingFragment(InDirection);
@@ -117,11 +119,11 @@ EMCOCharacterDirection UMCOMontageDataDirectional::GetClosestDirectionFromDegree
 {
 	if (InDegree < -180.0f)
 	{
-		InDegree = 360.0f + InDegree;
+		InDegree = 360.0f + FMath::Fmod(InDegree, 360.0f);
 	}
 	else if (180.0f < InDegree)
 	{
-		InDegree = -360.0f + InDegree;
+		InDegree = -360.0f + FMath::Fmod(InDegree, 360.0f);
 	}
 
 	EMCOCharacterDirection Result;

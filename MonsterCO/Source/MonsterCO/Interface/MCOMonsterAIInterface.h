@@ -7,7 +7,7 @@
 #include "UObject/Interface.h"
 #include "MCOMonsterAIInterface.generated.h"
 
-DECLARE_DELEGATE_OneParam(FAICharacterAITaskFinishedDelegate, EBTNodeResult::Type /*Result*/);
+DECLARE_DELEGATE_OneParam(FMCOAICharacterTaskFinishedDelegate, const EBTNodeResult::Type& /*InResult*/);
 
 
 UINTERFACE(MinimalAPI)
@@ -21,22 +21,25 @@ class MONSTERCO_API IMCOMonsterAIInterface
 	GENERATED_BODY()
 
 public:
-	FAICharacterAITaskFinishedDelegate OnAttackFinished;
-	FAICharacterAITaskFinishedDelegate OnTurnFinished;
-
-public:
 	virtual UObject* GetTarget() = 0;
-	
-	virtual float GetAIPatrolRadius() = 0;
-	virtual float GetAIDetectRange() = 0;
-	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) = 0;
-	virtual float GetAIAttackRangeMax(const FGameplayTag& InTag) = 0;
-	virtual float GetAITurnSpeed() = 0;
-	virtual FVector GetAITurnVector() = 0;
 
-	virtual bool IsTurning() = 0;
+// --- AI/Data
+public:
+	virtual float GetAIPatrolRadius() const = 0;
+	virtual float GetAIDetectRange() const = 0;
+	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) const = 0;
+	virtual float GetAIAttackRangeMax(const FGameplayTag& InTag) const = 0;
+	virtual float GetAITurnSpeed() const = 0;
+
+// --- AI/State	
+public:
+	virtual FVector GetAITurnVector() const = 0;
+	virtual bool IsTurning() const = 0;
 	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) = 0;
-	virtual void SetAIAttackDelegate(const FAICharacterAITaskFinishedDelegate& InOnAttackFinished) = 0;
+	virtual void SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnActionFinished) = 0;
+	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const = 0;
 
-	virtual void Attack(const FGameplayTag& InTag) = 0;
+// --- AI/Action
+public:
+	virtual void Attack(const FGameplayTag& InTag) const = 0;
 };

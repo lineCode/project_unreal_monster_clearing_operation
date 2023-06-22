@@ -23,7 +23,7 @@ void AMCOGameplayCue_DurationEffect::HandleGameplayCue(AActor* MyTarget, EGamepl
 	UNiagaraSystem* DurationNiagara = CharacterInterface->GetDamagedData().DurationNiagara;
 	ISTRUE(nullptr != DurationNiagara);
 	
-	MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Activated : [%s]"), *GetName(), *DurationNiagara->GetName());
+	//MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Activated : [%s]"), *GetName(), *DurationNiagara->GetName());
 	
 	NiagaraComponent->SetAsset(DurationNiagara);
 	NiagaraComponent->SetWorldRotation(MyTarget->GetActorRotation());

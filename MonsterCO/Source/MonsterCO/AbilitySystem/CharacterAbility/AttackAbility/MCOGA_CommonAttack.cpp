@@ -60,12 +60,10 @@ void UMCOGA_CommonAttack::OnTaskCancelled()
 
 void UMCOGA_CommonAttack::BeginDamaging()
 {
-	if (CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
-	{
-		MCOLOG_C(MCOAbility, TEXT("Move Character !"));
-		StopCharacter(false);
-	}
-	
+	ResetDamageTimer();
+	SetMovementOnBeginDamaging();
+
+	// Set End Timer
 	StartDamageEndTimer();
 	
 	if (true == bUseOverlapEvent)
@@ -80,14 +78,16 @@ void UMCOGA_CommonAttack::BeginDamaging()
 
 void UMCOGA_CommonAttack::EndDamaging()
 {
-	if (CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
-	{
-		MCOLOG_C(MCOAbility, TEXT("Stop Character !"));
-		StopCharacter(true);
-	}
-	
+	ResetDamageTimer();
+	SetMovementOnEndDamaging();
+
+	// Next Damage Timing : Set Begin Timer
 	CurrentDamageTimingIdx++;
-	StartDamageBeginTimer();
+	MCOLOG_C(MCOAbility, TEXT("[%d] ... Idx++ "), CurrentDamageTimingIdx);
+	if (true == CurrentDefinition->AttackTimingFragment->IsValidIdx(CurrentDamageTimingIdx))
+	{
+		StartDamageBeginTimer();
+	}
 	
 	if (true == bUseOverlapEvent)
 	{
@@ -219,6 +219,8 @@ void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacte
 
 void UMCOGA_CommonAttack::Attack()
 {
+	MCOLOG_C(MCOAbility, TEXT("[%d] ... Attack !"), CurrentDamageTimingIdx);
+	
 	ISTRUE(nullptr != CurrentDefinition);
 	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
 	
@@ -238,6 +240,9 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor
 	ISTRUE(nullptr != InAttackCauser);
 	ISTRUE(nullptr != InAttackedCharacter);
 	ISTRUE(false == DamagedCharacters.Contains(InAttackedCharacter));
+	ISTRUE(nullptr != CurrentDefinition);
+	ISTRUE(nullptr != CurrentDefinition->CollisionFragment);
+	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
 
 	const IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(InAttackedCharacter);
 	ISTRUE(nullptr != AttackedInterface);
@@ -419,14 +424,53 @@ void UMCOGA_CommonAttack::DrawDebug(const FVector& AttackForward, const FVector&
 	);
 }
 
+void UMCOGA_CommonAttack::SetMovementOnBeginDamaging() const
+{
+	ensure(nullptr != CurrentDefinition);
+	ensure(nullptr != CurrentDefinition->AttackTimingFragment);
+
+	if (!bAutoStopCharacter != CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
+	{
+		MCOLOG_C(MCOAbility, TEXT("Can Move"));
+		StopCharacterFromMoving(false);
+	}
+
+	if (false == CurrentDefinition->AttackTimingFragment->CanTurn(CurrentDamageTimingIdx))
+	{
+		MCOLOG_C(MCOAbility, TEXT("Stop Turn"));
+		StopCharacterFromTurning(true);
+	}
+}
+
+void UMCOGA_CommonAttack::SetMovementOnEndDamaging() const
+{
+	ensure(nullptr != CurrentDefinition);
+	ensure(nullptr != CurrentDefinition->AttackTimingFragment);
+
+	if (!bAutoStopCharacter != CurrentDefinition->AttackTimingFragment->IsMovable(CurrentDamageTimingIdx))
+	{
+		MCOLOG_C(MCOAbility, TEXT("Stop Move"));
+		StopCharacterFromMoving(true);
+	}
+	
+	if (false == CurrentDefinition->AttackTimingFragment->CanTurn(CurrentDamageTimingIdx))
+	{
+		MCOLOG_C(MCOAbility, TEXT("Can Turn"));
+		StopCharacterFromTurning(false);
+	}
+}
+
 void UMCOGA_CommonAttack::SetDamageTimer()
 {
 	CurrentDamageTimingIdx = 0;
+	ResetDamageTimer();
 	StartDamageBeginTimer();
 }
 
 void UMCOGA_CommonAttack::ResetDamageTimer()
 {
+	MCOLOG_C(MCOAbility, TEXT("... Reset Timer "));
+	
 	GetWorld()->GetTimerManager().ClearTimer(DamageTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DamageByChannelTimerHandle);
 }
@@ -448,11 +492,9 @@ float UMCOGA_CommonAttack::GetCurrentDamageCheckRate() const
 
 void UMCOGA_CommonAttack::StartDamageBeginTimer()
 {
-	ResetDamageTimer();
-	
 	const float FrameCount = GetCurrentDamageBeginFrameCount();
 
-	//MCOLOG_C(MCOAbility, TEXT("... To Start : %f sec later "), FrameCount);
+	MCOLOG_C(MCOAbility, TEXT("[%d] ... To Start : %f sec later "), CurrentDamageTimingIdx, FrameCount);
 	
 	ISTRUE(FrameCount > 0.0f);
 		
@@ -467,11 +509,9 @@ void UMCOGA_CommonAttack::StartDamageBeginTimer()
 
 void UMCOGA_CommonAttack::StartDamageEndTimer()
 {
-	ResetDamageTimer();
-
 	const float FrameCount = GetCurrentDamageEndFrameCount();
 
-	//MCOLOG_C(MCOAbility, TEXT("... To End : %f sec later "), FrameCount);
+	MCOLOG_C(MCOAbility, TEXT("[%d] ... To End : %f sec later "), CurrentDamageTimingIdx, FrameCount);
 	
 	ISTRUE(FrameCount > 0.0f);
 	

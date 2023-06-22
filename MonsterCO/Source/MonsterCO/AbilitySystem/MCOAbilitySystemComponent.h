@@ -16,10 +16,10 @@ class MONSTERCO_API UMCOAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
 	UMCOAbilitySystemComponent();
+	virtual void NotifyAbilityFailed(const FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason) override;
 
 public:
 	bool bCharacterAbilitySetGiven;
-
 
 public:
 	void TryActivateAbilityByTag(const FGameplayTag& InTag);

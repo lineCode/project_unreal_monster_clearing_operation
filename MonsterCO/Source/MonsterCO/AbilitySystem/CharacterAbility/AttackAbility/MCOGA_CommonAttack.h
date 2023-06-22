@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "MCOGameplayAbility.h"
+#include "AbilitySystem/CharacterAbility/MCOGameplayAbility.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "MCOGA_CommonAttack.generated.h"
 
@@ -62,7 +62,12 @@ protected:
 	UPROPERTY()
 	TSubclassOf<UGameplayEffect> DurationEffectWithCue;
 	
+// --- Movement
+protected:
+	void SetMovementOnBeginDamaging() const;
+	void SetMovementOnEndDamaging() const;
 
+	
 // --- Damage Timer
 protected:
 	void SetDamageTimer();

@@ -13,6 +13,7 @@ class UMCOAbilitySystemComponent;
 class IMCOCharacterInterface;
 class UMCOActionFragment_Cooldown;
 class UMCOActionFragment_AttributeEffect;
+class UMCOActionFragment_MonsterAI;
 
 
 UCLASS()
@@ -37,13 +38,14 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 protected:
-	virtual void SetDefaultDefinition() {};
+	virtual void SetDefaultDefinition();
 	bool SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData);
 	void CancelAllAbility();
 	void HandleGameplayEventWithTag(const FGameplayTag& InTag);
 
 protected:
-	void StopCharacter(const bool& InStop) const;
+	void StopCharacterFromMoving(const bool& bStopMoving) const;
+	void StopCharacterFromTurning(const bool& bStopTurning) const;
 
 	
 // --- Setting
@@ -78,7 +80,7 @@ protected:
 // 	TSubclassOf<UGameplayEffect> TagEffectClass;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MCO|Fragment")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Fragment")
 	UMCOActionDefinition* CurrentDefinition;
 		
 	UPROPERTY()
@@ -138,4 +140,10 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnGrantedEventTag(FGameplayTag EventTag, FGameplayEventData EventData);
+
+
+// --- Monster AI
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Instanced, Category = "MCO|MonsterAI")
+	TObjectPtr<UMCOActionFragment_MonsterAI> MonsterAIFragment;
 };

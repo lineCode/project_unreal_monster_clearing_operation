@@ -60,10 +60,19 @@ class MONSTERCO_API IMCOCharacterInterface
 // --- Action
 public:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) = 0;
-	virtual void StopCharacter(bool InToStop) = 0;
+
+	virtual void StopCharacterFromMoving(bool bStopMoving) = 0;
+	virtual void StopCharacterFromTurning(bool bStopTuring) = 0;
+
+// --- Information
+public:
 	virtual FVector GetSocketLocation(const FName& InSocketName) = 0;
 	virtual FTransform GetSocketTransform(const FName& InSocketName) = 0;
+
 	virtual float GetCapsuleRadius() const = 0;
+
+// --- Collision
+public:
 	virtual FCollisionBeginOverlapDelegate& GetCollisionBeginOverlapDelegate() = 0;
 	virtual void TurnOnCollision(const FName& InName) = 0;
 	virtual void TurnOffCollision(const FName& InName) = 0;

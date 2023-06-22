@@ -53,12 +53,17 @@ void AMCOCharacter::BeginPlay()
 
 }
 
-void AMCOCharacter::StopCharacter(bool bToStop)
+void AMCOCharacter::StopCharacterFromMoving(bool bToStop)
 {
 	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	ISTRUE(CharacterMC);
 	
 	CharacterMC->MovementMode = (true == bToStop) ? MOVE_None : MOVE_Walking;
+}
+
+void AMCOCharacter::StopCharacterFromTurning(bool bStopTuring)
+{
+	
 }
 
 void AMCOCharacter::DisableMovement() const

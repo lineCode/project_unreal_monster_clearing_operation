@@ -2,10 +2,22 @@
 #include "MCOAttributeSet.h"
 #include "MCOCharacterTags.h"
 #include "CharacterAbility/MCOGameplayAbility.h"
+#include "Interface/MCOMonsterAIInterface.h"
 
 UMCOAbilitySystemComponent::UMCOAbilitySystemComponent()
 {
 	bCharacterAbilitySetGiven = false;
+}
+
+void UMCOAbilitySystemComponent::NotifyAbilityFailed(const FGameplayAbilitySpecHandle Handle, UGameplayAbility* Ability, const FGameplayTagContainer& FailureReason)
+{
+	Super::NotifyAbilityFailed(Handle, Ability, FailureReason);
+
+	const IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(GetOwnerActor());
+	if (nullptr != MonsterInterface)
+	{
+		MonsterInterface->OnActionFinished(EBTNodeResult::Failed);
+	}
 }
 
 void UMCOAbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag& InTag)

@@ -16,7 +16,7 @@ void UAnimNotifyState_StopMoving::NotifyBegin(USkeletalMeshComponent* MeshComp, 
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(MeshComp->GetOwner());
 	ISTRUE(CharacterInterface);
 
-	CharacterInterface->StopCharacter(true);
+	CharacterInterface->StopCharacterFromMoving(true);
 }
 
 void UAnimNotifyState_StopMoving::NotifyEnd(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
@@ -28,5 +28,5 @@ void UAnimNotifyState_StopMoving::NotifyEnd(USkeletalMeshComponent* MeshComp, UA
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(MeshComp->GetOwner());
 	ISTRUE(CharacterInterface);
 
-	CharacterInterface->StopCharacter(false);
+	CharacterInterface->StopCharacterFromMoving(false);
 }

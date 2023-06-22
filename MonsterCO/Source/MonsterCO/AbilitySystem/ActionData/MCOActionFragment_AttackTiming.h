@@ -65,9 +65,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float NextComboFrameCount = 0.0f;
 
+public:
+	bool IsValidIdx(const uint8& InDamageIdx) const;
+	
 // --- Control
 public:
 	bool IsMovable(const uint8& InDamageIdx) const;
+	bool CanTurn(const uint8& InDamageIdx) const;
 
 // --- Timing
 public:

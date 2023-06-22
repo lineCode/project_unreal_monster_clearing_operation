@@ -6,6 +6,7 @@
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_AttributeEffect.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_MonsterAI.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOCharacterInterface.h"
 
@@ -13,13 +14,10 @@
 UMCOGameplayAbility::UMCOGameplayAbility()
 {
 	// Effect 
-	// GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
+	// GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
 	GETCLASS(DurationEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Duration.GE_Attribute_Duration_C"));
 	GETCLASS(InstantEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Instant.GE_Attribute_Instant_C"));
 	GETCLASS(InfiniteEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
-
-	// Definition
-	CurrentDefinition = CreateDefaultSubobject<UMCOActionDefinition>(TEXT("NAME_Definition"));
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -77,7 +75,7 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	
 	if (true == bAutoStopCharacter)
 	{
-		StopCharacter(false);
+		StopCharacterFromMoving(false);
 	}
 
 	CancelAbilityEffectsSelf();
@@ -85,6 +83,19 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	if (true == bAutoActivateChargingStaminaAbility)
 	{
 		ActivateStaminaChargeAbility();
+	}
+	
+	if (nullptr != MonsterAIFragment)
+	{
+		MonsterAIFragment->OnActionFinished(CurrentActorInfo->AvatarActor.Get(), false == bWasCancelled);
+	}
+}
+
+void UMCOGameplayAbility::SetDefaultDefinition()
+{
+	if (nullptr == CurrentDefinition)
+	{
+		CurrentDefinition = NewObject<UMCOActionDefinition>(this);
 	}
 }
 
@@ -130,7 +141,7 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 
 	if (true == bAutoStopCharacter)
 	{
-		StopCharacter(true);
+		StopCharacterFromMoving(true);
 	}
 
 	return true;
@@ -299,11 +310,18 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
 }
 
-void UMCOGameplayAbility::StopCharacter(const bool& InStop) const
+void UMCOGameplayAbility::StopCharacterFromMoving(const bool& bStopMoving) const
 {
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
-	CharacterInterface->StopCharacter(InStop);
+	CharacterInterface->StopCharacterFromMoving(bStopMoving);
+}
+
+void UMCOGameplayAbility::StopCharacterFromTurning(const bool& bStopTurning) const
+{
+	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
+	ISTRUE(CharacterInterface);
+	CharacterInterface->StopCharacterFromTurning(bStopTurning);
 }
 
 void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, const FName& SectionName)

@@ -1,4 +1,4 @@
-#include "AbilitySystem/CharacterAbility/MCOGameplayAbility_SingleAttack.h"
+#include "MCOGameplayAbility_SingleAttack.h"
 #include "AbilitySystem/ActionData/MCOMontageDataSingle.h"
 
 
@@ -9,6 +9,8 @@ UMCOGameplayAbility_SingleAttack::UMCOGameplayAbility_SingleAttack()
 
 void UMCOGameplayAbility_SingleAttack::SetDefaultDefinition()
 {
+	Super::SetDefaultDefinition();
+	
 	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);
 }

@@ -11,6 +11,8 @@ UMCOGameplayAbility_Dash::UMCOGameplayAbility_Dash()
 
 void UMCOGameplayAbility_Dash::SetDefaultDefinition()
 {
+	Super::SetDefaultDefinition();
+	
 	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);
 }

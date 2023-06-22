@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/CharacterAbility/MCOGA_CommonAttack.h"
+#include "MCOGA_CommonAttack.h"
 #include "MCOGameplayAbility_SingleAttack.generated.h"
 
 class UMCOMontageDataSingle;

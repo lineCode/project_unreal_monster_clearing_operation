@@ -11,6 +11,8 @@ UMCOGameplayAbility_ChargeStamina::UMCOGameplayAbility_ChargeStamina()
 
 void UMCOGameplayAbility_ChargeStamina::SetDefaultDefinition()
 {
+	Super::SetDefaultDefinition();
+	
 	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);	
 }

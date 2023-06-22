@@ -18,6 +18,9 @@ UMCOGameplayAbility_Dodge::UMCOGameplayAbility_Dodge(const FObjectInitializer& O
 
 void UMCOGameplayAbility_Dodge::SetDefaultDefinition()
 {
+	Super::SetDefaultDefinition();
+	
+	ensure(nullptr != Data);
 	Data->UpdateDefinition(CurrentDefinition);
 }
 

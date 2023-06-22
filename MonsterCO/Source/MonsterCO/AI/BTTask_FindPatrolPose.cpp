@@ -8,7 +8,7 @@
 
 UBTTask_FindPatrolPose::UBTTask_FindPatrolPose()
 {
-	NodeName = TEXT("FindPatrolPose");
+	NodeName = TEXT("Find Patrol Position");
 }
 
 EBTNodeResult::Type UBTTask_FindPatrolPose::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -20,20 +20,21 @@ EBTNodeResult::Type UBTTask_FindPatrolPose::ExecuteTask(UBehaviorTreeComponent& 
 	{
 		return EBTNodeResult::Failed;
 	}
-	UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
+	const UNavigationSystemV1* NavSystem = UNavigationSystemV1::GetNavigationSystem(ControllingPawn->GetWorld());
 	if (nullptr == NavSystem)
 	{
 		return EBTNodeResult::Failed;
 	}
 	 
-	IMCOMonsterAIInterface* AIPawn = Cast<IMCOMonsterAIInterface>(ControllingPawn);
+	const IMCOMonsterAIInterface* AIPawn = Cast<IMCOMonsterAIInterface>(ControllingPawn);
 	if (nullptr == AIPawn)
 	{
 		return EBTNodeResult::Failed;
 	}
 	
-	float PatrolRadius = AIPawn->GetAIPatrolRadius();
-	FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_HOMEPOS);
+	const float PatrolRadius = AIPawn->GetAIPatrolRadius();
+	const FVector HomePos = OwnerComp.GetBlackboardComponent()->GetValueAsVector(BBKEY_HOMEPOS);
+	
 	FNavLocation NextPatrolPos;
 	if (true == NavSystem->GetRandomPointInNavigableRadius(HomePos, PatrolRadius, NextPatrolPos))
 	{

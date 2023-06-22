@@ -8,7 +8,7 @@
 
 UBTService_Detect::UBTService_Detect()
 {
-	NodeName = TEXT("Detect");
+	NodeName = TEXT("Detect player");
 	Interval = 1.0f;
 }
 
@@ -22,8 +22,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	FVector Center = ControllingPawn->GetActorLocation();
-	UWorld* World = ControllingPawn->GetWorld();
+	const FVector Center = ControllingPawn->GetActorLocation();
+	const UWorld* World = ControllingPawn->GetWorld();
 	if (nullptr == World)
 	{
 		return;
@@ -35,7 +35,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		return;
 	}
 
-	float DetectRadius = AIPawn->GetAIDetectRange();
+	const float DetectRadius = AIPawn->GetAIDetectRange();
 	
 	TArray<FOverlapResult> OverlapResults;
 	FCollisionQueryParams Params(
@@ -44,7 +44,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 		ControllingPawn
 	);
 
-	bool HitDetected = World->OverlapMultiByChannel(
+	const bool HitDetected = World->OverlapMultiByChannel(
 		OverlapResults,
 		Center,
 		FQuat::Identity,
@@ -54,7 +54,7 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	);
 
 #if ENABLE_DRAW_DEBUG
-	DrawDebugSphere(World, Center, DetectRadius, 16, (HitDetected == true) ? FColor::Blue : FColor::Yellow, false, 0.2f);
+	//DrawDebugSphere(World, Center, DetectRadius, 16, (HitDetected == true) ? FColor::Blue : FColor::Yellow, false, 0.2f);
 #endif
 
 	if (true == HitDetected)

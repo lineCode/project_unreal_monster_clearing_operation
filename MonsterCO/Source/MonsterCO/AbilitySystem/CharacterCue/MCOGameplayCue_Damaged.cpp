@@ -24,7 +24,7 @@ void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEv
 	UNiagaraSystem* DamageNiagara = CharacterInterface->GetDamagedData().DamagedNiagara;
 	ISTRUE(nullptr != DamageNiagara);
 	
-	MCOLOG_C(MCOAbility, TEXT("[%s] Cue Activated : [%s]"), *GetName(), *DamageNiagara->GetName());
+	//MCOLOG_C(MCOAbility, TEXT("[%s] Cue Activated : [%s]"), *GetName(), *DamageNiagara->GetName());
 
 	NiagaraComponent->SetAsset(DamageNiagara);
 	NiagaraComponent->SetWorldLocation(DamagedLocation);

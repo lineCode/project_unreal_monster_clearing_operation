@@ -154,8 +154,9 @@ void AMCOPlayerCharacter::OnRep_PlayerState()
 void AMCOPlayerCharacter::InitializeCharacter()
 {
 	Super::InitializeCharacter();
-	
-	bIsGettingInput = true;
+
+	bCanTurnByInput = true;
+	bCanMoveByInput = true;
 	bIsMonsterInfoShowed = false;
 	bIsStaminaTimerTicking = false;
 	CurrentStaminaForWidget = GetStamina();
@@ -282,6 +283,7 @@ bool AMCOPlayerCharacter::CanMoveCamera() const
 {
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(false == HasTag(FMCOCharacterTags::Get().DodgeTag));
+	ISTRUE_F(true == bCanTurnByInput);
 
 	return true;
 }
@@ -290,7 +292,7 @@ bool AMCOPlayerCharacter::CanMoveCharacter() const
 {
 	ISTRUE_F(true == IsAlive());
 	ISTRUE_F(true == CheckCanMoveWithTags());
-	ISTRUE_F(true == bIsGettingInput);
+	ISTRUE_F(true == bCanMoveByInput);
 	ISTRUE_F(false == GetMovementComponent()->IsFalling());
 
 	return true;
@@ -353,9 +355,14 @@ void AMCOPlayerCharacter::SetSpeed(const EMCOCharacterSpeed& InSpeed) const
 	GetCharacterMovement()->MinAnalogWalkSpeed = CharacterControlData->WalkSpeeds[InSpeed];
 }
 
-void AMCOPlayerCharacter::StopCharacter(bool bToStop)
+void AMCOPlayerCharacter::StopCharacterFromMoving(bool bStopMoving)
 {
-	bIsGettingInput = bToStop == false;
+	bCanMoveByInput = bStopMoving == false;
+}
+
+void AMCOPlayerCharacter::StopCharacterFromTurning(bool bStopTuring)
+{
+	bCanTurnByInput = bStopTuring == false;
 }
 
 void AMCOPlayerCharacter::Move(const FInputActionValue& Value)

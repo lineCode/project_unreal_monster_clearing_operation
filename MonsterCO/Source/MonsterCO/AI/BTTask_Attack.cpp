@@ -26,15 +26,15 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 	
-	FAICharacterAITaskFinishedDelegate OnAttackFinished;
-	OnAttackFinished.BindLambda(
-		[&](EBTNodeResult::Type bInResult)
-		{
-			FinishLatentTask(OwnerComp, bInResult);
-		}
-	);
+	FMCOAICharacterTaskFinishedDelegate OnAttackFinished;
+	OnAttackFinished.BindLambda([&](EBTNodeResult::Type bInResult)
+	{
+		FinishLatentTask(OwnerComp, bInResult);
+		MCOPRINT(TEXT("Monster Attack [%s] is %s"), *AttackTag.GetTagName().ToString(),
+			(bInResult == EBTNodeResult::Failed) ? TEXT("FAILED") : TEXT("SUCCEEDED"));
+	});
 
-	AIPawn->SetAIAttackDelegate(OnAttackFinished);
+	AIPawn->SetActionDelegate(OnAttackFinished);
 	AIPawn->Attack(AttackTag);
 
 	return EBTNodeResult::InProgress;
