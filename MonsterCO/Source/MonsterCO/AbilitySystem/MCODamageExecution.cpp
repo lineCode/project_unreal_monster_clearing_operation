@@ -36,9 +36,7 @@ UMCODamageExecution::UMCODamageExecution()
 }
 
 // calculate damage and modify health 
-void UMCODamageExecution::Execute_Implementation(
-	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UMCODamageExecution::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	// get ability system components of source & target 
 	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
@@ -47,6 +45,11 @@ void UMCODamageExecution::Execute_Implementation(
 	UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	AActor* SourceActor = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
 
+	UMCOAbilitySystemComponent* TargetMCOASC = Cast<UMCOAbilitySystemComponent>(TargetASC);
+	UMCOAbilitySystemComponent* SourceMCOASC = Cast<UMCOAbilitySystemComponent>(SourceASC);
+	ensure(nullptr != TargetASC);
+	ensure(nullptr != SourceMCOASC);
+	
 	// get GameplayEffect Spec to use its variables and tags
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
@@ -85,19 +88,20 @@ void UMCODamageExecution::Execute_Implementation(
 		}
 	}
 
-	if (0.0f < AdditiveStiffness)
+	// Check source is dead
+	if (false == SourceMCOASC->IsAlive())
 	{
-		UMCOAbilitySystemComponent* TargetMCOASC = Cast<UMCOAbilitySystemComponent>(TargetASC);
-		UMCOAbilitySystemComponent* SourceMCOASC = Cast<UMCOAbilitySystemComponent>(SourceASC);
-		ISTRUE(nullptr != TargetASC);
-		ISTRUE(nullptr != SourceMCOASC);
-		
-		// Broadcast damages to Target ASC
-		TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveDamage, TargetMCOASC->AttributeSet->GetStiffness() + AdditiveStiffness);
+		MCOPRINT(TEXT("Damage is ignored because source is dead"));
+		return;
 	}
+
 	
+	// DAMAGE
 	if (AdditiveDamage != 0.0f)
 	{
+		// Broadcast damages to Target ASC
+		TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveDamage);
+		
 		// Set the Target's Damage meta attribute
 		OutExecutionOutput.AddOutputModifier(
 			FGameplayModifierEvaluatedData(
@@ -107,8 +111,16 @@ void UMCODamageExecution::Execute_Implementation(
 			)
 		);
 	}
+
+	// HEATLH
 	if (AdditiveHealth != 0.0f)
 	{
+		if (AdditiveHealth < 0.0f)
+		{
+			// Broadcast damages to Target ASC
+			TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveHealth);
+		}
+		
 		OutExecutionOutput.AddOutputModifier(
 			FGameplayModifierEvaluatedData(
 				UMCOAttributeSet::GetAdditiveHealthAttribute(), 
@@ -117,6 +129,8 @@ void UMCODamageExecution::Execute_Implementation(
 			)
 		);
 	}
+
+	// STAMINA
 	if (AdditiveStamina != 0.0f)
 	{
 		OutExecutionOutput.AddOutputModifier(
@@ -127,6 +141,8 @@ void UMCODamageExecution::Execute_Implementation(
 			)
 		);
 	}
+
+	// STIFFNESS
 	if (AdditiveStiffness != 0.0f)
 	{
 		OutExecutionOutput.AddOutputModifier(
@@ -136,7 +152,5 @@ void UMCODamageExecution::Execute_Implementation(
 				AdditiveStiffness
 			)
 		);
-	}
-
-	
+	}	
 }

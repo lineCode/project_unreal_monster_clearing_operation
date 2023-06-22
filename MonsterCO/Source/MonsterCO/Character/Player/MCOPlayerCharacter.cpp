@@ -121,10 +121,6 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	{
 		bIsMonsterInfoShowed = false;
 	}
-	else if (InState == EMCOGameState::REWARD)
-	{
-		RemoveEffectsOnNextGame();
-	}
 	else if (InState == EMCOGameState::NEXT)
 	{
 		if (nullptr != GetMCOAbilitySystemComponent())
@@ -138,7 +134,7 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 		{
 			DisableMovement();
 			GetMCOAbilitySystemComponent()->CancelAbilities();
-			RemoveEffectsOnResult();
+			GetMCOAbilitySystemComponent()->RemoveEffectsOnResult();
 			GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
 		}
 	}

@@ -92,7 +92,7 @@ void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::RESULT_LOSE)
 	{
-		RemoveEffectsOnResult();
+		GetMCOAbilitySystemComponent()->RemoveEffectsOnResult();
 	}
 }
 

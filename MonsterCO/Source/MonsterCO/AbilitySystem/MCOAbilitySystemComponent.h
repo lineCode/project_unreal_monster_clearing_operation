@@ -24,7 +24,6 @@ public:
 public:
 	void TryActivateAbilityByTag(const FGameplayTag& InTag);
 	void CancelAbilityByTag(const FGameplayTag& InTag);
-	void CancelAllEffects();
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
@@ -73,5 +72,8 @@ protected:
 public:
 	FReceivedDamageDelegate OnDamagedReceived;
 	
-	virtual void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage, float TotalStiffness);
+	virtual void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float AdditiveDamage);
+	
+	void RemoveEffectsOnNextGame();
+	void RemoveEffectsOnResult();
 };

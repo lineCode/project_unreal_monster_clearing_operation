@@ -42,13 +42,6 @@ void UMCOAbilitySystemComponent::CancelAbilityByTag(const FGameplayTag& InTag)
 	CancelAbilities(&Tags);
 }
 
-void UMCOAbilitySystemComponent::CancelAllEffects()
-{
-	MCOLOG_C(MCOAbility, TEXT("Cancel all effects"));
-	
-	
-}
-
 bool UMCOAbilitySystemComponent::IsAlive() const
 {
 	return 0.0f < GetHealth();
@@ -212,9 +205,31 @@ void UMCOAbilitySystemComponent::ClearAbilityInput()
 	InputHeldSpecHandles.Reset();
 }
 
-void UMCOAbilitySystemComponent::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage, float TotalStiffness)
+void UMCOAbilitySystemComponent::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float AdditiveDamage)
 {
-	OnDamagedReceived.Broadcast(SourceASC, Damage);
+	OnDamagedReceived.Broadcast(SourceASC, AdditiveDamage);
+
+	if (GetHealth() + AdditiveDamage <= 0.0f)
+	{
+		SourceASC->RemoveEffectsOnNextGame();
+	}
 }
 
+void UMCOAbilitySystemComponent::RemoveEffectsOnNextGame()
+{
+	ISTRUE(true == IsAlive());
+	
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+	RemoveActiveEffectsWithGrantedTags(TagContainer);
+}
+
+void UMCOAbilitySystemComponent::RemoveEffectsOnResult()
+{
+	ISTRUE(true == IsAlive());
+	
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(FMCOCharacterTags::Get().GameplayEffectTag);
+	RemoveActiveEffectsWithGrantedTags(TagContainer);
+}
 
