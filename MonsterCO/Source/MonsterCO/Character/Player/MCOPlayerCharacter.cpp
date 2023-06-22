@@ -136,11 +136,6 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	{
 		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())
 		{
-			if (nullptr != Controller)
-			{
-				Controller->SetIgnoreMoveInput(true);
-			}
-
 			DisableMovement();
 			GetMCOAbilitySystemComponent()->CancelAbilities();
 			RemoveEffectsOnResult();

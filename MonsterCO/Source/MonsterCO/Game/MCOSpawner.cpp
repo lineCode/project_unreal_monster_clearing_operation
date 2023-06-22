@@ -99,7 +99,7 @@ void AMCOSpawner::FindSpawnLocationThenSpawnItem()
 	);
 	
 #if ENABLE_DRAW_DEBUG
-	DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.0f);
+	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Blue, false, 2.0f);
 #endif
 	
 	ISTRUE(true == bResult);
@@ -112,7 +112,7 @@ void AMCOSpawner::FindSpawnLocationThenSpawnItem()
 		}
 		
 #if ENABLE_DRAW_DEBUG
-		DrawDebugPoint(GetWorld(), HiResult.ImpactPoint, 10.0f, FColor::Blue, false, 2.0f);
+		//DrawDebugPoint(GetWorld(), HiResult.ImpactPoint, 10.0f, FColor::Blue, false, 2.0f);
 #endif
 		
 		PickRandomItem(HiResult.ImpactPoint);

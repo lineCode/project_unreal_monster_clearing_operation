@@ -81,5 +81,9 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = MCO)
 	TObjectPtr<UMCOMonsterAIData> MonsterAIData;
+
+// --- Die
+protected:
+	virtual void Die() override;
 	
 };

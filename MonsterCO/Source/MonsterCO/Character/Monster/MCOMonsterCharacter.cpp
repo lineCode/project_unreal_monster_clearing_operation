@@ -75,11 +75,11 @@ void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)
 {
 	if (true == bToStop)
 	{
-		StopAI();
+		//StopAI();
 	}
 	else
 	{
-		ContinueAI();
+		//ContinueAI();
 	}
 }
 
@@ -203,4 +203,11 @@ void AMCOMonsterCharacter::StopAI() const
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
 	ISTRUE(nullptr != AIController);
 	AIController->StopAI();
+}
+
+void AMCOMonsterCharacter::Die()
+{
+	Super::Die();
+
+	StopAI();
 }
