@@ -35,12 +35,13 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	const float AttackRangeMin = AIPawn->GetAIAttackRangeMin(AttackTag);
 	const float AttackRangeMax = AIPawn->GetAIAttackRangeMax(AttackTag);
 	const float DistanceToTarget = ControllingPawn->GetDistanceTo(Target);
-	bResult = (DistanceToTarget <= AttackRangeMax) && (AttackRangeMin <= DistanceToTarget);
+	bResult = (AttackRangeMin <= DistanceToTarget) && (DistanceToTarget <= AttackRangeMax);
 
+	MCOLOG_C(MCOMonsterAI, TEXT("%f <= %f <= %f"), AttackRangeMin, DistanceToTarget, AttackRangeMax);
 	
 #if ENABLE_DRAW_DEBUG
-	//DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMin, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
-	//DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMax, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
+	DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMin, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
+	DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMax, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
 #endif
 	
 	return bResult;

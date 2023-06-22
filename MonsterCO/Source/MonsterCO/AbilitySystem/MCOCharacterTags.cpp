@@ -36,16 +36,16 @@ void FMCOCharacterTags::InitializeTags()
 	CharacterTags.DodgeTag      = FGameplayTag::RequestGameplayTag(FName("State.Dodge"),    bErrorIfNotFound);
 	CharacterTags.DashTag       = FGameplayTag::RequestGameplayTag(FName("State.Dash"),     bErrorIfNotFound);
 	CharacterTags.AttackTag     = FGameplayTag::RequestGameplayTag(FName("State.Attack"),   bErrorIfNotFound);
-	CharacterTags.DamagedTag    = FGameplayTag::RequestGameplayTag(FName("State.Damaged"),     bErrorIfNotFound);
-	CharacterTags.DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),        bErrorIfNotFound);
+	CharacterTags.DamagedTag    = FGameplayTag::RequestGameplayTag(FName("State.Damaged"),  bErrorIfNotFound);
+	CharacterTags.DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),     bErrorIfNotFound);
 	CharacterTags.TakeItemTag   = FGameplayTag::RequestGameplayTag(FName("State.TakeItem"), bErrorIfNotFound);
 	CharacterTags.ChargingTag   = FGameplayTag::RequestGameplayTag(FName("State.Charging"), bErrorIfNotFound);
 
-	CharacterTags.EffectRemoveOnDeathTag  = FGameplayTag::RequestGameplayTag(FName("Ability.RemoveOnDeath"), bErrorIfNotFound);
+	CharacterTags.EffectRemoveOnDeathTag  = FGameplayTag::RequestGameplayTag(FName("Ability.RemoveOnDeath"),        bErrorIfNotFound);
 	CharacterTags.CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("Ability.CancelOnStaminaEmpty"), bErrorIfNotFound);
 	
-	CharacterTags.DragonAbility_Claw = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Claw"), bErrorIfNotFound);
+	CharacterTags.DragonAbility_Claw     = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Claw"),     bErrorIfNotFound);
 	CharacterTags.DragonAbility_Fireball = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Fireball"), bErrorIfNotFound);
-	CharacterTags.DragonAbility_Breath = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Breath"), bErrorIfNotFound);
+	CharacterTags.DragonAbility_Breath   = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Breath"),   bErrorIfNotFound);
 }
 
