@@ -68,3 +68,11 @@ UObject* AMCOMonsterAIController::GetTarget()
 	return BlackboardPtr->GetValueAsObject(BBKEY_TARGET);
 }
 
+void AMCOMonsterAIController::SetDamagedInBlackBoard(bool IsDamaged) const
+{
+	MCOLOG_C(MCOMonsterAI, TEXT("Set damaged in bb : %s"), (true == IsDamaged) ? TEXT("DAMAGED") : TEXT("FINISHED"));
+	
+	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
+	BlackboardPtr->SetValueAsBool(BBKEY_ISDAMAGED, IsDamaged);
+}
+

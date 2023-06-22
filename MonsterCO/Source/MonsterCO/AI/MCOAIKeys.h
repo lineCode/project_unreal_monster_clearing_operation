@@ -5,3 +5,4 @@
 #define BBKEY_TARGET    TEXT("Target")
 #define BBKEY_TARGETROT TEXT("TargetRot")
 #define BBKEY_MYROT     TEXT("MyRot")
+#define BBKEY_ISDAMAGED TEXT("IsDamaged")

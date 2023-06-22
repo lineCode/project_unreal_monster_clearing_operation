@@ -11,4 +11,5 @@ class MONSTERCO_API UMCOActionFragment_MonsterAI : public UMCOActionFragment
 	
 public:
 	void OnActionFinished(const AActor* InCurrentActor, const bool& InSucceeded) const;
+	void SetDamagedInBlackBoard(const AActor* InCurrentActor, const bool& InDamaged) const;
 };

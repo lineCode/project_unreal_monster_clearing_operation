@@ -88,16 +88,9 @@ void UMCODamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 		}
 	}
 
-	// Check source is dead
-	if (false == SourceMCOASC->IsAlive())
-	{
-		MCOPRINT(TEXT("Damage is ignored because source is dead"));
-		return;
-	}
-
 	
 	// DAMAGE
-	if (AdditiveDamage != 0.0f)
+	if (AdditiveDamage != 0.0f && true == SourceMCOASC->IsAlive())
 	{
 		// Broadcast damages to Target ASC
 		TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveDamage);
@@ -117,6 +110,11 @@ void UMCODamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 	{
 		if (AdditiveHealth < 0.0f)
 		{
+			if (false == SourceMCOASC->IsAlive())
+			{
+				return;
+			}
+			
 			// Broadcast damages to Target ASC
 			TargetMCOASC->ReceiveDamage(SourceMCOASC, AdditiveHealth);
 		}

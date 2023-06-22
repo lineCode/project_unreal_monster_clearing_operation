@@ -13,7 +13,7 @@
 const int SLOT_MAX = 5;
 const float WIDGET_RATE = 0.05f;
 const int32 NEXT_STAGE_TIME = 5;
-const int32 MAX_STAGE = 2;
+const int32 MAX_STAGE = 100;
 
 #define ITEMDATA_NAME "MCOItemData"
 
@@ -30,7 +30,7 @@ DECLARE_LOG_CATEGORY_EXTERN(MCOLog, Display, All);
 DECLARE_LOG_CATEGORY_EXTERN(MCOAbility, Display, All);
 DECLARE_LOG_CATEGORY_EXTERN(MCOCollision, Display, All);
 DECLARE_LOG_CATEGORY_EXTERN(MCOTimer, Display, All);
-DECLARE_LOG_CATEGORY_EXTERN(MCOMonseterAI, Display, All);
+DECLARE_LOG_CATEGORY_EXTERN(MCOMonsterAI, Display, All);
 
 
 class MONSTERCO_API FLog

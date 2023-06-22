@@ -1,6 +1,7 @@
 #include "MCOGameplayAbility_Damaged.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/MCOAttributeSet.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_MonsterAI.h"
 #include "AbilitySystem/ActionData/MCOMontageDataDirectional.h"
 #include "Interface/MCOCharacterInterface.h"
 #include "Interface/MCOPlayerInterface.h"
@@ -31,6 +32,11 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
+	if (nullptr != MonsterAIFragment)
+	{
+		MonsterAIFragment->SetDamagedInBlackBoard(CurrentActorInfo->AvatarActor.Get(), true);
+	}
+	
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
 	if (nullptr != PlayerInterface)
 	{
@@ -45,4 +51,14 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 
 	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedData().DamagedDegree);
 	StartActivationWithMontage(Data->GetMontage(Direction));
+}
+
+void UMCOGameplayAbility_Damaged::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	
+	if (nullptr != MonsterAIFragment)
+	{
+		MonsterAIFragment->SetDamagedInBlackBoard(CurrentActorInfo->AvatarActor.Get(), false);
+	}
 }

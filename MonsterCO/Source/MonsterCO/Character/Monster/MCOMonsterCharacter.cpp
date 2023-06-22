@@ -183,6 +183,13 @@ void AMCOMonsterCharacter::SetTurnVector(const bool InIsTurning, const FVector& 
 	TurnVector = InTurnVector;
 }
 
+void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
+{
+	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
+	ISTRUE(nullptr != AIController);
+	AIController->SetDamagedInBlackBoard(IsDamaged);
+}
+
 void AMCOMonsterCharacter::Attack(const FGameplayTag& InTag) const
 {
 	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();

@@ -32,14 +32,14 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	OnAttackFinished.BindLambda([&](EBTNodeResult::Type bInResult)
 	{
 		FinishLatentTask(OwnerComp, bInResult);
-		MCOLOG_C(MCOMonseterAI, TEXT("Monster Attack [%s] is %s"), *AttackTag.GetTagName().ToString(),
-			(bInResult == EBTNodeResult::Failed) ? TEXT("FAILED") : TEXT("SUCCEEDED"));
+		//MCOLOG_C(MCOMonsterAI, TEXT("Monster Attack [%s] is %s"), *AttackTag.GetTagName().ToString(),
+			//(bInResult == EBTNodeResult::Failed) ? TEXT("FAILED") : TEXT("SUCCEEDED"));
 	});
 
 	AIPawn->SetActionDelegate(OnAttackFinished);
 	AIPawn->Attack(AttackTag);
 
 	
-	MCOLOG_C(MCOMonseterAI, TEXT("Monster Attack [%s] is INPROGRESS"), *AttackTag.GetTagName().ToString());
+	//MCOLOG_C(MCOMonsterAI, TEXT("Monster Attack [%s] is INPROGRESS"), *AttackTag.GetTagName().ToString());
 	return EBTNodeResult::InProgress;
 }

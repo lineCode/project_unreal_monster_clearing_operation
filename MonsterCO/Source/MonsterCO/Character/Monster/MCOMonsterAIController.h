@@ -28,6 +28,7 @@ public:
 
 public:
 	UObject* GetTarget();
+	void SetDamagedInBlackBoard(bool IsDamaged) const;
 
 private:
 	UPROPERTY()

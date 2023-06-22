@@ -36,8 +36,10 @@ public:
 	virtual FVector GetAITurnVector() const = 0;
 	virtual bool IsTurning() const = 0;
 	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) = 0;
+	
 	virtual void SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnActionFinished) = 0;
 	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const = 0;
+	virtual void SetDamagedInBlackBoard(bool IsDamaged) const = 0;
 
 // --- AI/Action
 public:
