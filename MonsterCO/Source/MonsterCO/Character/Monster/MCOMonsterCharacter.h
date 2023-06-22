@@ -31,6 +31,11 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = MCO)
 	TObjectPtr<UCapsuleComponent> Body;
 	
+// --- Game State
+public:
+	UFUNCTION()
+	void OnGameStateChanged(const EMCOGameState& InState);
+	
 // --- Ability
 protected:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;

@@ -101,15 +101,18 @@ void UMCOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	}
 	else if (Data.EvaluatedData.Attribute == GetAdditiveStiffnessAttribute())
 	{
-		float NewStiffness = GetStiffness() + GetAdditiveStiffness();
-
+		const float NewStiffness = GetStiffness() + GetAdditiveStiffness();
+		
 		if (GetMaxStiffness() <= NewStiffness)
 		{
-			NewStiffness -= GetMaxStiffness();
+			SetStiffness(0.0f);
 			HandleEventWithTag(FMCOCharacterTags::Get().GameplayEvent_DamagedTag, Data);
 		}
-		
-		SetStiffness(NewStiffness);
+		else
+		{
+			SetStiffness(NewStiffness);
+		}
+				
 		SetAdditiveStiffness(0.0f);
 	}
 	else if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())

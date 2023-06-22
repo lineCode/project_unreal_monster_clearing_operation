@@ -9,7 +9,8 @@
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 #include "CharacterAttachment/MCOMonsterModeComponent.h"
-#include "CharacterAttachment/Attachment/MCOAttachment.h"
+#include "Interface/MCOGameModeInterface.h"
+#include "GameFramework/GameModeBase.h"
 
 
 AMCOMonsterCharacter::AMCOMonsterCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -64,6 +65,10 @@ void AMCOMonsterCharacter::BeginPlay()
 	// Body->SetCapsuleHalfHeight(220.0f);
 	// Body->SetCapsuleRadius(100.0f);
 	// Body->SetRelativeLocationAndRotation(FVector(-30.0f, 0.0f, -60.0f), FRotator(-90.0f, 180.0f, 180.0f));
+	
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
 }
 
 void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)
@@ -81,6 +86,17 @@ void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)
 void AMCOMonsterCharacter::StopCharacterFromTurning(bool bStopTuring)
 {
 	
+}
+
+void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
+{
+	if (InState == EMCOGameState::RESULT_LOSE)
+	{
+		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())
+		{
+			GetMCOAbilitySystemComponent()->CancelAllEffects();
+		}
+	}
 }
 
 bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)

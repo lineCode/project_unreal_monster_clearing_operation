@@ -7,7 +7,7 @@ bool UMCOActionFragment_AttributeEffect::CanActivateAbilityWithStamina(const flo
 {
 	for (auto Tuple : Data)
 	{
-		if (Tuple.Value.bIsStartupStamina == false)
+		if (Tuple.Value.bIsStartupEffectOfAbility == false)
 		{
 			continue;
 		}
@@ -80,7 +80,11 @@ void UMCOActionFragment_AttributeEffect::ApplyAttributeAdditiveValue(const EMCOE
 		);
 	}
 
-	Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+	if (false == AttributeValue.bIsStartupEffectOfAbility)
+	{
+		Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+	}
+	
 	InHandle.Data->DynamicGrantedTags = Tags;
 
 	MCOLOG_C(MCOAbility, TEXT("Effect Applied [Stamina %.1f] [Health %.1f] [Damage %.1f] [Stiffness %.1f]"),

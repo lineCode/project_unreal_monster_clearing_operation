@@ -24,7 +24,7 @@ public:
 protected:
 	void OnStaminaFull();
 
-protected:
+public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetImagePercent(float InPercent);
 

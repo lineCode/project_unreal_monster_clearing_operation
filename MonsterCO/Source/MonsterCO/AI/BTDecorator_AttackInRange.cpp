@@ -39,8 +39,8 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 
 	
 #if ENABLE_DRAW_DEBUG
-	DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMin, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
-	DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMax, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
+	//DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMin, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
+	//DrawDebugSphere(GetWorld(), ControllingPawn->GetActorLocation(), AttackRangeMax, 16,  (bResult == true) ? FColor::Blue : FColor::Yellow, false, (true == bResult) ? 1.0f : 0.3f);
 #endif
 	
 	return bResult;

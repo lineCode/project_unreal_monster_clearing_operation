@@ -42,6 +42,15 @@ void UMCOAbilitySystemComponent::CancelAbilityByTag(const FGameplayTag& InTag)
 	CancelAbilities(&Tags);
 }
 
+void UMCOAbilitySystemComponent::CancelAllEffects()
+{
+	MCOLOG_C(MCOAbility, TEXT("Cancel all effects"));
+	
+	FGameplayTagContainer Tags;
+	Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+	RemoveActiveEffectsWithGrantedTags(Tags);
+}
+
 bool UMCOAbilitySystemComponent::IsAlive() const
 {
 	return 0.0f < GetHealth();

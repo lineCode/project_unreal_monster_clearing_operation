@@ -15,6 +15,7 @@ public:
 	FGameplayTag LookTag;
 
 	// Effect
+	FGameplayTag GameplayEffectTag;
 	FGameplayTag GameplayEffect_AbilityTag;
 	FGameplayTag GameplayEffect_DurationTag;
 	FGameplayTag GameplayEffect_CooldownTag;

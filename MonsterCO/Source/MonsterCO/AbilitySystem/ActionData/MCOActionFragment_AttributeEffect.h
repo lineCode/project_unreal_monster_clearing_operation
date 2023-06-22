@@ -14,10 +14,10 @@ struct FMCOAttributeValue
 	GENERATED_BODY()
 
 public:
-	FMCOAttributeValue() : bIsStartupStamina(false) {}
+	FMCOAttributeValue() : bIsStartupEffectOfAbility(false) {}
 	
 	UPROPERTY(EditAnywhere)
-	uint8 bIsStartupStamina : 1;
+	uint8 bIsStartupEffectOfAbility : 1; 
 	
 	UPROPERTY(EditAnywhere)
 	float Stamina = 0.0f;

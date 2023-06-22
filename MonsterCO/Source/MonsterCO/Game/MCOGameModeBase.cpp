@@ -21,6 +21,8 @@ void AMCOGameModeBase::StartPlay()
 
 void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)
 {
+	MCOLOG_C(MCOAbility, TEXT("GameState Changed to : [%s]"), *FHelper::GetEnumDisplayName(TEXT("EMCOGameState"), (int64)InState));
+	
 	CurrentGameState = InState;
 	
 	if (InState == EMCOGameState::MOVE_TO_NEXT_STAGE)
@@ -61,7 +63,7 @@ void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)
 
 		return;
 	}
-	else if (InState == EMCOGameState::NEXT)
+	else if (InState == EMCOGameState::REWARD)
 	{
 		if (MAX_STAGE <= CurrentStage)
 		{

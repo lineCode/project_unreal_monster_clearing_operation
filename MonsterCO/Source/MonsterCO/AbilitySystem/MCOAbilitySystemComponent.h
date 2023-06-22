@@ -24,6 +24,7 @@ public:
 public:
 	void TryActivateAbilityByTag(const FGameplayTag& InTag);
 	void CancelAbilityByTag(const FGameplayTag& InTag);
+	void CancelAllEffects();
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")

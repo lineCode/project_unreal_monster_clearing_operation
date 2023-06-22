@@ -69,8 +69,8 @@ void UMCOHUDWidget::OnGameStateChanged(const EMCOGameState& InState)
 	}
 	else if (InState == EMCOGameState::NEXT)
 	{
-		// ShowInGameWidget(PlayerName, false);
-		// ShowInGameWidget(MonsterName, false);
+		ShowInGameWidget(PlayerName, false);
+		ShowInGameWidget(MonsterName, false);
 	}
 	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
 	{

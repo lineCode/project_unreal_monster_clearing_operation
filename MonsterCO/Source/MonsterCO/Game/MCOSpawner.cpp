@@ -70,6 +70,10 @@ void AMCOSpawner::SpawnMonster()
 
 void AMCOSpawner::OnMonsterDied(const AMCOCharacter* InCharacter)
 {
+	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
+	ISTRUE(nullptr != GameModeInterface);
+	GameModeInterface->OnChangeGameState(EMCOGameState::REWARD);
+	
 	FindSpawnLocation(InCharacter);	
 }
 

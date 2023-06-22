@@ -121,6 +121,13 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	{
 		bIsMonsterInfoShowed = false;
 	}
+	else if (InState == EMCOGameState::REWARD)
+	{
+		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())
+		{
+			GetMCOAbilitySystemComponent()->CancelAllEffects();
+		}
+	}
 	else if (InState == EMCOGameState::NEXT)
 	{
 		if (nullptr != GetMCOAbilitySystemComponent())
@@ -130,7 +137,7 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	}
 	else if (InState == EMCOGameState::RESULT_WIN)
 	{
-		if (nullptr != AbilitySystemComponent && true == IsAlive())
+		if (nullptr != GetMCOAbilitySystemComponent() && true == IsAlive())
 		{
 			if (nullptr != Controller)
 			{
@@ -138,8 +145,9 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 			}
 
 			DisableMovement();
-			AbilitySystemComponent->CancelAbilities();
-			StopStaminaTimer();	
+			GetMCOAbilitySystemComponent()->CancelAbilities();
+			GetMCOAbilitySystemComponent()->CancelAllEffects();
+			GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
 		}
 	}
 }
