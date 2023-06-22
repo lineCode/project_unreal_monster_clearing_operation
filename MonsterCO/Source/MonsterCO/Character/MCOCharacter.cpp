@@ -103,13 +103,24 @@ void AMCOCharacter::DestroyAllAttachedActors() const
 
 FVector AMCOCharacter::GetSocketLocation(const FName& InSocketName)
 {
-	FVector SocketLocation;
+	FVector Location;
 	if (nullptr != GetMesh() && true == GetMesh()->DoesSocketExist(InSocketName))
 	{
-		SocketLocation = GetMesh()->GetSocketLocation(InSocketName);
+		Location = GetMesh()->GetSocketLocation(InSocketName);
 	}
-	return SocketLocation;
+	return Location;
 }
+
+FTransform AMCOCharacter::GetSocketTransform(const FName& InSocketName)
+{
+	FTransform Transform;
+	if (nullptr != GetMesh() && true == GetMesh()->DoesSocketExist(InSocketName))
+	{
+		Transform = GetMesh()->GetSocketTransform(InSocketName);
+	}
+	return Transform;
+}
+
 void AMCOCharacter::InitializeCharacter()
 {
 	// get ASC

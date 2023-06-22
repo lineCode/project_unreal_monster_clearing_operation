@@ -67,6 +67,7 @@ public:
 	void DisableAllCollision();
 	void DestroyAllAttachedActors() const;
 	virtual FVector GetSocketLocation(const FName& InSocketName) override;
+	virtual FTransform GetSocketTransform(const FName& InSocketName) override;
 
 	
 // --- Ability

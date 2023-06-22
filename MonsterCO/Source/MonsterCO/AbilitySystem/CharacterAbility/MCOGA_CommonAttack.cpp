@@ -269,15 +269,16 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
 
-	FTransform SpawnTransform;
-	SpawnTransform.SetLocation(CharacterInterface->GetSocketLocation(CurrentDefinition->CollisionFragment->SocketName));
+	FTransform SocketTransform = CharacterInterface->GetSocketTransform(CurrentDefinition->CollisionFragment->SocketName);
+	SocketTransform.SetRotation(FQuat(FRotator(
+		0.0f,
+		SocketTransform.GetRotation().Rotator().Yaw,
+		SocketTransform.GetRotation().Rotator().Roll
+	)));
 
-	const FVector CharacterForwardVector = CurrentActorInfo->AvatarActor.Get()->GetActorForwardVector();
-	SpawnTransform.SetRotation(FRotationMatrix::MakeFromX(CharacterForwardVector).ToQuat());
-	
 	AMCOProjectile* SpawnedProjectile = GetWorld()->SpawnActorDeferred<AMCOProjectile>(
 		*CurrentDefinition->AttackTimingFragment->GetProjectileClass(CurrentDamageTimingIdx),
-		SpawnTransform,
+		SocketTransform,
 		CurrentActorInfo->AvatarActor.Get(),
 		Cast<APawn>(CurrentActorInfo->AvatarActor.Get()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
@@ -292,7 +293,7 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 		CurrentDefinition->AttackTimingFragment->GetProjectileLifeSpan(CurrentDamageTimingIdx)
 	);
 	
-	SpawnedProjectile->FinishSpawning(SpawnTransform);
+	SpawnedProjectile->FinishSpawning(SocketTransform);
 }
 
 void UMCOGA_CommonAttack::AttackByInstantCheck()

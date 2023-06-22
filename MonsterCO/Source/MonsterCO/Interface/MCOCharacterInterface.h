@@ -62,6 +62,7 @@ public:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) = 0;
 	virtual void StopCharacter(bool InToStop) = 0;
 	virtual FVector GetSocketLocation(const FName& InSocketName) = 0;
+	virtual FTransform GetSocketTransform(const FName& InSocketName) = 0;
 	virtual float GetCapsuleRadius() const = 0;
 	virtual FCollisionBeginOverlapDelegate& GetCollisionBeginOverlapDelegate() = 0;
 	virtual void TurnOnCollision(const FName& InName) = 0;
