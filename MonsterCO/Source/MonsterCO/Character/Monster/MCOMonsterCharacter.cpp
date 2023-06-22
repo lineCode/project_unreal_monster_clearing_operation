@@ -100,6 +100,10 @@ bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
 	{
 		
 	}
+	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Fireball)
+	{
+		
+	}
 	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Breath)
 	{
 		

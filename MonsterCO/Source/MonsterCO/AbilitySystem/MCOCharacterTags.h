@@ -47,6 +47,7 @@ public:
 	
 	// Dragon
 	FGameplayTag DragonAbility_Claw;
+	FGameplayTag DragonAbility_Fireball;
 	FGameplayTag DragonAbility_Breath;
 
 private:

@@ -41,6 +41,7 @@ void FMCOCharacterTags::InitializeTags()
 	CharacterTags.CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("Ability.CancelOnStaminaEmpty"), bErrorIfNotFound);
 	
 	CharacterTags.DragonAbility_Claw = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Claw"), bErrorIfNotFound);
+	CharacterTags.DragonAbility_Fireball = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Fireball"), bErrorIfNotFound);
 	CharacterTags.DragonAbility_Breath = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Breath"), bErrorIfNotFound);
 }
 

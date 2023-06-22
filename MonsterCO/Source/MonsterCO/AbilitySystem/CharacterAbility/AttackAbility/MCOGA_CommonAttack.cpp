@@ -81,12 +81,13 @@ void UMCOGA_CommonAttack::EndDamaging()
 	ResetDamageTimer();
 	SetMovementOnEndDamaging();
 
-	// Next Damage Timing : Set Begin Timer
-	CurrentDamageTimingIdx++;
-	MCOLOG_C(MCOAbility, TEXT("[%d] ... Idx++ "), CurrentDamageTimingIdx);
-	if (true == CurrentDefinition->AttackTimingFragment->IsValidIdx(CurrentDamageTimingIdx))
+	if (true == CurrentDefinition->AttackTimingFragment->IsValidIdx(CurrentDamageTimingIdx + 1))
 	{
+		// Next Damage Timing : Set Begin Timer
+		CurrentDamageTimingIdx++;
 		StartDamageBeginTimer();
+		
+		MCOLOG_C(MCOTimer, TEXT("[%d] ... Idx++ "), CurrentDamageTimingIdx);
 	}
 	
 	if (true == bUseOverlapEvent)
@@ -219,7 +220,7 @@ void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacte
 
 void UMCOGA_CommonAttack::Attack()
 {
-	MCOLOG_C(MCOAbility, TEXT("[%d] ... Attack !"), CurrentDamageTimingIdx);
+	MCOLOG_C(MCOTimer, TEXT("[%d] ... Attack !"), CurrentDamageTimingIdx);
 	
 	ISTRUE(nullptr != CurrentDefinition);
 	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
@@ -469,7 +470,7 @@ void UMCOGA_CommonAttack::SetDamageTimer()
 
 void UMCOGA_CommonAttack::ResetDamageTimer()
 {
-	MCOLOG_C(MCOAbility, TEXT("... Reset Timer "));
+	MCOLOG_C(MCOTimer, TEXT("... Reset Timer "));
 	
 	GetWorld()->GetTimerManager().ClearTimer(DamageTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DamageByChannelTimerHandle);
@@ -494,7 +495,7 @@ void UMCOGA_CommonAttack::StartDamageBeginTimer()
 {
 	const float FrameCount = GetCurrentDamageBeginFrameCount();
 
-	MCOLOG_C(MCOAbility, TEXT("[%d] ... To Start : %f sec later "), CurrentDamageTimingIdx, FrameCount);
+	MCOLOG_C(MCOTimer, TEXT("[%d] ... To Start : %f sec later "), CurrentDamageTimingIdx, FrameCount);
 	
 	ISTRUE(FrameCount > 0.0f);
 		
@@ -511,7 +512,7 @@ void UMCOGA_CommonAttack::StartDamageEndTimer()
 {
 	const float FrameCount = GetCurrentDamageEndFrameCount();
 
-	MCOLOG_C(MCOAbility, TEXT("[%d] ... To End : %f sec later "), CurrentDamageTimingIdx, FrameCount);
+	MCOLOG_C(MCOTimer, TEXT("[%d] ... To End : %f sec later "), CurrentDamageTimingIdx, FrameCount);
 	
 	ISTRUE(FrameCount > 0.0f);
 	

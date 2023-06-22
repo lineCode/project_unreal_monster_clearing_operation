@@ -54,6 +54,8 @@ void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 
 bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {
+	MCOLOG_C(MCOAbility, TEXT("---- [%s] Check CanActivate"), *AbilityTag.GetTagName().ToString());
+	
 	ISTRUE_F(nullptr != ActorInfo);
 	ISTRUE_F(true == ActorInfo->AvatarActor.IsValid());
 	ISTRUE_F(true == ActorInfo->AbilitySystemComponent.IsValid());
@@ -131,7 +133,7 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 	
 	if (false == CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, true, false);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return false;
 	}
 

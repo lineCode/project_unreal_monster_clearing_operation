@@ -32,7 +32,7 @@ void UMCOCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	
 	bIsIdle = CurrentPawnSpeed < MovingThreshould;
 	bIsFalling = MovementComponent->IsFalling();
-	bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
+	bIsJumping = bIsFalling & (JumpingThreshould < Velocity.Z);
 
 	SetPawnDirection(Velocity, Owner->GetActorRotation());
 }
