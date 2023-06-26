@@ -34,7 +34,7 @@ void AMCOSpawner::BeginPlay()
 
 void AMCOSpawner::OnGameStateChanged(const EMCOGameState& InState)
 {
-	if (InState == EMCOGameState::LOBBY)
+	if (InState == EMCOGameState::TITLE)
 	{
 	}
 	else if (InState == EMCOGameState::FIGHT)

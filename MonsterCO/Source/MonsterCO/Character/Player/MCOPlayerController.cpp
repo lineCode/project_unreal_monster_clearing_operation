@@ -5,12 +5,16 @@
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
-#include "UI/MCOHUDWidget.h"
+#include "UI/MainWidgets/MCOMainWidget.h"
+#include "UI/MainWidgets/MCOMainWidgetData.h"
 
 
 AMCOPlayerController::AMCOPlayerController()
 {
-	GETCLASS(HUDWidgetClass, UMCOHUDWidget, TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
+// 	GETCLASS(HUDWidgetClass, UMCOHUDWidget, TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
+// 	GETCLASS(OptionWidgetClass, UMCOOptionWidget, TEXT("/Game/UI/WBP_Option.WBP_Option_C"));
+
+	GETASSET(WidgetData, UMCOMainWidgetData, TEXT("/Game/Data/UI/DA_MainWidgetData.DA_MainWidgetData"));
 }
 
 void AMCOPlayerController::OnPossess(APawn* InPawn)
@@ -28,8 +32,8 @@ void AMCOPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HUDWidget = CreateWidget<UMCOHUDWidget>(GetWorld(), HUDWidgetClass);
-	HUDWidget->AddToViewport();
+	// Create HUD
+	CreateWidgetAndAddToViewport(WidgetData->WidgetClasses[EMCOWidgetState::INGAME], EMCOWidgetState::INGAME);
 
 	// OnGameStateChanged
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
@@ -39,23 +43,21 @@ void AMCOPlayerController::BeginPlay()
 
 void AMCOPlayerController::OnGameStateChanged(const EMCOGameState& InState)
 {
-	if (InState == EMCOGameState::LOBBY)
+	if (InState == EMCOGameState::TITLE)
 	{
-		SetInputMode(FInputModeUIOnly());
-		SetShowMouseCursor(true);
+		ChangeWidgetByState(EMCOWidgetState::TITLE);
 	}
 	else if (InState == EMCOGameState::FIGHT)
 	{
-		SetInputMode(FInputModeGameOnly());
-		SetShowMouseCursor(false);
+		ChangeWidgetByState(EMCOWidgetState::INGAME);
 	}
-	else if (InState == EMCOGameState::REWARD)
+	else if (InState == EMCOGameState::NEXT)
 	{
+		ChangeWidgetByState(EMCOWidgetState::NEXT);
 	}
 	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
 	{
-		SetInputMode(FInputModeUIOnly());
-		SetShowMouseCursor(true);
+		ChangeWidgetByState(EMCOWidgetState::RESULT);
 	}
 }
 
@@ -74,4 +76,79 @@ void AMCOPlayerController::PostProcessInput(const float DeltaTime, const bool bG
 	}
 
 	Super::PostProcessInput(DeltaTime, bGamePaused);
+}
+
+void AMCOPlayerController::CreateWidgetAndAddToViewport(TSubclassOf<UMCOMainWidget>& InClass, EMCOWidgetState InState)
+{
+	UMCOMainWidget* Widget = CreateWidget<UMCOMainWidget>(GetWorld(), InClass);
+	Widget->OnExitGameDelegate.BindUObject(this, &ThisClass::ExitGame);
+	Widget->OnWidgetClosedByUserDelegate.BindUObject(this, &ThisClass::OnWidgetClosedByUser);
+	Widget->AddToViewport();
+
+	Widgets.Emplace(InState, Widget);
+}
+
+void AMCOPlayerController::ChangeInputMode(bool bGameMode)
+{
+	if (true == bGameMode)
+	{
+		SetInputMode(FInputModeGameOnly());
+		SetShowMouseCursor(false);
+	}
+	else
+	{
+		SetInputMode(FInputModeUIOnly());
+		SetShowMouseCursor(true);
+	}
+}
+
+void AMCOPlayerController::OnOptionKeyPressed()
+{
+	ChangeWidgetByState(EMCOWidgetState::OPTION);
+}
+
+void AMCOPlayerController::ExitGame()
+{
+	UKismetSystemLibrary::QuitGame(
+		GetWorld(),
+		this,
+		EQuitPreference::Quit,
+		true
+	);
+}
+
+void AMCOPlayerController::ChangeWidgetByState(EMCOWidgetState InState)
+{
+	ISTRUE(true == WidgetData->WidgetClasses.Contains(InState));
+
+	ChangeInputMode(InState == EMCOWidgetState::INGAME || InState == EMCOWidgetState::NEXT);
+	
+	if (true == Widgets.Contains(CurrentWidgetState))
+	{
+		if (InState != EMCOWidgetState::OPTION && CurrentWidgetState != EMCOWidgetState::INGAME)
+		{
+			Widgets[CurrentWidgetState]->RemoveFromParent();
+		}
+		else
+		{
+			Widgets[CurrentWidgetState]->OnClosed();
+		}
+	}
+	
+	if (false == Widgets.Contains(InState) || (CurrentWidgetState != EMCOWidgetState::OPTION && InState != EMCOWidgetState::INGAME))
+	{
+		CreateWidgetAndAddToViewport(WidgetData->WidgetClasses[InState], InState);
+	}
+	Widgets[InState]->OnShow();
+
+	PreviousWidgetState = CurrentWidgetState;
+	CurrentWidgetState = InState;
+}
+
+void AMCOPlayerController::OnWidgetClosedByUser()
+{
+	if (CurrentWidgetState == EMCOWidgetState::OPTION)
+	{
+		ChangeWidgetByState(PreviousWidgetState);
+	}
 }

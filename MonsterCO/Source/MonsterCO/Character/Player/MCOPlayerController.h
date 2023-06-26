@@ -5,8 +5,8 @@
 #include "MCOPlayerController.generated.h"
 
 class UMCOAbilitySystemComponent;
-class UMCOHUDWidget;
-
+class UMCOMainWidget;
+class UMCOMainWidgetData;
 
 
 UCLASS()
@@ -24,6 +24,7 @@ protected:
 protected:
 	UFUNCTION()
 	void OnGameStateChanged(const EMCOGameState& InState);
+
 	
 // --- Ability
 public:
@@ -35,9 +36,27 @@ protected:
 	
 // --- Widget
 protected:
+	void CreateWidgetAndAddToViewport(TSubclassOf<UMCOMainWidget>& InClass, EMCOWidgetState InState);
+	void ChangeWidgetByState(EMCOWidgetState InState);
+	void ChangeInputMode(bool bGameMode);
+
+public:
+	void OnOptionKeyPressed();
+	
+protected:
+	UFUNCTION()
+	void ExitGame();
+	
+	UFUNCTION()
+	void OnWidgetClosedByUser();
+	
+protected:
 	UPROPERTY()
-	TSubclassOf<UMCOHUDWidget> HUDWidgetClass;
+	TObjectPtr<UMCOMainWidgetData> WidgetData;
 	
 	UPROPERTY()
-	TObjectPtr<UMCOHUDWidget> HUDWidget;
+	TMap<EMCOWidgetState, TObjectPtr<UMCOMainWidget>> Widgets;
+	
+	EMCOWidgetState PreviousWidgetState;
+	EMCOWidgetState CurrentWidgetState;
 };

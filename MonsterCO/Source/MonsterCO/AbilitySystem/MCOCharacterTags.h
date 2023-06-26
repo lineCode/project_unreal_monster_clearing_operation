@@ -13,6 +13,7 @@ public:
 	// Native ability
 	FGameplayTag MoveTag;
 	FGameplayTag LookTag;
+	FGameplayTag OptionTag;
 
 	// Effect
 	FGameplayTag GameplayEffectTag;

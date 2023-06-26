@@ -17,6 +17,8 @@ void UMCOHpWidget::NativeConstruct()
 
 	ensure(NameText);
 	ensure(HpProgressBar);
+	
+	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMCOHpWidget::SetName(const FString& InName)

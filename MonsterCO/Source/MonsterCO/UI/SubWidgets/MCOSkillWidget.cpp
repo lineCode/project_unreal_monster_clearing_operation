@@ -12,6 +12,8 @@ void UMCOSkillWidget::NativeConstruct()
 	ensure(SkillRadialProgressBar);
 	
 	UnSetSkillWidget();
+	
+	SetVisibility(ESlateVisibility::Hidden);
 }
 
 bool UMCOSkillWidget::IsActive()

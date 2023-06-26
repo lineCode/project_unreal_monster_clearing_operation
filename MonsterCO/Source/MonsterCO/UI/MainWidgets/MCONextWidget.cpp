@@ -1,4 +1,4 @@
-#include "UI/Widgets/MCONextWidget.h"
+#include "MCONextWidget.h"
 #include "Components/TextBlock.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
@@ -15,33 +15,21 @@ void UMCONextWidget::NativeConstruct()
 
 	TimeTxt = Cast<UTextBlock>(GetWidgetFromName(TEXT("TxtTime")));
 	ensure(nullptr != TimeTxt);
-	
-	SetVisibility(ESlateVisibility::Hidden);
-
-	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
-	ISTRUE(nullptr != GameModeInterface);
-	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
-	
 }
 
-void UMCONextWidget::OnGameStateChanged(const EMCOGameState& InState)
+void UMCONextWidget::OnShow()
 {
-	if (InState == EMCOGameState::MOVE_TO_NEXT_STAGE)
+	if (CurrentTime == 0)
 	{
-		SetVisibility(ESlateVisibility::Hidden);
-	}
-	else if (InState == EMCOGameState::NEXT)
-	{
-		SetVisibility(ESlateVisibility::Visible);
 		StartTimer();
 	}
+	
+	Super::OnShow();
 }
 
 void UMCONextWidget::StartTimer()
 {
 	TimeTxt->SetText(FText::FromString(FString::Printf(TEXT("%d"), NEXT_STAGE_TIME)));
-	
-	CurrentTime = 0;
 	
 	NextStageTimerHandle.Invalidate();
 	
@@ -71,6 +59,8 @@ void UMCONextWidget::UpdateTime()
 
 void UMCONextWidget::MoveToNextStage()
 {
+	CurrentTime = 0;
+	
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
 	GameModeInterface->OnChangeGameState(EMCOGameState::MOVE_TO_NEXT_STAGE);

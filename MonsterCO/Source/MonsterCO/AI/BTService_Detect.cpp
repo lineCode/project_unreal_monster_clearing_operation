@@ -66,10 +66,11 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (nullptr != Target && true == Target->GetController()->IsPlayerController())
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Target);
+				OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_LASTTARGETPOS, Target->GetActorLocation());
 
 #if ENABLE_DRAW_DEBUG
-				// DrawDebugPoint(World, Pawn->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
-				// DrawDebugLine(World, ControllingPawn->GetActorLocation(), Pawn->GetActorLocation(), FColor::Green, false, 0.27f);
+				DrawDebugPoint(World, Target->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+				// DrawDebugLine(World, ControllingPawn->GetActorLocation(), Target->GetActorLocation(), FColor::Green, false, 0.27f);
 #endif
 				return;
 			}
@@ -77,4 +78,5 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 	}
 	
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, nullptr);
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_LASTTARGETPOS, nullptr);
 }

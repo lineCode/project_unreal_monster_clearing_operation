@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "Blueprint/UserWidget.h"
+#include "MCOMainWidget.h"
 #include "MCONextWidget.generated.h"
 
 
@@ -11,7 +11,7 @@ class UTextBlock;
 
 
 UCLASS()
-class MONSTERCO_API UMCONextWidget : public UUserWidget
+class MONSTERCO_API UMCONextWidget : public UMCOMainWidget
 {
 	GENERATED_BODY()
 		
@@ -21,10 +21,10 @@ public:
 protected:
 	virtual void NativeConstruct() override;
 
-protected:
-	UFUNCTION()
-	void OnGameStateChanged(const EMCOGameState& InState);
+public:
+	virtual void OnShow() override;
 
+protected:
 	void StartTimer();
 	void UpdateTime();
 	void MoveToNextStage();

@@ -12,6 +12,7 @@ void FMCOCharacterTags::InitializeTags()
 	
 	CharacterTags.MoveTag = FGameplayTag::RequestGameplayTag(FName("Input.Move"), bErrorIfNotFound);
 	CharacterTags.LookTag = FGameplayTag::RequestGameplayTag(FName("Input.Look"), bErrorIfNotFound);
+	CharacterTags.OptionTag = FGameplayTag::RequestGameplayTag(FName("Input.Option"), bErrorIfNotFound);
 
 	CharacterTags.GameplayEffectTag              = FGameplayTag::RequestGameplayTag(FName("GameplayEffect"),              bErrorIfNotFound);
 

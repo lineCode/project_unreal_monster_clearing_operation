@@ -9,6 +9,10 @@ class UMCOHUDWidget;
 class UMCOStaminaWidget;
 class IMCOCharacterInterface;
 
+
+
+
+
 UINTERFACE(MinimalAPI)
 class UMCOHUDInterface : public UInterface
 {

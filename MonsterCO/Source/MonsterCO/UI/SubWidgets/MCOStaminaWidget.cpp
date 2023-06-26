@@ -30,11 +30,7 @@ void UMCOStaminaWidget::NativeConstruct()
 
 void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
 {
-	if (InState == EMCOGameState::LOBBY)
-	{
-		SetVisibility(ESlateVisibility::Hidden);
-	}
-	else if (InState == EMCOGameState::RESTART_STAGE_AFTER_LOSE)
+	if (InState == EMCOGameState::RESTART_STAGE_AFTER_LOSE)
 	{
 		IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(OwningActor);
 		if (nullptr != HUDInterface)
@@ -45,9 +41,6 @@ void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::FIGHT)
 	{
 		SetVisibility(ESlateVisibility::Visible);
-	}
-	else if (InState == EMCOGameState::REWARD)
-	{
 	}
 	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
 	{

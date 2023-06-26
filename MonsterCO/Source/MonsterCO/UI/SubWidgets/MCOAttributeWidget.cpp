@@ -19,6 +19,8 @@ void UMCOAttributeWidget::NativeConstruct()
 	ensure(MaxStaminaText);
 	ensure(StiffnessText);
 	ensure(MaxStiffnessText);
+	
+	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UMCOAttributeWidget::UpdateHealth(float InValue)

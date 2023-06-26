@@ -12,6 +12,7 @@
 #include "Input/MCOInputComponent.h"
 #include "Input/MCOInputConfig.h"
 #include "MCOPlayerControlData.h"
+#include "MCOPlayerController.h"
 #include "MCOPlayerSetting.h"
 #include "Character/MCOCharacterData.h"
 #include "Character/MCOPlayerState.h"
@@ -21,9 +22,9 @@
 #include "CharacterAttachment/Attachment/MCOAttachment.h"
 #include "CharacterAttachment/MCOPlayerModeComponent.h"
 #include "CharacterAttachment/Attachment/MCOWeapon.h"
-#include "UI/MCOHUDWidget.h"
+#include "UI/MainWidgets/MCOHUDWidget.h"
 #include "UI/MCOWidgetComponent.h"
-#include "UI/Widgets/MCOStaminaWidget.h"
+#include "UI/SubWidgets/MCOStaminaWidget.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
 #include "Item/MCOItemData_Potion.h"
@@ -49,7 +50,7 @@ AMCOPlayerCharacter::AMCOPlayerCharacter(const FObjectInitializer& ObjectInitial
 	WidgetComponent = CreateDefaultSubobject<UMCOWidgetComponent>(TEXT("NAME_WidgetComponent"));
 	WidgetComponent->SetupAttachment(GetMesh());
 	WidgetComponent->SetRelativeLocation(FVector(20.0f, -50.0f, 160.0f));
-	static ConstructorHelpers::FClassFinder<UUserWidget> StaminaWidgetRef(TEXT("/Game/UI/WBP_PlayerStamina.WBP_PlayerStamina_C"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> StaminaWidgetRef(TEXT("/Game/UI/Widgets/WBP_PlayerStamina.WBP_PlayerStamina_C"));
 	if (StaminaWidgetRef.Class)
 	{
 		WidgetComponent->SetWidgetClass(StaminaWidgetRef.Class); 
@@ -153,6 +154,7 @@ void AMCOPlayerCharacter::InitializeCharacter()
 
 	bCanTurnByInput = true;
 	bCanMoveByInput = true;
+	bIsOptionOpened = false;
 	bIsMonsterInfoShowed = false;
 	bIsStaminaTimerTicking = false;
 	CurrentStaminaForWidget = GetStamina();
@@ -170,7 +172,10 @@ void AMCOPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 
 	MCOInputComponent->SetMappingContext(InputConfig, Subsystem);
-		
+
+	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().OptionTag, ETriggerEvent::Triggered, this, &ThisClass::Option);
+	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().OptionTag, ETriggerEvent::Completed, this, &ThisClass::UnOption);
+	
 	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().MoveTag, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().MoveTag, ETriggerEvent::Completed, this, &ThisClass::MoveReleased);
 	MCOInputComponent->BindNativeAction(InputConfig, FMCOCharacterTags::Get().LookTag, ETriggerEvent::Triggered, this, &ThisClass::Look);
@@ -340,6 +345,19 @@ bool AMCOPlayerCharacter::CanActivateAbility(const FGameplayTag& InTag)
 	}
 	
 	return true;
+}
+
+void AMCOPlayerCharacter::Option()
+{
+	MCOPRINT(TEXT("Option Key Pressed"));
+	
+	AMCOPlayerController* PlayerController = Cast<AMCOPlayerController>(GetController());
+	PlayerController->OnOptionKeyPressed();
+}
+
+void AMCOPlayerCharacter::UnOption()
+{
+	MCOPRINT(TEXT("Option Key Completed"));
 }
 
 void AMCOPlayerCharacter::SetSpeed(const EMCOCharacterSpeed& InSpeed) const

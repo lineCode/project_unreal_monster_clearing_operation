@@ -1,9 +1,9 @@
 #include "MCOHUDWidget.h"
 #include "Interface/MCOGameModeInterface.h"
-#include "Widgets/MCOHpWidget.h"
-#include "Widgets/MCOAttributeWidget.h"
-#include "Widgets/MCOSkillWidget.h"
-#include "Widgets/MCOSkillWidgetData.h"
+#include "UI/SubWidgets/MCOHpWidget.h"
+#include "UI/SubWidgets/MCOAttributeWidget.h"
+#include "UI/SubWidgets/MCOSkillWidget.h"
+#include "UI/SubWidgets/MCOSkillWidgetData.h"
 #include "Interface/MCOHUDInterface.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
@@ -24,9 +24,6 @@ void UMCOHUDWidget::NativeConstruct()
 	SetInGameWidget(PlayerName);
 	SetInGameWidget(MonsterName);
 
-	TitleWidget = GetWidgetFromName(TEXT("WBP_Title")); 
-	ensure(nullptr != TitleWidget);
-	
 	// for (int32 i = 0; i < SLOT_MAX; i++)
 	// {
 	// 	SkillWidgets.Emplace(Cast<UMCOSkillWidget>(GetWidgetFromName(
@@ -47,13 +44,7 @@ void UMCOHUDWidget::NativeConstruct()
 
 void UMCOHUDWidget::OnGameStateChanged(const EMCOGameState& InState)
 {
-	if (InState == EMCOGameState::LOBBY)
-	{
-		ShowTitleWidget(true);
-		ShowInGameWidget(PlayerName, false);
-		ShowInGameWidget(MonsterName, false);
-	}
-	else if (InState == EMCOGameState::RESTART_STAGE_AFTER_LOSE)
+	if (InState == EMCOGameState::RESTART_STAGE_AFTER_LOSE)
 	{
 		IMCOHUDInterface* HUDPawn = Cast<IMCOHUDInterface>(GetOwningPlayerPawn());
 		ensure(nullptr != HUDPawn);
@@ -62,19 +53,6 @@ void UMCOHUDWidget::OnGameStateChanged(const EMCOGameState& InState)
 	else if (InState == EMCOGameState::FIGHT)
 	{
 		ShowInGameWidget(PlayerName, true);
-		ShowInGameWidget(MonsterName, false);
-	}
-	else if (InState == EMCOGameState::REWARD)
-	{
-	}
-	else if (InState == EMCOGameState::NEXT)
-	{
-		//ShowInGameWidget(PlayerName, false);
-		//ShowInGameWidget(MonsterName, false);
-	}
-	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
-	{
-		ShowInGameWidget(PlayerName, false);
 		ShowInGameWidget(MonsterName, false);
 	}
 }
@@ -104,13 +82,6 @@ void UMCOHUDWidget::ShowInGameWidget(const FName& InName, bool bShow)
 	
 	HpWidgets[InName]->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 	AttributeWidgets[InName]->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-}
-
-void UMCOHUDWidget::ShowTitleWidget(const bool bShow)
-{
-	ISTRUE(nullptr != TitleWidget);
-	
-	TitleWidget->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 UMCOHpWidget* UMCOHUDWidget::GetHpWidget(const bool bIsPlayer)

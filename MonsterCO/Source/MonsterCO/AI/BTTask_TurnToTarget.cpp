@@ -64,7 +64,7 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	const FRotator InterpRot = FMath::RInterpTo(
 		ControllingPawn->GetActorRotation(),
 		PrevTargetRot,
-		GetWorld()->GetDeltaSeconds(),
+		DeltaSeconds,
 		AIPawn->GetAITurnSpeed()
 	);
 

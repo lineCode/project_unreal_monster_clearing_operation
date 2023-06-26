@@ -1,7 +1,7 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "Blueprint/UserWidget.h"
+#include "MCOMainWidget.h"
 #include "MCOResultWidget.generated.h"
 
 
@@ -10,23 +10,20 @@ class UButton;
 
 
 UCLASS()
-class MONSTERCO_API UMCOResultWidget : public UUserWidget
+class MONSTERCO_API UMCOResultWidget : public UMCOMainWidget
 {
 	GENERATED_BODY()
 	
-public:
-	UMCOResultWidget(const FObjectInitializer& ObjectInitializer);
-
 protected:
 	virtual void NativeConstruct() override;
 
+public:
+	virtual void OnShow() override;
+	
+	void OnSuccessUI();
+	void OnFailUI();
+	
 protected:
-	UFUNCTION()
-	void OnGameStateChanged(const EMCOGameState& InState);
-
-	void SetSuccessUI();
-	void SetFailUI();
-
 	UFUNCTION()
 	void BackToTitle();
 	
@@ -39,6 +36,9 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UButton> ResultButton;
+	
+	UPROPERTY()
+	TObjectPtr<UButton> ExitButton;
 
 	UPROPERTY()
 	TObjectPtr<UTextBlock> ResultButtonTxt;

@@ -1,20 +1,19 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "Blueprint/UserWidget.h"
+#include "MCOMainWidget.h"
 #include "AbilitySystem/CharacterAbility/MCOCommonMontageData.h"
 #include "MCOHUDWidget.generated.h"
 
 
 class UMCOHpWidget;
 class UMCOAttributeWidget;
-class UMCOSkillWidget;
-class UMCOSkillWidgetData;
-class UMCOResultWidget;
+class UMCOOptionWidget;
+
 
 
 UCLASS()
-class MONSTERCO_API UMCOHUDWidget : public UUserWidget
+class MONSTERCO_API UMCOHUDWidget : public UMCOMainWidget
 {
 	GENERATED_BODY()
 
@@ -34,7 +33,6 @@ public:
 protected:
 	void ShowInGameWidget(const FName& InName, bool bShow);
 	void SetInGameWidget(const FName& InName);
-	void ShowTitleWidget(const bool bShow);
 
 protected:
 	UPROPERTY()
@@ -42,7 +40,6 @@ protected:
 	
 	UPROPERTY()
 	FName MonsterName;
-	
 	
 // --- HP Widget
 public:
@@ -62,10 +59,6 @@ protected:
 	TMap<FName, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
 
 	
-// --- Title
-protected:
-	UPROPERTY()
-	TObjectPtr<UWidget> TitleWidget;
 
 	
 // --- Skill Widget

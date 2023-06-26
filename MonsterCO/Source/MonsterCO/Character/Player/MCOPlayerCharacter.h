@@ -14,6 +14,7 @@ class UMCOInputConfig;
 class USpringArmComponent;
 class UCameraComponent;
 class UMCOHUDWidget;
+class UMCOOptionWidget;
 class UWidgetComponent;
 class UMCOPlayerSetting;
 
@@ -87,6 +88,9 @@ public:
 	bool CanMoveCamera() const;
 	bool CanMoveCharacter() const;
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
+
+	void Option();
+	void UnOption();
 	
 	void Move(const FInputActionValue& Value);
 	void MoveReleased();
@@ -101,6 +105,8 @@ public:
 	
 	bool bCanMoveByInput;
 	bool bCanTurnByInput;
+
+	bool bIsOptionOpened;
 	
 // --- Mode & Weapon 
 public:

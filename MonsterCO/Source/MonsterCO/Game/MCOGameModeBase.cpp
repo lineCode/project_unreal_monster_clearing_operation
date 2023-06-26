@@ -16,7 +16,7 @@ void AMCOGameModeBase::StartPlay()
 {
 	Super::StartPlay();
 	
-	OnChangeGameState(EMCOGameState::LOBBY);
+	OnChangeGameState(EMCOGameState::TITLE);
 }
 
 void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)

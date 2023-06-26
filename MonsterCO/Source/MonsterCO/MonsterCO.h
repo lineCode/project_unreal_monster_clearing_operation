@@ -73,45 +73,31 @@ ensure(OutResult);
 UENUM(BlueprintType)
 enum class EMCOGameState : uint8
 {
-	LOBBY,
+	NONE,
+	
+	TITLE,
+	
 	RESTART_STAGE_AFTER_LOSE,
 	MOVE_TO_NEXT_STAGE,
 	FIGHT,
 	MONSTER_DIED,
 	REWARD,
+	
 	NEXT,
+	
 	RESULT_WIN,
-	RESULT_LOSE
-};
-
-
-UENUM(BlueprintType)
-enum class EMCOAbilityID : uint8
-{
-	None           UMETA(DisplayName = "None"),
-	Confirm        UMETA(DisplayName = "Confirm"),
-	Cancel         UMETA(DisplayName = "Cancel"),
-      
-	Idle           UMETA(DisplayName = "Idle"),
-	Jump           UMETA(DisplayName = "Jump"),
-	Dodge          UMETA(DisplayName = "Roll"),
-	Dash           UMETA(DisplayName = "Dash"),
-	Equip          UMETA(DisplayName = "Equip"),
-	NormalAttack   UMETA(DisplayName = "NormalAttack"),
-	Damaged        UMETA(DisplayName = "Damaged"),
-	Dead           UMETA(DisplayName = "Dead"),
-  
-	// TO DO  
-	SkillA         UMETA(DisplayName = "SkillA"),
-	SkillB         UMETA(DisplayName = "SkillB")
+	RESULT_LOSE,
 };
 
 UENUM(BlueprintType)
-enum class EMCOMonsterAttack : uint8
+enum class EMCOWidgetState : uint8
 {
-	NormalAttack   UMETA(DisplayName = "NormalAttack"),
-	SkillA         UMETA(DisplayName = "SkillA"),
-	SkillB         UMETA(DisplayName = "SkillB")
+	NONE,	
+	TITLE,
+	INGAME,
+	NEXT,
+	RESULT,
+	OPTION
 };
 
 UENUM(BlueprintType)
