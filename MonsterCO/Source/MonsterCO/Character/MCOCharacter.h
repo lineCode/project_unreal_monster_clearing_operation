@@ -70,10 +70,12 @@ public:
 	void DestroyAllAttachedActors() const;
 	virtual FVector GetSocketLocation(const FName& InSocketName) override;
 	virtual FTransform GetSocketTransform(const FName& InSocketName) override;
+	virtual bool IsCharacterOnGround() const override;
 
 	
 // --- Ability
 public:
+	virtual void OnRep_PlayerState() override;
 	virtual void InitializeCharacter();
 	void UninitializeAbilitySystem();
 	

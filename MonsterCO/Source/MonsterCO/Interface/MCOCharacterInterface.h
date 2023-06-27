@@ -68,8 +68,8 @@ public:
 public:
 	virtual FVector GetSocketLocation(const FName& InSocketName) = 0;
 	virtual FTransform GetSocketTransform(const FName& InSocketName) = 0;
-
 	virtual float GetCapsuleRadius() const = 0;
+	virtual bool IsCharacterOnGround() const = 0;
 
 // --- Collision
 public:

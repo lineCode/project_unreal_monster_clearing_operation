@@ -141,13 +141,6 @@ void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	}
 }
 
-void AMCOPlayerCharacter::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-
-	InitializeCharacter();
-}
-
 void AMCOPlayerCharacter::InitializeCharacter()
 {
 	Super::InitializeCharacter();

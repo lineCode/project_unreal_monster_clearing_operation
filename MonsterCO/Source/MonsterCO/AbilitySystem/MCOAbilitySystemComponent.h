@@ -22,7 +22,7 @@ public:
 	bool bCharacterAbilitySetGiven;
 
 public:
-	void TryActivateAbilityByTag(const FGameplayTag& InTag);
+	bool TryActivateAbilityByTag(const FGameplayTag& InTag);
 	void CancelAbilityByTag(const FGameplayTag& InTag);
 
 public:

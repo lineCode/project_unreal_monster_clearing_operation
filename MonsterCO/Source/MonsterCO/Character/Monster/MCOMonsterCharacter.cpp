@@ -3,6 +3,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "MCOMonsterAIController.h"
 #include "Character/MCOCharacterData.h"
@@ -18,8 +19,6 @@ AMCOMonsterCharacter::AMCOMonsterCharacter(const FObjectInitializer& ObjectIniti
 	GETASSET(CharacterData, UMCOCharacterData, TEXT("/Game/Data/Monster/Dragon/DA_Dragon.DA_Dragon"));
 	GETASSET(MonsterAIData, UMCOMonsterAIData, TEXT("/Game/Data/Monster/Dragon/DA_DragonAIData.DA_DragonAIData"));
 
-	GetMesh()->SetGenerateOverlapEvents(true);
-	
 	bUseControllerRotationYaw = true;	
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
@@ -28,10 +27,12 @@ AMCOMonsterCharacter::AMCOMonsterCharacter(const FObjectInitializer& ObjectIniti
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
 	ModeComponent = CreateDefaultSubobject<UMCOMonsterModeComponent>(TEXT("NAME_ModeComponent"));
-
-	bIsTurning = false;
 	
 	SetCharacterData();
+
+	GetCharacterMovement()->MaxWalkSpeed = MonsterAIData->MoveSpeed;
+	GetCharacterMovement()->MinAnalogWalkSpeed = MonsterAIData->MoveSpeed;
+	GetCharacterMovement()->MaxFlySpeed = MonsterAIData->FlySpeed;
 }
 
 void AMCOMonsterCharacter::PostInitializeComponents()
@@ -96,6 +97,12 @@ void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
 	}
 }
 
+void AMCOMonsterCharacter::InitializeCharacter()
+{
+	Super::InitializeCharacter();
+	
+}
+
 bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
 {
 	ISTRUE_F(true == Super::CanActivateAbility(InTag));
@@ -109,15 +116,7 @@ bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
 	
 		return GetAbilitySystemComponent()->HasAnyMatchingGameplayTags(ActivationBlockedTags) == false;
 	}
-	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Claw)
-	{
-		
-	}
-	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Fireball)
-	{
-		
-	}
-	else if (InTag == FMCOCharacterTags::Get().DragonAbility_Breath)
+	else if (InTag == FMCOCharacterTags::Get().AttackTag)
 	{
 		
 	}
@@ -157,14 +156,86 @@ float AMCOMonsterCharacter::GetAITurnSpeed() const
 	return MonsterAIData->TurnSpeed;
 }
 
-FVector AMCOMonsterCharacter::GetAITurnVector() const
+float AMCOMonsterCharacter::GetAIFlySpeed() const
 {
-	return TurnVector;
+	return MonsterAIData->FlySpeed;
+}
+
+float AMCOMonsterCharacter::GetHalfHeight() const
+{
+	UCapsuleComponent* Capsule = GetCapsuleComponent();
+
+	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleHalfHeight() : 0.0f;
+}
+
+void AMCOMonsterCharacter::SetMovementMode(EMovementMode InMode)
+{
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	ISTRUE(nullptr != CharacterMC);
+
+	CharacterMC->MovementMode = InMode;
+}
+
+void AMCOMonsterCharacter::SetFlyMode(EMCOMonsterFlyMode InFlyMode)
+{
+	MCOLOG_C(MCOMonsterAI, TEXT("SetFlyMode : %s"), *FHelper::GetEnumDisplayName(TEXT("EMCOMonsterFlyMode"), (int64)InFlyMode));
+	
+	FlyMode = InFlyMode;
+}
+
+EMCOMonsterFlyMode AMCOMonsterCharacter::GetFlyMode()
+{
+	return FlyMode;
+}
+
+void AMCOMonsterCharacter::SetGravity(float InGravity)
+{
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	ISTRUE(nullptr != CharacterMC);
+
+	CharacterMC->GravityScale = InGravity;
+}
+
+void AMCOMonsterCharacter::AddForce(FVector InForce)
+{
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	ISTRUE(nullptr != CharacterMC);
+
+	CharacterMC->AddForce(InForce);
+}
+
+FVector AMCOMonsterCharacter::GetVelocity()
+{
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	if (nullptr == CharacterMC)
+	{
+		return FVector();
+	}
+
+	return CharacterMC->Velocity;
+}
+
+void AMCOMonsterCharacter::SetVelocity(FVector InVelocity)
+{
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	ISTRUE(nullptr != CharacterMC);
+
+	CharacterMC->Velocity = InVelocity;
 }
 
 bool AMCOMonsterCharacter::IsTurning() const
 {
-	return bIsTurning;
+	return false == TurnVector.IsNearlyZero();
+}
+
+FVector AMCOMonsterCharacter::GetTurnVector() const
+{
+	return TurnVector;
+}
+
+void AMCOMonsterCharacter::SetTurnVector(const FVector& InTurnVector)
+{
+	TurnVector = InTurnVector;
 }
 
 void AMCOMonsterCharacter::SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnAttackFinished)
@@ -177,12 +248,6 @@ void AMCOMonsterCharacter::OnActionFinished(const EBTNodeResult::Type& InResult)
 	OnAttackFinishedDelegate.ExecuteIfBound(InResult);
 }
 
-void AMCOMonsterCharacter::SetTurnVector(const bool InIsTurning, const FVector& InTurnVector)
-{
-	bIsTurning = InIsTurning;
-	TurnVector = InTurnVector;
-}
-
 void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
 {
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
@@ -190,12 +255,12 @@ void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
 	AIController->SetDamagedInBlackBoard(IsDamaged);
 }
 
-void AMCOMonsterCharacter::Attack(const FGameplayTag& InTag) const
+bool AMCOMonsterCharacter::Attack(const FGameplayTag& InTag) const
 {
 	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
-	ISTRUE(nullptr != ASC);
+	ISTRUE_F(nullptr != ASC);
 
-	ASC->TryActivateAbilityByTag(InTag);
+	return ASC->TryActivateAbilityByTag(InTag);
 }
 
 void AMCOMonsterCharacter::ContinueAI() const

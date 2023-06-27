@@ -37,6 +37,9 @@ public:
 	void OnGameStateChanged(const EMCOGameState& InState);
 	
 // --- Ability
+public:
+	virtual void InitializeCharacter() override;
+
 protected:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
 	
@@ -55,19 +58,28 @@ protected:
 	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) const override;
 	virtual float GetAIAttackRangeMax(const FGameplayTag& InTag) const override;
 	virtual float GetAITurnSpeed() const override;
+	virtual float GetAIFlySpeed() const override;
+	virtual float GetHalfHeight() const override;
 	
 // --- AI/State
 protected:
-	virtual FVector GetAITurnVector() const override;
+	virtual void SetMovementMode(EMovementMode InMode) override;
+	virtual void SetFlyMode(EMCOMonsterFlyMode InFlyMode) override;
+	virtual EMCOMonsterFlyMode GetFlyMode() override;
+	virtual void SetGravity(float InGravity) override;
+	virtual void AddForce(FVector InForce) override;
+	virtual FVector GetVelocity() override;
+	virtual void SetVelocity(FVector InVelocity) override;
 	virtual bool IsTurning() const override;
-	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) override;
+	virtual FVector GetTurnVector() const override;
+	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) override;
 	virtual void SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnAttackFinished) override;
 	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const override;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const override;
 	
 // --- AI/Action
 protected:
-	virtual void Attack(const FGameplayTag& InTag) const override;
+	virtual bool Attack(const FGameplayTag& InTag) const override;
 
 protected:
 	void ContinueAI() const;
@@ -77,7 +89,8 @@ protected:
 	UPROPERTY()
 	FVector TurnVector;
 
-	bool bIsTurning;
+	UPROPERTY()
+	EMCOMonsterFlyMode FlyMode;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = MCO)

@@ -39,7 +39,7 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 	PrevTargetRot = TargetRot;
 	
-	AIPawn->SetTurnVector(true, LookVector);
+	AIPawn->SetTurnVector(LookVector);
 	return EBTNodeResult::InProgress;
 }
 
@@ -57,6 +57,7 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	IMCOMonsterAIInterface* AIPawn = Cast<IMCOMonsterAIInterface>(ControllingPawn);
 	if (nullptr == AIPawn)
 	{
+		AIPawn->SetTurnVector();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
@@ -73,7 +74,7 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	
 	if (true == FMath::IsNearlyEqual(ControllingPawn->GetActorRotation().Yaw, TargetRot.Yaw, 5.0f))
 	{
-		AIPawn->SetTurnVector(false);
+		AIPawn->SetTurnVector();
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

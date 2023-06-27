@@ -126,6 +126,19 @@ FTransform AMCOCharacter::GetSocketTransform(const FName& InSocketName)
 	return Transform;
 }
 
+bool AMCOCharacter::IsCharacterOnGround() const
+{
+	ISTRUE_F(nullptr != GetCharacterMovement());
+	return false == GetCharacterMovement()->IsFalling();
+}
+
+void AMCOCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	InitializeCharacter();
+}
+
 void AMCOCharacter::InitializeCharacter()
 {
 	// get ASC

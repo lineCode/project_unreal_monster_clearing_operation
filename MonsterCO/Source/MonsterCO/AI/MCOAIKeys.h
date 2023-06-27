@@ -7,3 +7,4 @@
 #define BBKEY_TARGETROT     TEXT("TargetRot")
 #define BBKEY_MYROT         TEXT("MyRot")
 #define BBKEY_ISDAMAGED     TEXT("IsDamaged")
+#define BBKEY_FLYUPPOS      TEXT("FlyUpPos")

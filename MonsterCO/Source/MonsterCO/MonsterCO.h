@@ -115,6 +115,16 @@ enum class EMCOPlayerMode : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMCOMonsterFlyMode : uint8
+{
+	Down = 0       UMETA(DisplayName = "Down"),
+	Hold           UMETA(DisplayName = "Hold"),
+	Up             UMETA(DisplayName = "Up"),
+	Max            UMETA(DisplayName = "Max")
+};
+
+
+UENUM(BlueprintType)
 enum class EMCOCharacterSpeed : uint8
 {
 	Slow           UMETA(DisplayName = "Slow"),

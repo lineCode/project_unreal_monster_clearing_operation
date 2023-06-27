@@ -33,7 +33,13 @@ public:
 	float DetectRange;
 	
 	UPROPERTY(EditAnywhere, Category = AI)
+	float MoveSpeed;
+	
+	UPROPERTY(EditAnywhere, Category = AI)
 	float TurnSpeed;
+	
+	UPROPERTY(EditAnywhere, Category = AI)
+	float FlySpeed;
 
 protected:	
 	UPROPERTY(EditAnywhere, Category = AI)

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "MonsterCO.h"
 #include "GameplayTagContainer.h"
 #include "BehaviorTree/BehaviorTreeTypes.h"
@@ -30,12 +29,21 @@ public:
 	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) const = 0;
 	virtual float GetAIAttackRangeMax(const FGameplayTag& InTag) const = 0;
 	virtual float GetAITurnSpeed() const = 0;
+	virtual float GetAIFlySpeed() const = 0;
+	virtual float GetHalfHeight() const = 0;
 
 // --- AI/State	
 public:
-	virtual FVector GetAITurnVector() const = 0;
+	virtual void SetMovementMode(EMovementMode InMode) = 0;
+	virtual void SetGravity(float InGravity) = 0;
+	virtual void SetFlyMode(EMCOMonsterFlyMode InFlyMode) = 0;
+	virtual EMCOMonsterFlyMode GetFlyMode() = 0;
+	virtual void AddForce(FVector InForce) = 0;
+	virtual void SetVelocity(FVector InVelocity) = 0;
+	virtual FVector GetVelocity() = 0;
 	virtual bool IsTurning() const = 0;
-	virtual void SetTurnVector(const bool InIsTurning, const FVector& InTurnVector = FVector()) = 0;
+	virtual FVector GetTurnVector() const = 0;
+	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) = 0;
 	
 	virtual void SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnActionFinished) = 0;
 	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const = 0;
@@ -43,5 +51,5 @@ public:
 
 // --- AI/Action
 public:
-	virtual void Attack(const FGameplayTag& InTag) const = 0;
+	virtual bool Attack(const FGameplayTag& InTag) const = 0;
 };

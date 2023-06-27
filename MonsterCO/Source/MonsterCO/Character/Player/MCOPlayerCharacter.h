@@ -62,12 +62,8 @@ protected:
 
 	
 // --- Ability System
-protected:
-	virtual void OnRep_PlayerState() override;
-
 public:
 	virtual void InitializeCharacter() override;
-
 	
 // --- Input
 public:	

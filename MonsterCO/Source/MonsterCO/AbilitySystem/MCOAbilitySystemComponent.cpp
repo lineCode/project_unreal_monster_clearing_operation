@@ -20,17 +20,21 @@ void UMCOAbilitySystemComponent::NotifyAbilityFailed(const FGameplayAbilitySpecH
 	}
 }
 
-void UMCOAbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag& InTag)
+bool UMCOAbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag& InTag)
 {
-	ISTRUE(true == InTag.IsValid());
+	ISTRUE_F(true == InTag.IsValid());
+
+	bool bResult = false;
 	
 	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
 	{
 		if (AbilitySpec.Ability == nullptr) continue;
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InTag) == false) continue;
 
-		TryActivateAbility(AbilitySpec.Handle);
+		bResult = bResult || TryActivateAbility(AbilitySpec.Handle);
 	}
+
+	return bResult;
 }
 
 void UMCOAbilitySystemComponent::CancelAbilityByTag(const FGameplayTag& InTag)

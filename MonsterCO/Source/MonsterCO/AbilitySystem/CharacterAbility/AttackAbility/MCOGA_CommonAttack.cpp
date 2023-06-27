@@ -321,7 +321,8 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 	IMCOCharacterInterface* AttackerInterface = Cast<IMCOCharacterInterface>(Attacker);
 	ISTRUE(nullptr != AttackerInterface);
 
-	const FVector Start = AttackerInterface->GetSocketLocation(CurrentDefinition->CollisionFragment->SocketName);
+	const FName SocketName = CurrentDefinition->CollisionFragment->SocketName;
+	const FVector Start = (SocketName != NAME_None) ? AttackerInterface->GetSocketLocation(CurrentDefinition->CollisionFragment->SocketName) : Attacker->GetActorLocation();
 	// const FVector Start = Attacker->GetActorLocation() +
 	// 	(Attacker->GetActorForwardVector() * Radius) +
 	// 	(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);

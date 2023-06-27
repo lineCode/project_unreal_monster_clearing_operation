@@ -37,8 +37,13 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 	});
 
 	AIPawn->SetActionDelegate(OnAttackFinished);
-	AIPawn->Attack(AttackTag);
+	
+	const bool bTryAttack = AIPawn->Attack(AttackTag);
 
+	if (false == bTryAttack)
+	{
+		return EBTNodeResult::Failed;
+	}
 	
 	//MCOLOG_C(MCOMonsterAI, TEXT("Monster Attack [%s] is INPROGRESS"), *AttackTag.GetTagName().ToString());
 	return EBTNodeResult::InProgress;
