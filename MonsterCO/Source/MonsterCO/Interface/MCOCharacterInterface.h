@@ -80,6 +80,7 @@ public:
 	
 // --- Damaged
 public:
+	virtual bool CheckCanBeDamaged(FGameplayTag InTag) = 0;
 	virtual const FMCODamagedData& GetDamagedData() = 0;
 	virtual void SetDamagedData(const FMCODamagedData& InDegree) = 0;
 

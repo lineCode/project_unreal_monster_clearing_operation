@@ -57,6 +57,7 @@ public:
 	FGameplayTag DragonAbility_Claw;
 	FGameplayTag DragonAbility_Fireball;
 	FGameplayTag DragonAbility_Breath;
+	FGameplayTag DragonAbility_Falldown;
 
 private:
 	static FMCOCharacterTags CharacterTags;

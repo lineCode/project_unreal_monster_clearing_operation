@@ -47,7 +47,7 @@ void UMCOGA_MonsterDirectionalAttack::ActivateAbility(const FGameplayAbilitySpec
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
-	StartActivation_CommonAttack(
+	StartAttackActivation(
 		Data->GetMontage(Direction),
 		Data->MontageSectionName
 	);

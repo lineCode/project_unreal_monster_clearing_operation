@@ -20,11 +20,11 @@ class MONSTERCO_API UMCOGA_CommonAttack : public UMCOGameplayAbility
 
 public:
 	UMCOGA_CommonAttack();
-
+	
 	
 // --- Ability
 protected:
-	void StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName);
+	void StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName, bool InIsInstantAttack = false);
 
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
@@ -38,6 +38,9 @@ private:
 	void BeginDamaging_Collision();
 	void EndDamaging_Collision();
 
+private:
+	bool bIsInstantAttack;
+	
 // --- Attack
 protected:
 	void ApplyDamageAndStiffness(ACharacter* InAttackedCharacter);

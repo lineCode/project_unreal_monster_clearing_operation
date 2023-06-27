@@ -326,6 +326,18 @@ void AMCOCharacter::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float D
 	
 }
 
+bool AMCOCharacter::CheckCanBeDamaged(FGameplayTag InAttackTag)
+{
+	// except dodge...
+	
+	if (InAttackTag == FMCOCharacterTags::Get().DragonAbility_Falldown)
+	{
+		return IsCharacterOnGround();
+	}
+
+	return true;
+}
+
 void AMCOCharacter::SetDamagedData(const FMCODamagedData& InDamagedData)
 {
 	CurrentDamagedData = InDamagedData;

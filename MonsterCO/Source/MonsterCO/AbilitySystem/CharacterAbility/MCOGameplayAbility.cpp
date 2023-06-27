@@ -76,6 +76,7 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
 	StopCharacterFromMoving(false);
+	StopCharacterFromTurning(false);
 
 	CancelAbilityEffectsSelf();
 

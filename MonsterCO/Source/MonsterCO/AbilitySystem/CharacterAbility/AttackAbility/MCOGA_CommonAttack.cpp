@@ -33,12 +33,17 @@ UMCOGA_CommonAttack::UMCOGA_CommonAttack()
 // 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 // }
 
-void UMCOGA_CommonAttack::StartActivation_CommonAttack(UAnimMontage* InMontage, const FName& InSectionName)
+void UMCOGA_CommonAttack::StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName, bool InIsInstantAttack)
 {
+	bIsInstantAttack = InIsInstantAttack;
+	
 	DamagedCharacters.Reset();
 
-	// Play Montage
-	StartActivationWithMontage(InMontage, InSectionName);
+	if (nullptr != InMontage)
+	{
+		// Play Montage
+		StartActivationWithMontage(InMontage, InSectionName);
+	}
 
 	// Damage Timer
 	SetDamageTimer();
@@ -233,6 +238,11 @@ void UMCOGA_CommonAttack::Attack()
 	{
 		AttackByInstantCheck();
 	}
+
+	if (true == bIsInstantAttack)
+	{
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	}
 }
 
 void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult)
@@ -364,6 +374,15 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 			continue;
 		}
 		if (Attacker == AttackedCharacter)
+		{
+			continue;
+		}
+		IMCOCharacterInterface* AttackedCharacterInterface = Cast<IMCOCharacterInterface>(AttackedCharacter);
+		if (nullptr == AttackedCharacterInterface)
+		{
+			continue;
+		}
+		if (false == AttackedCharacterInterface->CheckCanBeDamaged(AbilityTag))
 		{
 			continue;
 		}

@@ -21,7 +21,7 @@ void UMCOGameplayAbility_SingleAttack::ActivateAbility(const FGameplayAbilitySpe
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
-	StartActivation_CommonAttack(
+	StartAttackActivation(
 		Data->Montage,
 		Data->MontageSectionName
 	);

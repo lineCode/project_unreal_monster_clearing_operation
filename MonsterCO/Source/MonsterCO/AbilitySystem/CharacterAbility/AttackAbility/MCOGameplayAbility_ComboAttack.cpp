@@ -44,7 +44,7 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
-	StartActivation_CommonAttack(
+	StartAttackActivation(
 		Data->GetMontage(CurrentCombo - 1),
 		Data->MontageSectionName
 	);
@@ -119,7 +119,7 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	}
 	
 	// Play next Montage
-	StartActivation_CommonAttack(
+	StartAttackActivation(
 		Data->GetMontage(CurrentCombo - 1),
 		Data->MontageSectionName
 	);

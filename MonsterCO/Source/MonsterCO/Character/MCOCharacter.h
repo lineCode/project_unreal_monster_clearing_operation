@@ -139,6 +139,7 @@ public:
 	UFUNCTION()
 	void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage);
 
+	virtual bool CheckCanBeDamaged(FGameplayTag InAttackTag) override;
 	virtual const FMCODamagedData& GetDamagedData() override  { return CurrentDamagedData; }
 	virtual void SetDamagedData(const FMCODamagedData&  InDamagedData) override;
 
