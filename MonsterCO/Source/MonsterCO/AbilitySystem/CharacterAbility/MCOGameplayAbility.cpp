@@ -76,7 +76,7 @@ bool UMCOGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-	MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
+	//MCOLOG_C(MCOAbility, TEXT("---- [%s] End"), *AbilityTag.GetTagName().ToString());
 	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 	
@@ -140,7 +140,7 @@ bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, cons
 		return false;
 	}
 
-	MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
+	//MCOLOG_C(MCOAbility, TEXT("---- [%s] Activated"), *AbilityTag.GetTagName().ToString());
 
 	ApplyAbilityEffectSelf(Handle, ActorInfo, ActivationInfo);
 
@@ -258,15 +258,15 @@ void UMCOGameplayAbility::CancelAbilityEffectsSelf() const
 	//MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
 }
 
-void UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect) const
+bool UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect) const
 {
-	ISTRUE(nullptr != ASC);
-	ISTRUE(nullptr != EffectClass);
-	ISTRUE(nullptr != AttributeFragment);
-	ISTRUE(true == AttributeFragment->IsEffectExistByPolicy(InPolicy));
+	ISTRUE_F(nullptr != ASC);
+	ISTRUE_F(nullptr != EffectClass);
+	ISTRUE_F(nullptr != AttributeFragment);
+	ISTRUE_F(true == AttributeFragment->IsEffectExistByPolicy(InPolicy));
 	
 	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(EffectClass);
-	ISTRUE(true == NewHandle.IsValid());
+	ISTRUE_F(true == NewHandle.IsValid());
 
 	AttributeFragment->ApplyAttributeAdditiveValue(InPolicy, NewHandle);
 
@@ -274,11 +274,13 @@ void UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOAc
 	{
 		NewHandle.Data->DynamicGrantedTags.AddTag(EffectTag);
 	}
-	
+
 	ASC->ApplyGameplayEffectSpecToSelf(
 		*NewHandle.Data.Get(),
 		ASC->GetPredictionKeyForNewAction()
 	);
+
+	return true;
 }
 
 

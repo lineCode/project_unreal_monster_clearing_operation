@@ -5,6 +5,7 @@
 #include "AbilitySystem/MCOAbilityTask_PlayMontageAndWaitForEvent.h"
 #include "AbilitySystem/ActionData/MCOActionDefinition.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
+#include "AbilitySystem/ActionData/MCOActionFragment_AttributeEffect.h"
 #include "AbilitySystem/ActionData/MCOActionFragment_Collision.h"
 #include "Physics/MCOPhysics.h"
 #include "Interface/MCOAttackedInterface.h"
@@ -90,7 +91,7 @@ void UMCOGA_CommonAttack::EndDamaging()
 		CurrentDamageTimingIdx++;
 		StartDamageBeginTimer();
 		
-		MCOLOG_C(MCOTimer, TEXT("[%d] ... Idx++ "), CurrentDamageTimingIdx);
+		//MCOLOG_C(MCOTimer, TEXT("[%d] ... Idx++ "), CurrentDamageTimingIdx);
 	}
 	
 	if (true == bUseOverlapEvent)
@@ -148,7 +149,7 @@ void UMCOGA_CommonAttack::EndDamaging_Collision()
 	CharacterInterface->TurnOffCollision(CurrentDefinition->CollisionFragment->SocketName);
 }
 
-void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter)
+void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FVector& InDamagedLocation)
 {
 	ISTRUE(nullptr != CurrentDefinition);
 	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
@@ -168,8 +169,13 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacte
 	}
 
 	const UMCOActionFragment_AttributeEffect* AttributeFragment = CurrentDefinition->AttackTimingFragment->GetAttributeFragment(CurrentDamageTimingIdx);
-	
+
+	// Instant effect
+	SendDamagedDataToTarget(InAttackedCharacter, InDamagedDegree, InDamagedLocation, EMCOEffectPolicy::Instant, AttributeFragment);
 	ApplyEffect(AttackedASC, AttributeFragment, EMCOEffectPolicy::Instant, InstantEffectWithCue);
+
+	// Duration effect
+	SendDamagedDataToTarget(InAttackedCharacter, InDamagedDegree, InDamagedLocation, EMCOEffectPolicy::Duration, AttributeFragment);
 	ApplyEffect(AttackedASC, AttributeFragment, EMCOEffectPolicy::Duration, DurationEffectWithCue);
 }
 
@@ -214,16 +220,33 @@ float UMCOGA_CommonAttack::CalculateDegree(const FVector& SourceLocation, const 
 	return Degree;
 }
 
-void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const
+void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacter, float InDegree, const FVector& InDamagedLocation,
+	const EMCOEffectPolicy& InPolicy, const UMCOActionFragment_AttributeEffect* InAttributeFragment) const
+{
+	ISTRUE(true == InAttributeFragment->IsEffectExistByPolicy(InPolicy));
+	
+	UMCODamagedData* DamagedData = NewObject<UMCODamagedData>(InAttackedCharacter);
+	DamagedData->DamagedDegree = InDegree;
+	DamagedData->DamagedLocation = InDamagedLocation;
+	DamagedData->DamagedEffectType = InAttributeFragment->GetEffectType(InPolicy);
+	DamagedData->DamagedEffectPolicy = InPolicy;
+	DamagedData->DamagedAmount = InAttributeFragment->GetDamage(InPolicy);
+	
+	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
+	ISTRUE(CharacterInterface);
+	CharacterInterface->SetDamagedData(DamagedData, InPolicy);
+}
+
+void UMCOGA_CommonAttack::RemoveDamagedDataFromTarget(ACharacter* InAttackedCharacter, const EMCOEffectPolicy& InPolicy) const
 {
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
 	ISTRUE(CharacterInterface);
-	CharacterInterface->SetDamagedData(CurrentDamagedData);
+	CharacterInterface->RemoveDamagedData(InPolicy);
 }
 
 void UMCOGA_CommonAttack::Attack()
 {
-	MCOLOG_C(MCOTimer, TEXT("[%d] ... Attack !"), CurrentDamageTimingIdx);
+	//MCOLOG_C(MCOTimer, TEXT("[%d] ... Attack !"), CurrentDamageTimingIdx);
 	
 	ISTRUE(nullptr != CurrentDefinition);
 	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
@@ -257,19 +280,16 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor
 	ISTRUE(nullptr != AttackedInterface);
 	
 	DamagedCharacters.Emplace(InAttackedCharacter);
-			
-	CurrentDamagedData.DamagedDegree = CalculateDegree(
+	
+	const float DamagedDegree = CalculateDegree(
 		InAttackedCharacter->GetActorLocation(),
 		InAttackedCharacter->GetActorForwardVector(),
 		-CurrentDefinition->CollisionFragment->GetAttackDirection(InAttacker)
 	);
 
-	CurrentDamagedData.DamagedLocation = SweepResult.ImpactPoint;
-	CurrentDamagedData.DamagedNiagara = CurrentDefinition->AttackTimingFragment->GetDamageNiagara(CurrentDamageTimingIdx);
-	CurrentDamagedData.DurationNiagara = CurrentDefinition->AttackTimingFragment->GetDurationEffectNiagara(CurrentDamageTimingIdx);
-	
-	SendDamagedDataToTarget(InAttackedCharacter);
-	ApplyDamageAndStiffness(InAttackedCharacter);
+	const FVector DamagedLocation = SweepResult.ImpactPoint;
+		
+	ApplyDamageAndStiffness(InAttackedCharacter, DamagedDegree, DamagedLocation);
 	
 	DamagedCharacters.Reset();
 }
@@ -298,6 +318,8 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 
+	ISTRUE(nullptr != SpawnedProjectile);
+	
 	// bind overlap event 
 	SpawnedProjectile->CollisionBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlap);
 
@@ -339,7 +361,7 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 	const FVector End = Start + AttackDirection * CurrentDefinition->CollisionFragment->AttackLength;
 	
 	const FCollisionShape Shape = FCollisionShape::MakeSphere(CurrentDefinition->CollisionFragment->AttackRadius);
-	const bool HitDetected = GetWorld()->SweepMultiByChannel(
+	bool HitDetected = GetWorld()->SweepMultiByChannel(
 		OutHitResults,
 		Start,
 		End,
@@ -349,12 +371,10 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 		Params
 	);
 	
-#if ENABLE_DRAW_DEBUG
-	DrawDebug(AttackDirection, Start, End, HitDetected);
-#endif
 	
 	ISTRUE(true == HitDetected);
-
+	HitDetected = false;
+	
 	for (const FHitResult & Result : OutHitResults)
 	{
 		IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(Result.GetActor());
@@ -384,25 +404,33 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 		{
 			continue;
 		}
+
+		HitDetected = true;
 		
 		DamagedCharacters.Emplace(AttackedCharacter);
 			
-		CurrentDamagedData.DamagedDegree = CalculateDegree(
+		const float DamagedDegree = CalculateDegree(
 			AttackedCharacter->GetActorLocation(),
 			AttackedCharacter->GetActorForwardVector(),
 			-AttackDirection
 		);
 
-		CurrentDamagedData.DamagedLocation = Result.ImpactPoint;
-		CurrentDamagedData.DamagedNiagara = CurrentDefinition->AttackTimingFragment->GetDamageNiagara(CurrentDamageTimingIdx);
-		CurrentDamagedData.DurationNiagara = CurrentDefinition->AttackTimingFragment->GetDurationEffectNiagara(CurrentDamageTimingIdx);
+		const FVector DamagedLocation = Result.ImpactPoint;
 		
-		SendDamagedDataToTarget(AttackedCharacter);
-		ApplyDamageAndStiffness(AttackedCharacter);
+#if ENABLE_DRAW_DEBUG
+		DrawDebugPoint(GetWorld(), DamagedLocation, 10.0f, FColor::Blue, false, 2.0f);
+#endif
+		
+		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, DamagedLocation);
 	}
 	
 	DamagedCharacters.Reset();
 
+#if ENABLE_DRAW_DEBUG
+	DrawDebug(AttackDirection, Start, End, HitDetected);
+#endif
+
+	
 	// FGameplayAbilityTargetDataHandle TargetDataHandle;
 	// FGameplayAbilityTargetData_SingleTargetHit* HitData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
 	// TargetDataHandle.Add(HitData);
@@ -484,7 +512,7 @@ void UMCOGA_CommonAttack::SetDamageTimer()
 
 void UMCOGA_CommonAttack::ResetDamageTimer()
 {
-	MCOLOG_C(MCOTimer, TEXT("... Reset Timer "));
+	//MCOLOG_C(MCOTimer, TEXT("... Reset Timer "));
 	
 	GetWorld()->GetTimerManager().ClearTimer(DamageTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DamageByChannelTimerHandle);
@@ -509,7 +537,7 @@ void UMCOGA_CommonAttack::StartDamageBeginTimer()
 {
 	const float FrameCount = GetCurrentDamageBeginFrameCount();
 
-	MCOLOG_C(MCOTimer, TEXT("[%d] ... To Start : %f sec later "), CurrentDamageTimingIdx, FrameCount);
+	//MCOLOG_C(MCOTimer, TEXT("[%d] ... To Start : %f sec later "), CurrentDamageTimingIdx, FrameCount);
 	
 	ISTRUE(FrameCount > 0.0f);
 		
@@ -526,7 +554,7 @@ void UMCOGA_CommonAttack::StartDamageEndTimer()
 {
 	const float FrameCount = GetCurrentDamageEndFrameCount();
 
-	MCOLOG_C(MCOTimer, TEXT("[%d] ... To End : %f sec later "), CurrentDamageTimingIdx, FrameCount);
+	//MCOLOG_C(MCOTimer, TEXT("[%d] ... To End : %f sec later "), CurrentDamageTimingIdx, FrameCount);
 	
 	ISTRUE(FrameCount > 0.0f);
 	

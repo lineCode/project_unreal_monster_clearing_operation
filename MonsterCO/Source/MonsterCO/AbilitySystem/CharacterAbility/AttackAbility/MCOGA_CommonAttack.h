@@ -44,10 +44,11 @@ protected:
 	
 // --- Attack
 protected:
-	void ApplyDamageAndStiffness(ACharacter* InAttackedCharacter);
+	void ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FVector& InDamagedLocation);
 	float CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog = false) const;
-	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter) const;
-
+	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter, float InDegree, const FVector& InDamagedLocation,
+		const EMCOEffectPolicy& InPolicy, const UMCOActionFragment_AttributeEffect* InAttributeFragment) const;
+	void RemoveDamagedDataFromTarget(ACharacter* InAttackedCharacter, const EMCOEffectPolicy& InPolicy) const;
 	void Attack();
 	
 // --- Attack/Overlap
@@ -94,7 +95,6 @@ private:
 	
 	int32 CurrentDamageTimingIdx = 0;
 	FTimerHandle DamageTimerHandle;
-	FMCODamagedData CurrentDamagedData;
 	
 	FTimerHandle DamageByChannelTimerHandle;
 	

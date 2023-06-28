@@ -140,8 +140,11 @@ public:
 	void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage);
 
 	virtual bool CheckCanBeDamaged(FGameplayTag InAttackTag) override;
-	virtual const FMCODamagedData& GetDamagedData() override  { return CurrentDamagedData; }
-	virtual void SetDamagedData(const FMCODamagedData&  InDamagedData) override;
+	virtual float GetDamagedDegreeThenSetZero() override;
+	
+	virtual const UMCODamagedData* GetDamagedData(EMCOEffectPolicy InPolicy) override;
+	virtual void SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy) override;
+	virtual void RemoveDamagedData(EMCOEffectPolicy InPolicy) override;
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;
@@ -149,7 +152,13 @@ public:
 	
 protected:
 	UPROPERTY()
-	FMCODamagedData CurrentDamagedData;
+	TArray<TObjectPtr<UMCODamagedData>> InstantDamagedData;
+	
+	UPROPERTY()
+	TArray<TObjectPtr<UMCODamagedData>> DurationDamagedData;
+	
+	UPROPERTY()
+	float LastDamagedDegree;
 	
 	
 // --- Die

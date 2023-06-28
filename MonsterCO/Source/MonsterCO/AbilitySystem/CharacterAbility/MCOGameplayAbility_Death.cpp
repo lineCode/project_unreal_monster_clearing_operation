@@ -42,7 +42,7 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 	Tags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
 	ASC->RemoveActiveEffectsWithGrantedTags(Tags);
 
-	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedData().DamagedDegree);
+	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedDegreeThenSetZero());
 	
 	StartActivationWithMontage(Data->GetMontage(Direction));
 }

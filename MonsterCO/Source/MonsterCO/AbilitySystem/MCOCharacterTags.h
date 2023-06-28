@@ -48,6 +48,7 @@ public:
 	FGameplayTag ChargingTag;
 	FGameplayTag DamagedTag;
 	FGameplayTag DeadTag;
+	FGameplayTag InvincibleTag;
 	
 	// Ability 
 	FGameplayTag EffectRemoveOnDeathTag;

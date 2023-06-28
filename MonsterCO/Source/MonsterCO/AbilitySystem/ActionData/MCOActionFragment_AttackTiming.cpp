@@ -63,22 +63,6 @@ UMCOActionFragment_AttributeEffect* UMCOActionFragment_AttackTiming::GetAttribut
 	return (DamageTimings.IsValidIndex(InDamageIdx)) ? DamageTimings[InDamageIdx].Attribute : nullptr;
 }
 
-UNiagaraSystem* UMCOActionFragment_AttackTiming::GetDamageNiagara(const uint8& InDamageIdx) const
-{
-	ensure(DamageTimings.IsValidIndex(InDamageIdx));
-	ISTRUE_N(nullptr != DamageTimings[InDamageIdx].Attribute);
-	
-	return DamageTimings[InDamageIdx].Attribute->GetNiagara(EMCOEffectPolicy::Instant);
-}
-
-UNiagaraSystem* UMCOActionFragment_AttackTiming::GetDurationEffectNiagara(const uint8& InDamageIdx) const
-{
-	ensure(DamageTimings.IsValidIndex(InDamageIdx));
-	ensure(nullptr != DamageTimings[InDamageIdx].Attribute);
-	
-	return DamageTimings[InDamageIdx].Attribute->GetNiagara(EMCOEffectPolicy::Duration);
-}
-
 bool UMCOActionFragment_AttackTiming::IsUsingProjectile(const uint8& InDamageIdx) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));

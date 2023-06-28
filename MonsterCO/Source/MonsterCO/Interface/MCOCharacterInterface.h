@@ -26,9 +26,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCollisionEndOverlapDelegate,
 												ACharacter*, InOtherCharacter);
 
 
-
-USTRUCT()
-struct FMCODamagedData
+UCLASS()
+class MONSTERCO_API UMCODamagedData : public UObject
 {
 	GENERATED_BODY()
 
@@ -40,10 +39,13 @@ public:
 	FVector DamagedLocation = FVector(0.0f, 0.0f, 0.0f);
 
 	UPROPERTY()
-	TObjectPtr<UNiagaraSystem> DamagedNiagara = nullptr;
+	EMCONiagaraEffectType DamagedEffectType = EMCONiagaraEffectType::Melee;
 	
 	UPROPERTY()
-	TObjectPtr<UNiagaraSystem> DurationNiagara = nullptr;
+	EMCOEffectPolicy DamagedEffectPolicy = EMCOEffectPolicy::Instant;
+	
+	UPROPERTY()
+	float DamagedAmount = 0.0f;	
 };
 
 
@@ -81,8 +83,10 @@ public:
 // --- Damaged
 public:
 	virtual bool CheckCanBeDamaged(FGameplayTag InTag) = 0;
-	virtual const FMCODamagedData& GetDamagedData() = 0;
-	virtual void SetDamagedData(const FMCODamagedData& InDegree) = 0;
+	virtual float GetDamagedDegreeThenSetZero() = 0;
+	virtual const UMCODamagedData* GetDamagedData(EMCOEffectPolicy InPolicy) = 0;
+	virtual void SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy) = 0;
+	virtual void RemoveDamagedData(EMCOEffectPolicy InPolicy) = 0;
 
 	
 // --- Die

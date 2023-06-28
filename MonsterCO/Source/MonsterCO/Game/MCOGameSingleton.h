@@ -4,8 +4,7 @@
 #include "MCOGameSingleton.generated.h"
 
 
-class USoundCue;
-class UMCOSoundData;
+class UMCONiagaraEffectData;
 
 UCLASS()
 class MONSTERCO_API UMCOGameSingleton : public UObject
@@ -15,12 +14,8 @@ class MONSTERCO_API UMCOGameSingleton : public UObject
 public:
 	UMCOGameSingleton();
 	static UMCOGameSingleton& Get();
-
-	void PlaySoundByGameState(const UWorld* InWorld, const EMCOGameState& InState);	
-
-protected:
-	void PlaySound(const UWorld* InWorld, USoundCue* SoundCue) const;
-
+	
+public:
 	UPROPERTY()
-	TObjectPtr<UMCOSoundData> SoundData;
+	TObjectPtr<UMCONiagaraEffectData> NiagaraEffectData;
 };

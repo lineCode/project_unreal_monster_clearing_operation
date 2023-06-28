@@ -9,7 +9,6 @@ class UNiagaraComponent;
 
 
 
-
 UCLASS()
 class MONSTERCO_API AMCOGameplayCue_DurationEffect : public AGameplayCueNotify_Actor
 {

@@ -86,8 +86,6 @@ protected:
 // --- Damage
 public:
 	UMCOActionFragment_AttributeEffect* GetAttributeFragment(const uint8& InDamageIdx) const;
-	UNiagaraSystem* GetDamageNiagara(const uint8& InDamageIdx) const;
-	UNiagaraSystem* GetDurationEffectNiagara(const uint8& InDamageIdx) const;
 
 // --- Projectile
 public:

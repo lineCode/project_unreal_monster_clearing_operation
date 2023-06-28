@@ -10,6 +10,7 @@
 #include "MCOPlayerState.h"
 #include "CharacterAttachment/MCOModeComponent.h"
 #include "CharacterAttachment/Attachment/MCOAttachment.h"
+#include "Containers/Queue.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -330,11 +331,13 @@ bool AMCOCharacter::CheckCanBeDamaged(FGameplayTag InAttackTag)
 {
 	// except dodge...
 
-	if (true == HasTag(FMCOCharacterTags::Get().CharacterAbility_Invincible))
-	{
-		return false;
-	}
-	else if (InAttackTag == FMCOCharacterTags::Get().DragonAbility_Falldown)
+	// removed and set effect tag
+	// if (true == HasTag(FMCOCharacterTags::Get().InvincibleTag))
+	// {
+	// 	MCOLOG_C(MCOAbility, TEXT("Escaped from attack because I'm invincible"))
+	// 	return false;
+	// }
+	if (InAttackTag == FMCOCharacterTags::Get().DragonAbility_Falldown)
 	{
 		return IsCharacterOnGround();
 	}
@@ -342,14 +345,49 @@ bool AMCOCharacter::CheckCanBeDamaged(FGameplayTag InAttackTag)
 	return true;
 }
 
-void AMCOCharacter::SetDamagedData(const FMCODamagedData& InDamagedData)
+float AMCOCharacter::GetDamagedDegreeThenSetZero()
 {
-	CurrentDamagedData = InDamagedData;
+	float Result = LastDamagedDegree;
+	if (0.0f == LastDamagedDegree)
+	{
+		MCOLOG_C(MCOAbility, TEXT("Damaged Degree was zero !!!!!!"));
+	}
+	LastDamagedDegree = 0.0f;
+	return Result;
+}
+
+const UMCODamagedData* AMCOCharacter::GetDamagedData(EMCOEffectPolicy InPolicy)
+{
+	if ((InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.IsEmpty() : DurationDamagedData.IsEmpty())
+	{
+		MCOLOG_C(MCOAbility, TEXT("Damaged Data was empty !!!!!!"));
+		return nullptr;
+	}
+	
+	return (InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData[0] : DurationDamagedData[0];
+}
+
+void AMCOCharacter::SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy)
+{
+	(InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.Emplace(InData) : DurationDamagedData.Emplace(InData);
+
+	LastDamagedDegree = InData->DamagedDegree;
+}
+
+void AMCOCharacter::RemoveDamagedData(EMCOEffectPolicy InPolicy)
+{
+	if ((InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.IsEmpty() : DurationDamagedData.IsEmpty())
+	{
+		MCOLOG_C(MCOAbility, TEXT("Damaged Data was empty, so nothing to remove"));
+		return;
+	}
+	
+	(InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.RemoveAt(0) : DurationDamagedData.RemoveAt(0);
 }
 
 float AMCOCharacter::GetCapsuleRadius() const
 {
-	UCapsuleComponent* Capsule = GetCapsuleComponent();
+	const UCapsuleComponent* Capsule = GetCapsuleComponent();
 
 	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleRadius() : 0.0f;
 }

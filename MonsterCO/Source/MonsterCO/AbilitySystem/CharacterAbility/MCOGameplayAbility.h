@@ -116,7 +116,7 @@ protected:
 	void CancelAbilityEffectsSelf() const;
 
 protected:
-	void ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect = false) const;
+	bool ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect = false) const;
 
 	
 // --- Stamina charge

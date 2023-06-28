@@ -8,8 +8,10 @@ EMCOCharacterDirection UMCOMontageDataDirectional::GetDirectionFromDegree(const 
 	EMCOCharacterDirection Result = EMCOCharacterDirection::Front;
 	for (int32 i = 0; i <= 4; i++)
 	{
-		const EMCOCharacterDirection Right = GetClosestDirectionFromDegree(InDegree + Gap * i, bLog); 
-		const EMCOCharacterDirection Left = GetClosestDirectionFromDegree(InDegree - Gap * i, bLog);
+		EMCOCharacterDirection Right;
+		const float RightGap = GetClosestDirectionFromDegree(InDegree + Gap * i, Right, bLog); 
+		EMCOCharacterDirection Left;
+		const float LeftGap = GetClosestDirectionFromDegree(InDegree - Gap * i, Left, bLog);
 		const bool HasRight = MontageFragments.Contains(Right);
 		const bool HasLeft = MontageFragments.Contains(Left);
 
@@ -17,8 +19,14 @@ EMCOCharacterDirection UMCOMontageDataDirectional::GetDirectionFromDegree(const 
 		{
 			continue;
 		}
-
-		Result = (true == HasRight) ? Right : Left;
+		else if (true == HasRight && true == HasLeft)
+		{
+			Result = (RightGap < LeftGap) ? Right : Left; 
+		}
+		else
+		{
+			Result = (true == HasRight) ? Right : Left;
+		}
 		break;
 	}
 
@@ -115,7 +123,7 @@ UMCOActionFragment_Montage* UMCOMontageDataDirectional::GetMontageFragment(const
 	return MontageFragments[InDirection];
 }
 
-EMCOCharacterDirection UMCOMontageDataDirectional::GetClosestDirectionFromDegree(float InDegree, const bool bLog) const
+float UMCOMontageDataDirectional::GetClosestDirectionFromDegree(float InDegree, EMCOCharacterDirection& OutDirection, const bool bLog) const
 {
 	if (InDegree < -180.0f)
 	{
@@ -126,34 +134,56 @@ EMCOCharacterDirection UMCOMontageDataDirectional::GetClosestDirectionFromDegree
 		InDegree = -360.0f + FMath::Fmod(InDegree, 360.0f);
 	}
 
-	EMCOCharacterDirection Result;
+	const int32 MaxDirectionCount = static_cast<int32>(EMCOCharacterDirection::Max);
+	const float GapDegree = 360.0f / MaxDirectionCount;
+	const float StartDegree = GapDegree / 2;
+	
+	float ResultGapDegree = 0.0f;
+	int32 ResultIndex = 0;
 	
 	// Left
 	if (InDegree < 0.0f)
 	{
-		if (InDegree > -22.5f)       Result = EMCOCharacterDirection::Front;
-		else if (InDegree > -67.5f)  Result = EMCOCharacterDirection::Front_Left;
-		else if (InDegree > -112.5f) Result = EMCOCharacterDirection::Left; 
-		else if (InDegree > -157.5f) Result = EMCOCharacterDirection::Back_Left;
-		else                         Result = EMCOCharacterDirection::Back;
+		for (int32 i = 0; i <= 4; i++)
+		{
+			const float CurrentDegree = -StartDegree - GapDegree * i;
+			if (InDegree > CurrentDegree) // -22.5f > -67.5 > -112.5 > 157.5 > 202.5
+			{
+				ResultIndex = i; // front > fl > l > bl > back
+				ResultGapDegree = InDegree - CurrentDegree;
+				break;
+			}
+		}
 	}
 	// Right
 	else
 	{
-		if (InDegree < 22.5f)        Result = EMCOCharacterDirection::Front;
-		else if (InDegree < 67.5f)   Result = EMCOCharacterDirection::Front_Right;
-		else if (InDegree < 112.5f)  Result = EMCOCharacterDirection::Right; 
-		else if (InDegree < 157.5f)  Result = EMCOCharacterDirection::Back_Right;
-		else                         Result = EMCOCharacterDirection::Back;
+		for (int32 i = 0; i <= 4; i++)
+		{
+			const float CurrentDegree = StartDegree + GapDegree * i;
+			if (InDegree < CurrentDegree)
+			{
+				ResultIndex = i; // front > fr > r > br > back
+				ResultGapDegree = InDegree - CurrentDegree;
+				break;
+			}
+		}
+
+		if (ResultIndex != 0)
+		{
+			ResultIndex = MaxDirectionCount - ResultIndex;
+		}
 	}
+
+	OutDirection = static_cast<EMCOCharacterDirection>(ResultIndex);
 
 	if (true == bLog)
 	{
 		MCOLOG_C(MCOAbility, TEXT("...Calculating : %f == %s"), InDegree,
-			*FHelper::GetEnumDisplayName(TEXT("EMCOCharacterDirection"), (int64)Result)
+			*FHelper::GetEnumDisplayName(TEXT("EMCOCharacterDirection"), (int64)OutDirection)
 		);
 	}
 	
-	return Result;
+	return FMath::Abs(ResultGapDegree);
 }
 

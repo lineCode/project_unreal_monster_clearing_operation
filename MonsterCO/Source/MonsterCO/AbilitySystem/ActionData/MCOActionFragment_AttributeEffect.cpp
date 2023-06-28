@@ -87,9 +87,9 @@ void UMCOActionFragment_AttributeEffect::ApplyAttributeAdditiveValue(const EMCOE
 	
 	InHandle.Data->DynamicGrantedTags = Tags;
 
-	MCOLOG_C(MCOAbility, TEXT("Effect Applied [Stamina %.1f] [Health %.1f] [Damage %.1f] [Stiffness %.1f]"),
-		AttributeValue.Stamina, AttributeValue.Health, AttributeValue.Damage, AttributeValue.Stiffness
-	);
+	// MCOLOG_C(MCOAbility, TEXT("Effect Applied [Stamina %.1f] [Health %.1f] [Damage %.1f] [Stiffness %.1f]"),
+	// 	AttributeValue.Stamina, AttributeValue.Health, AttributeValue.Damage, AttributeValue.Stiffness
+	// );
 }
 
 FGameplayTagContainer UMCOActionFragment_AttributeEffect::GetAllTags() const
@@ -104,9 +104,14 @@ FGameplayTagContainer UMCOActionFragment_AttributeEffect::GetAllTags() const
 	return Tags;
 }
 
-UNiagaraSystem* UMCOActionFragment_AttributeEffect::GetNiagara(const EMCOEffectPolicy& InPolicy) const
+float UMCOActionFragment_AttributeEffect::GetDamage(const EMCOEffectPolicy& InPolicy) const
 {
-	ISTRUE_N(true == Data.Contains(InPolicy));
+	ISTRUE_Z(true == Data.Contains(InPolicy));
 	
-	return Data[InPolicy].Niagara;
+	return Data[InPolicy].Damage;
+}
+
+EMCONiagaraEffectType UMCOActionFragment_AttributeEffect::GetEffectType(const EMCOEffectPolicy& InPolicy) const
+{
+	return (true == Data.Contains(InPolicy)) ? Data[InPolicy].EffectType : EMCONiagaraEffectType::Melee;
 }

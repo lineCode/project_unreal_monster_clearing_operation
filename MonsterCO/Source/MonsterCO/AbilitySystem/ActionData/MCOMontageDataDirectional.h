@@ -33,5 +33,5 @@ protected:
 	UMCOActionFragment_AttackTiming* GetAttackTimingFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_Collision* GetCollisionFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_Montage* GetMontageFragment(const EMCOCharacterDirection& InDirection) const;
-	EMCOCharacterDirection GetClosestDirectionFromDegree(float InDegree, const bool bLog) const;
+	float GetClosestDirectionFromDegree(float InDegree, EMCOCharacterDirection& OutDirection, const bool bLog) const;
 };

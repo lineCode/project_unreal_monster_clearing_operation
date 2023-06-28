@@ -41,6 +41,7 @@ void FMCOCharacterTags::InitializeTags()
 	CharacterTags.DeadTag       = FGameplayTag::RequestGameplayTag(FName("State.Dead"),     bErrorIfNotFound);
 	CharacterTags.TakeItemTag   = FGameplayTag::RequestGameplayTag(FName("State.TakeItem"), bErrorIfNotFound);
 	CharacterTags.ChargingTag   = FGameplayTag::RequestGameplayTag(FName("State.Charging"), bErrorIfNotFound);
+	CharacterTags.InvincibleTag = FGameplayTag::RequestGameplayTag(FName("State.Invincible"),   bErrorIfNotFound);
 
 	CharacterTags.EffectRemoveOnDeathTag  = FGameplayTag::RequestGameplayTag(FName("Ability.RemoveOnDeath"),        bErrorIfNotFound);
 	CharacterTags.CancelOnStaminaEmptyTag = FGameplayTag::RequestGameplayTag(FName("Ability.CancelOnStaminaEmpty"), bErrorIfNotFound);

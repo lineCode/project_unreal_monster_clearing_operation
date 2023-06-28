@@ -32,14 +32,22 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 	{
 		return EBTNodeResult::Failed;
 	}
-	
+
 	FVector LookVector = (TargetPawn->GetActorLocation() - ControllingPawn->GetActorLocation()).GetSafeNormal();
 	LookVector.Z = 0.0f;
 
 	TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();
 	PrevTargetRot = TargetRot;
 	
+	if (true == FMath::IsNearlyEqual(ControllingPawn->GetActorRotation().Yaw, TargetRot.Yaw, 5.0f))
+	{
+		return EBTNodeResult::Succeeded;
+	}
+
+	//MCOLOG_C(MCOMonsterAI, TEXT("Turn vector : %s"), *LookVector.ToString());
+	
 	AIPawn->SetTurnVector(LookVector);
+	
 	return EBTNodeResult::InProgress;
 }
 

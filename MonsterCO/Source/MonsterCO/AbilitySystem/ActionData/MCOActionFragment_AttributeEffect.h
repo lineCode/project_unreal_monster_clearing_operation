@@ -20,6 +20,9 @@ public:
 	uint8 bIsStartupEffectOfAbility : 1; 
 	
 	UPROPERTY(EditAnywhere)
+	EMCONiagaraEffectType EffectType = EMCONiagaraEffectType::Melee;
+	
+	UPROPERTY(EditAnywhere)
 	float Stamina = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
@@ -30,10 +33,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	float Stiffness = 0.0f;
-	
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UNiagaraSystem> Niagara = nullptr;
-	
+		
 	UPROPERTY(EditAnywhere)
 	float Duration = 0.0f;
 };
@@ -49,7 +49,8 @@ public:
 	bool IsEffectExistByPolicy(const EMCOEffectPolicy& InPolicy) const;
 	void ApplyAttributeAdditiveValue(const EMCOEffectPolicy& InPolicy, const FGameplayEffectSpecHandle& InHandle) const;
 	FGameplayTagContainer GetAllTags() const;
-	UNiagaraSystem* GetNiagara(const EMCOEffectPolicy& InPolicy) const;
+	float GetDamage(const EMCOEffectPolicy& InPolicy) const;
+	EMCONiagaraEffectType GetEffectType(const EMCOEffectPolicy& InPolicy) const;
 
 protected:
 	UPROPERTY(EditAnywhere)

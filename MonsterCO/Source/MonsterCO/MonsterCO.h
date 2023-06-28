@@ -10,10 +10,13 @@
 #include "DrawDebugHelpers.h"
 
 
-const int SLOT_MAX = 5;
+// How to decide this number...?
+const float LARGE_DAMAGE_AMOUNT = 30.0f;
+const float MAX_INITIAL_ATTRIBUTE_VALUE = 100.0f;
+const int32 SLOT_MAX = 5;
 const float WIDGET_RATE = 0.05f;
 const int32 NEXT_STAGE_TIME = 5;
-const int32 MAX_STAGE = 100;
+const int32 MAX_STAGE = 2;
 
 #define ITEMDATA_NAME "MCOItemData"
 
@@ -123,7 +126,6 @@ enum class EMCOMonsterFlyMode : uint8
 	Max            UMETA(DisplayName = "Max")
 };
 
-
 UENUM(BlueprintType)
 enum class EMCOCharacterSpeed : uint8
 {
@@ -175,6 +177,13 @@ enum class EMCOEffectPolicy : uint8
 	Infinite       UMETA(DisplayName = "Infinite")
 };
 
+UENUM(BlueprintType)
+enum class EMCONiagaraEffectType : uint8
+{
+	None           UMETA(DisplayName = "None"),
+	Melee          UMETA(DisplayName = "Melee"),
+	Flame          UMETA(DisplayName = "Flame")
+};
 
 
 // --- Helper
