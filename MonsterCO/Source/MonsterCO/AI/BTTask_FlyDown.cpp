@@ -26,6 +26,11 @@ EBTNodeResult::Type UBTTask_FlyDown::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 	{
 		return EBTNodeResult::Failed;
 	}
+
+	if (AIPawn->GetFlyMode() == EMCOMonsterFlyMode::None)
+	{
+		return EBTNodeResult::Succeeded;
+	}
 	
 	AIPawn->SetFlyMode(EMCOMonsterFlyMode::Down);
 		
@@ -65,6 +70,7 @@ void UBTTask_FlyDown::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	{
 		AIPawn->SetMovementMode(MOVE_Falling);
 		AIPawn->SetGravity(1.0f);
+		AIPawn->SetFlyMode(EMCOMonsterFlyMode::None);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

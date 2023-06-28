@@ -65,7 +65,7 @@ bool UMCOAttributeSet::PreGameplayEffectExecute(FGameplayEffectModCallbackData& 
 {
 	if (Data.EvaluatedData.Attribute == GetAdditiveStaminaAttribute())
 	{
-		MCOLOG_C(MCOAbility, TEXT("Stamina is changed +[%.1f] => [%.1f]"), Data.EvaluatedData.Magnitude, GetStamina() + Data.EvaluatedData.Magnitude);
+		//MCOLOG_C(MCOAbility, TEXT("Stamina is changed +[%.1f] => [%.1f]"), Data.EvaluatedData.Magnitude, GetStamina() + Data.EvaluatedData.Magnitude);
 		
 		if (GetStamina() + Data.EvaluatedData.Magnitude < 0.0f)
 		{

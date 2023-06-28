@@ -1,5 +1,4 @@
 #include "AI/BTTask_ActivateAttack.h"
-
 #include "AIController.h"
 #include "Interface/MCOMonsterAIInterface.h"
 
@@ -24,7 +23,6 @@ EBTNodeResult::Type UBTTask_ActivateAttack::ExecuteTask(UBehaviorTreeComponent& 
 		return EBTNodeResult::Failed;
 	}
 
-	AIPawn->OnActivateAction();
 
 	FMCOActionFinishedDelegate OnAttackFinished;
 	OnAttackFinished.BindLambda([&](EBTNodeResult::Type bInResult)
@@ -32,7 +30,11 @@ EBTNodeResult::Type UBTTask_ActivateAttack::ExecuteTask(UBehaviorTreeComponent& 
 		FinishLatentTask(OwnerComp, bInResult);
 	});
 
+	// To finish this task after check hit
 	AIPawn->SetActionFinishedDelegate(OnAttackFinished);
+
+	// Check hit now
+	AIPawn->OnActivateAction();
 
 	return EBTNodeResult::InProgress;
 }

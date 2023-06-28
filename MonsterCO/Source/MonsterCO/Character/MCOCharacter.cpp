@@ -157,14 +157,17 @@ void AMCOCharacter::InitializeCharacter()
 	ISTRUE(GetLocalRole() == ROLE_Authority);
 	ISTRUE(nullptr != CharacterData);
 	ISTRUE(nullptr != CharacterData->AbilitySet);
-	if (false == AbilitySystemComponent->bCharacterAbilitySetGiven)
-	{	
-		CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-	}
-	else
-	{
-		CharacterData->AbilitySet->AddStartupEffects(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-	}
+
+	CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+	
+	// if (false == AbilitySystemComponent->bCharacterAbilitySetGiven)
+	// {	
+	// 	CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+	// }
+	// else
+	// {
+	// 	CharacterData->AbilitySet->AddStartupEffects(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
+	// }
 	
 	// set delegates "after giving abilities" 
 	MCOPlayerState->InitializeAbilitySystem();
@@ -350,7 +353,7 @@ float AMCOCharacter::GetDamagedDegreeThenSetZero()
 	float Result = LastDamagedDegree;
 	if (0.0f == LastDamagedDegree)
 	{
-		MCOLOG_C(MCOAbility, TEXT("Damaged Degree was zero !!!!!!"));
+		MCOLOG_C(MCOAbility, TEXT("Damaged Degree was zero.. this could be zero if character died on duration effect"));
 	}
 	LastDamagedDegree = 0.0f;
 	return Result;
@@ -360,7 +363,7 @@ const UMCODamagedData* AMCOCharacter::GetDamagedData(EMCOEffectPolicy InPolicy)
 {
 	if ((InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.IsEmpty() : DurationDamagedData.IsEmpty())
 	{
-		MCOLOG_C(MCOAbility, TEXT("Damaged Data was empty !!!!!!"));
+		MCOLOG_C(MCOAbility, TEXT("Damaged Data was empty"));
 		return nullptr;
 	}
 	
@@ -418,6 +421,8 @@ void AMCOCharacter::Die()
 
 void AMCOCharacter::FinishDying()
 {
+	AbilitySetHandles.TakeFromAbilitySystem(AbilitySystemComponent.Get());
+	
 	if (GetLocalRole() == ROLE_Authority)
 	{
 		DetachFromControllerPendingDestroy();

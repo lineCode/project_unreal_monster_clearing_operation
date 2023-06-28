@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "MCOMonsterAIInterface.generated.h"
 
-DECLARE_DELEGATE_OneParam(FMCOActionFinishedDelegate, const EBTNodeResult::Type& /*InResult*/);
+DECLARE_DELEGATE_OneParam(FMCOActionFinishedDelegate, EBTNodeResult::Type /*InResult*/);
 DECLARE_DELEGATE(FMCOActivateActionDelegate);
 
 
@@ -44,12 +44,12 @@ public:
 	virtual FVector GetVelocity() = 0;
 	virtual bool IsTurning() const = 0;
 	virtual FVector GetTurnVector() const = 0;
-	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) = 0;
+	virtual void SetTurnVector(FVector InTurnVector) = 0;
 
 	virtual void SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction) = 0;
 	virtual void OnActivateAction() = 0;
 	virtual void SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished) = 0;
-	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) = 0;
+	virtual void OnActionFinished(EBTNodeResult::Type InResult) = 0;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const = 0;
 
 // --- AI/Action

@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "MCOAbilitySet.generated.h"
 
-class UGameplayAbility;
+class UMCOGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UMCOAbilitySystemComponent;
@@ -20,7 +20,7 @@ struct FMCOAbilitySet_GameplayAbility
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UGameplayAbility> Ability = nullptr;
+	TSubclassOf<UMCOGameplayAbility> Ability = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 AbilityLevel = 1;

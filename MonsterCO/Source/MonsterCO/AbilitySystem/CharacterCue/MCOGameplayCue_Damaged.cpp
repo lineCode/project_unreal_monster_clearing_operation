@@ -17,11 +17,11 @@ AMCOGameplayCue_Damaged::AMCOGameplayCue_Damaged()
 void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters)
 {
 	// Only "Executed" is called because this is for an instant effect
-	if (EventType == EGameplayCueEvent::OnActive) MCOLOG_C(MCOAbility, TEXT("Instant Cue : OnActive"))
-	else if (EventType == EGameplayCueEvent::WhileActive) MCOLOG_C(MCOAbility, TEXT("Instant Cue : WhileActive"))
-	else if (EventType == EGameplayCueEvent::Executed) MCOLOG_C(MCOAbility, TEXT("Instant Cue : Executed"))
-	else if (EventType == EGameplayCueEvent::Removed) MCOLOG_C(MCOAbility, TEXT("Instant Cue : Removed"))
-	
+	// if (EventType == EGameplayCueEvent::OnActive) MCOLOG_C(MCOAbility, TEXT("Instant Cue : OnActive"))
+	// else if (EventType == EGameplayCueEvent::WhileActive) MCOLOG_C(MCOAbility, TEXT("Instant Cue : WhileActive"))
+	// else if (EventType == EGameplayCueEvent::Executed) MCOLOG_C(MCOAbility, TEXT("Instant Cue : Executed"))
+	// else if (EventType == EGameplayCueEvent::Removed) MCOLOG_C(MCOAbility, TEXT("Instant Cue : Removed"))
+	//
 	Super::HandleGameplayCue(MyTarget, EventType, Parameters);
 	
 	ISTRUE(nullptr != NiagaraComponent);
@@ -37,7 +37,7 @@ void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEv
 	);
 	ISTRUE(nullptr != DamageNiagara);
 	
-	//MCOLOG_C(MCOAbility, TEXT("[%s] Cue Activated : [%s]"), *GetName(), *DamageNiagara->GetName());
+	//MCOLOG_C(MCOAbility, TEXT("[%s] Cue Executed : [%s]"), *GetName(), *DamageNiagara->GetName());
 
 	NiagaraComponent->SetAsset(DamageNiagara);
 

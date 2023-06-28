@@ -66,10 +66,12 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			if (nullptr != Target && true == Target->GetController()->IsPlayerController())
 			{
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(BBKEY_TARGET, Target);
+
+				// use "Last Target Pose" to abort attack tasks...
 				OwnerComp.GetBlackboardComponent()->SetValueAsVector(BBKEY_LASTTARGETPOS, Target->GetActorLocation());
 
 #if ENABLE_DRAW_DEBUG
-				DrawDebugPoint(World, Target->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
+				// DrawDebugPoint(World, Target->GetActorLocation(), 10.0f, FColor::Green, false, 0.2f);
 				// DrawDebugLine(World, ControllingPawn->GetActorLocation(), Target->GetActorLocation(), FColor::Green, false, 0.27f);
 #endif
 				return;

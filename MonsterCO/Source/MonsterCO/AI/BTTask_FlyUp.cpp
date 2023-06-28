@@ -25,6 +25,11 @@ EBTNodeResult::Type UBTTask_FlyUp::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	{
 		return EBTNodeResult::Failed;
 	}
+
+	if (AIPawn->GetFlyMode() != EMCOMonsterFlyMode::None)
+	{
+		return EBTNodeResult::Failed;
+	}
 	
 	const FVector PawnLocation = ControllingPawn->GetActorLocation();
 	FlyGoal = PawnLocation + FVector(0.0f, 0.0f, FlyDistance);

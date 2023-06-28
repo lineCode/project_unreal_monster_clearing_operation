@@ -15,10 +15,10 @@ AMCOGameplayCue_DurationEffect::AMCOGameplayCue_DurationEffect()
 
 void AMCOGameplayCue_DurationEffect::HandleGameplayCue(AActor* MyTarget, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters)
 {
-	if (EventType == EGameplayCueEvent::OnActive) MCOLOG_C(MCOAbility, TEXT("Duration Cue : OnActive"))
-	else if (EventType == EGameplayCueEvent::WhileActive) MCOLOG_C(MCOAbility, TEXT("Duration Cue : WhileActive"))
-	else if (EventType == EGameplayCueEvent::Executed) MCOLOG_C(MCOAbility, TEXT("Duration Cue : Executed"))
-	else if (EventType == EGameplayCueEvent::Removed) MCOLOG_C(MCOAbility, TEXT("Duration Cue : Removed"))
+	// if (EventType == EGameplayCueEvent::OnActive) MCOLOG_C(MCOAbility, TEXT("Duration Cue : OnActive"))
+	// else if (EventType == EGameplayCueEvent::WhileActive) MCOLOG_C(MCOAbility, TEXT("Duration Cue : WhileActive"))
+	// else if (EventType == EGameplayCueEvent::Executed) MCOLOG_C(MCOAbility, TEXT("Duration Cue : Executed"))
+	// else if (EventType == EGameplayCueEvent::Removed) MCOLOG_C(MCOAbility, TEXT("Duration Cue : Removed"))
 	
 	Super::HandleGameplayCue(MyTarget, EventType, Parameters);
 
@@ -38,7 +38,7 @@ void AMCOGameplayCue_DurationEffect::HandleGameplayCue(AActor* MyTarget, EGamepl
 		);
 		ISTRUE(nullptr != DamageNiagara);
 
-		//MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Activated : [%s]"), *GetName(), *DurationNiagara->GetName());
+		//MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Executed : [%s]"), *GetName(), *DamageNiagara->GetName());
 	
 		NiagaraComponent->SetAsset(DamageNiagara);
 		NiagaraComponent->SetWorldRotation(MyTarget->GetActorRotation());

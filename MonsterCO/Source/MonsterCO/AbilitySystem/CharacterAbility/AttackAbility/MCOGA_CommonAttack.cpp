@@ -418,7 +418,7 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 		const FVector DamagedLocation = Result.ImpactPoint;
 		
 #if ENABLE_DRAW_DEBUG
-		DrawDebugPoint(GetWorld(), DamagedLocation, 10.0f, FColor::Blue, false, 2.0f);
+		//DrawDebugPoint(GetWorld(), DamagedLocation, 10.0f, FColor::Blue, false, 2.0f);
 #endif
 		
 		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, DamagedLocation);
@@ -513,7 +513,7 @@ void UMCOGA_CommonAttack::SetDamageTimer()
 void UMCOGA_CommonAttack::ResetDamageTimer()
 {
 	//MCOLOG_C(MCOTimer, TEXT("... Reset Timer "));
-	
+
 	GetWorld()->GetTimerManager().ClearTimer(DamageTimerHandle);
 	GetWorld()->GetTimerManager().ClearTimer(DamageByChannelTimerHandle);
 }

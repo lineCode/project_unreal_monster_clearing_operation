@@ -70,14 +70,15 @@ protected:
 	virtual void AddForce(FVector InForce) override;
 	virtual FVector GetVelocity() override;
 	virtual void SetVelocity(FVector InVelocity) override;
+	
 	virtual bool IsTurning() const override;
 	virtual FVector GetTurnVector() const override;
-	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) override;
+	virtual void SetTurnVector(FVector InTurnVector) override;
 
 	virtual void SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction) override;
 	virtual void OnActivateAction() override;
 	virtual void SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished) override;
-	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) override;
+	virtual void OnActionFinished(EBTNodeResult::Type InResult) override;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const override;
 	
 // --- AI/Action
@@ -86,7 +87,7 @@ protected:
 	virtual void CancelAbilityByTag(const FGameplayTag& InTag) const override;
 
 protected:
-	void ContinueAI() const;
+	void RestartAI() const;
 	void StopAI() const;
 	
 protected:

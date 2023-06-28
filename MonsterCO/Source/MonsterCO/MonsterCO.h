@@ -123,7 +123,7 @@ enum class EMCOMonsterFlyMode : uint8
 	Down = 0       UMETA(DisplayName = "Down"),
 	Hold           UMETA(DisplayName = "Hold"),
 	Up             UMETA(DisplayName = "Up"),
-	Max            UMETA(DisplayName = "Max")
+	None           UMETA(DisplayName = "None")
 };
 
 UENUM(BlueprintType)

@@ -54,10 +54,10 @@ void UMCOMonsterAnimInstance::SetPawnDirection(const FVector& InVelocity, const 
 	}
 	else
 	{
-		const FVector TurnVector = MonsterAIInterface->GetTurnVector();
+		const FVector TurnVector = MonsterAIInterface->GetTurnVector() * MovementComponent->GetMaxSpeed();
 		CurrentPawnDirection = UKismetAnimationLibrary::CalculateDirection(TurnVector, InActorRotation);
 		
-		//MCOLOG(TEXT("CurrentPawnDirection : %s -> %f"), *TurnVector.ToString(), CurrentPawnDirection);
+		//MCOLOG(TEXT("CurrentPawnDirection : %s * %f -> %f"), *TurnVector.ToString(), MovementComponent->GetMaxSpeed(), CurrentPawnDirection);
 	}
 
 }

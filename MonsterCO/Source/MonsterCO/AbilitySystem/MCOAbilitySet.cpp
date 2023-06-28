@@ -82,13 +82,17 @@ void FMCOAbilitySet_GrantedHandles::TakeFromAbilitySystem(UMCOAbilitySystemCompo
 
 
 
-UMCOAbilitySet::UMCOAbilitySet(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UMCOAbilitySet::UMCOAbilitySet(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 }
 
 void UMCOAbilitySet::GiveToAbilitySystem(UMCOAbilitySystemComponent* MCOASC, FMCOAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject) const
 {
+	if (true == MCOASC->bCharacterAbilitySetGiven)
+	{
+		return;
+	}
+	
 	check(MCOASC);
 	
 	if (false == MCOASC->IsOwnerActorAuthoritative())
@@ -149,6 +153,14 @@ void UMCOAbilitySet::GiveToAbilitySystem(UMCOAbilitySystemComponent* MCOASC, FMC
 
 void UMCOAbilitySet::AddStartupEffects(UMCOAbilitySystemComponent* MCOASC, FMCOAbilitySet_GrantedHandles* OutGrantedHandles, UObject* SourceObject) const
 {
+	check(MCOASC);
+	
+	if (false == MCOASC->IsOwnerActorAuthoritative())
+	{
+		// Must be authoritative to give or take ability sets.
+		return;
+	}
+	
 	// Grant the gameplay effects.
 	for (int32 EffectIndex = 0; EffectIndex < GrantedGameplayEffects.Num(); ++EffectIndex)
 	{
@@ -169,7 +181,7 @@ void UMCOAbilitySet::AddStartupEffects(UMCOAbilitySystemComponent* MCOASC, FMCOA
 		
 		if (OutGrantedHandles)
 		{
-			// GameplayEffectHandle will be -1 if it's an instant effect (because it finished)
+			// GameplayEffectHandle will be -1 if it's an instant effect (because it's finished)
 			OutGrantedHandles->AddGameplayEffectHandle(GameplayEffectHandle);
 		}
 	}

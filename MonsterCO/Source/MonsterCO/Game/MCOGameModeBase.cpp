@@ -19,7 +19,7 @@ void AMCOGameModeBase::StartPlay()
 	OnChangeGameState(EMCOGameState::TITLE);
 }
 
-void AMCOGameModeBase::OnChangeGameState(const EMCOGameState& InState)
+void AMCOGameModeBase::OnChangeGameState(EMCOGameState InState)
 {
 	MCOLOG_C(MCOAbility, TEXT("GameState Changed to : [%s]"), *FHelper::GetEnumDisplayName(TEXT("EMCOGameState"), (int64)InState));
 	

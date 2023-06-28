@@ -53,7 +53,7 @@ void AMCOMonsterAIController::StopAI()
 	BTComponent->StopTree();
 }
 
-void AMCOMonsterAIController::ContinueAI()
+void AMCOMonsterAIController::RestartAI()
 {
 	UBehaviorTreeComponent* BTComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
 	ISTRUE(nullptr != BTComponent);
@@ -70,7 +70,7 @@ UObject* AMCOMonsterAIController::GetTarget()
 
 void AMCOMonsterAIController::SetDamagedInBlackBoard(bool IsDamaged) const
 {
-	MCOLOG_C(MCOMonsterAI, TEXT("Set damaged in bb : %s"), (true == IsDamaged) ? TEXT("DAMAGED") : TEXT("FINISHED"));
+	//MCOLOG_C(MCOMonsterAI, TEXT("Set damaged in black board : %s"), (true == IsDamaged) ? TEXT("DAMAGED") : TEXT("FINISHED"));
 	
 	UBlackboardComponent* BlackboardPtr = Blackboard.Get();
 	BlackboardPtr->SetValueAsBool(BBKEY_ISDAMAGED, IsDamaged);

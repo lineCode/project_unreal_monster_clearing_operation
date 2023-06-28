@@ -51,9 +51,11 @@ void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	{
 		ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
 	}
+	
 	if (true == bApplyCooldownOnGranted)
 	{
-		ApplyCooldown(Spec.Handle, ActorInfo, CurrentActivationInfo);
+		//MCOLOG_C(MCOAbility, TEXT("%s : Apply cooldown on granted"), *AbilityTag.GetTagName().ToString());
+		ApplyCooldown(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
 	}
 }
 
@@ -104,7 +106,7 @@ void UMCOGameplayAbility::SetDefaultDefinition()
 	}
 }
 
-bool UMCOGameplayAbility::SetAndCommitAbility(const bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+bool UMCOGameplayAbility::SetAndCommitAbility(bool bIsCanBeCancelled, const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	ensure(nullptr != ActorInfo);
 	
@@ -316,7 +318,7 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 	GetAbilitySystemComponent()->HandleGameplayEvent(Payload.EventTag, &Payload);
 }
 
-void UMCOGameplayAbility::StopCharacterFromMoving(const bool& bStopMoving) const
+void UMCOGameplayAbility::StopCharacterFromMoving(bool bStopMoving) const
 {
 	//MCOLOG_C(MCOAbility, TEXT("Stop Character : %s"), bStopMoving ? TEXT("STOP") : TEXT("MOVE"));
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
@@ -324,7 +326,7 @@ void UMCOGameplayAbility::StopCharacterFromMoving(const bool& bStopMoving) const
 	CharacterInterface->StopCharacterFromMoving(bStopMoving);
 }
 
-void UMCOGameplayAbility::StopCharacterFromTurning(const bool& bStopTurning) const
+void UMCOGameplayAbility::StopCharacterFromTurning(bool bStopTurning) const
 {
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);

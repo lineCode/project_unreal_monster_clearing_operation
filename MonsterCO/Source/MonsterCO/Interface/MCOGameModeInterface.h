@@ -22,11 +22,11 @@ class MONSTERCO_API IMCOGameModeInterface
 	GENERATED_BODY()
 
 public:
-	virtual const int32& GetStage() const = 0;
-	virtual const EMCOGameState& GetGameState() const = 0;
+	virtual int32 GetStage() const = 0;
+	virtual EMCOGameState GetGameState() const = 0;
 
 	UFUNCTION()
 	virtual FOnGameStateChangedDelegate& GetOnGameStateChangedDelegate() = 0;
 	
-	virtual void OnChangeGameState(const EMCOGameState& InState) = 0;
+	virtual void OnChangeGameState(EMCOGameState InState) = 0;
 };

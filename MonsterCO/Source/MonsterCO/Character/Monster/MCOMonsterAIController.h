@@ -24,7 +24,7 @@ protected:
 public:
 	void RunAI();
 	void StopAI();
-	void ContinueAI();
+	void RestartAI();
 
 public:
 	UObject* GetTarget();

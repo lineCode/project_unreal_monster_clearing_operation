@@ -21,10 +21,10 @@ public:
 
 // --- Interface
 public:
-	virtual const int32& GetStage() const override { return CurrentStage; }
-	virtual const EMCOGameState& GetGameState() const override { return CurrentGameState; }
+	virtual int32 GetStage() const override { return CurrentStage; }
+	virtual EMCOGameState GetGameState() const override { return CurrentGameState; }
 	virtual FOnGameStateChangedDelegate& GetOnGameStateChangedDelegate() override { return OnGameStateChangedDelegate; }
-	virtual void OnChangeGameState(const EMCOGameState& InState) override;
+	virtual void OnChangeGameState(EMCOGameState InState) override;
 	
 protected:
 	FOnGameStateChangedDelegate OnGameStateChangedDelegate;

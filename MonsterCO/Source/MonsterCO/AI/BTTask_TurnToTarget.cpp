@@ -44,7 +44,8 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 		return EBTNodeResult::Succeeded;
 	}
 
-	//MCOLOG_C(MCOMonsterAI, TEXT("Turn vector : %s"), *LookVector.ToString());
+	//MCOLOG_C(MCOMonsterAI, TEXT("Set Turn vector : %s"), *LookVector.ToString());
+	//MCOLOG_C(MCOMonsterAI, TEXT("Target Rot : %f -> %f"), ControllingPawn->GetActorRotation().Yaw, TargetRot.Yaw);
 	
 	AIPawn->SetTurnVector(LookVector);
 	
@@ -65,7 +66,7 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	IMCOMonsterAIInterface* AIPawn = Cast<IMCOMonsterAIInterface>(ControllingPawn);
 	if (nullptr == AIPawn)
 	{
-		AIPawn->SetTurnVector();
+		AIPawn->SetTurnVector(FVector(0.0f, 0.0f, 0.0f));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
@@ -80,9 +81,13 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	PrevTargetRot += InterpRot - ControllingPawn->GetActorRotation();
 	ControllingPawn->SetActorRotation(InterpRot);
 	
+	//MCOLOG_C(MCOMonsterAI, TEXT("Turning Rot : %f -> %f"), InterpRot.Yaw, TargetRot.Yaw);
+
+	
 	if (true == FMath::IsNearlyEqual(ControllingPawn->GetActorRotation().Yaw, TargetRot.Yaw, 5.0f))
 	{
-		AIPawn->SetTurnVector();
+		//MCOLOG_C(MCOMonsterAI, TEXT("Turn Succeeded"));
+		AIPawn->SetTurnVector(FVector(0.0f, 0.0f, 0.0f));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

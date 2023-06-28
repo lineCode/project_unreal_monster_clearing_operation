@@ -49,7 +49,7 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 	CancelAllAbility();
 	// CharacterInterface->OffAllCollision();
 
-	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedDegreeThenSetZero(), true);
+	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedDegreeThenSetZero());
 	StartActivationWithMontage(Data->GetMontage(Direction));
 }
 

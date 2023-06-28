@@ -80,7 +80,7 @@ void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)
 	}
 	else
 	{
-		//ContinueAI();
+		//RestartAI();
 	}
 }
 
@@ -93,7 +93,8 @@ void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::RESULT_LOSE)
 	{
-		GetMCOAbilitySystemComponent()->RemoveEffectsOnResult();
+		//GetMCOAbilitySystemComponent()->RemoveEffectsOnResult();
+		AbilitySetHandles.TakeFromAbilitySystem(AbilitySystemComponent.Get());
 	}
 }
 
@@ -101,6 +102,12 @@ void AMCOMonsterCharacter::InitializeCharacter()
 {
 	Super::InitializeCharacter();
 	
+	SetFlyMode(EMCOMonsterFlyMode::None);
+	SetMovementMode(MOVE_Walking);
+	SetGravity(1.0f);
+	SetVelocity(FVector());
+
+	RestartAI();
 }
 
 bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
@@ -178,7 +185,7 @@ void AMCOMonsterCharacter::SetMovementMode(EMovementMode InMode)
 
 void AMCOMonsterCharacter::SetFlyMode(EMCOMonsterFlyMode InFlyMode)
 {
-	MCOLOG_C(MCOMonsterAI, TEXT("SetFlyMode : %s"), *FHelper::GetEnumDisplayName(TEXT("EMCOMonsterFlyMode"), (int64)InFlyMode));
+	//MCOLOG_C(MCOMonsterAI, TEXT("SetFlyMode : %s"), *FHelper::GetEnumDisplayName(TEXT("EMCOMonsterFlyMode"), (int64)InFlyMode));
 	
 	FlyMode = InFlyMode;
 }
@@ -233,7 +240,7 @@ FVector AMCOMonsterCharacter::GetTurnVector() const
 	return TurnVector;
 }
 
-void AMCOMonsterCharacter::SetTurnVector(const FVector& InTurnVector)
+void AMCOMonsterCharacter::SetTurnVector(FVector InTurnVector)
 {
 	TurnVector = InTurnVector;
 }
@@ -245,8 +252,10 @@ void AMCOMonsterCharacter::SetActivateActionDelegate(const FMCOActivateActionDel
 
 void AMCOMonsterCharacter::OnActivateAction()
 {
-	OnActivateActionDelegate.ExecuteIfBound();
-	OnActivateActionDelegate = FMCOActivateActionDelegate();
+	if (true == OnActivateActionDelegate.IsBound())
+	{
+		OnActivateActionDelegate.ExecuteIfBound();
+	}
 }
 
 void AMCOMonsterCharacter::SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished)
@@ -254,10 +263,12 @@ void AMCOMonsterCharacter::SetActionFinishedDelegate(const FMCOActionFinishedDel
 	OnActionFinishedDelegate = InOnActionFinished;
 }
 
-void AMCOMonsterCharacter::OnActionFinished(const EBTNodeResult::Type& InResult)
+void AMCOMonsterCharacter::OnActionFinished(EBTNodeResult::Type InResult)
 {
-	OnActionFinishedDelegate.ExecuteIfBound(InResult);
-	OnActionFinishedDelegate = FMCOActionFinishedDelegate();
+	if (true == OnActionFinishedDelegate.IsBound())
+	{
+		OnActionFinishedDelegate.ExecuteIfBound(InResult);
+	}
 }
 
 void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
@@ -283,11 +294,11 @@ void AMCOMonsterCharacter::CancelAbilityByTag(const FGameplayTag& InTag) const
 	return ASC->CancelAbilityByTag(InTag);
 }
 
-void AMCOMonsterCharacter::ContinueAI() const
+void AMCOMonsterCharacter::RestartAI() const
 {
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
 	ISTRUE(nullptr != AIController);
-	AIController->ContinueAI();
+	AIController->RestartAI();
 }
 
 void AMCOMonsterCharacter::StopAI() const
