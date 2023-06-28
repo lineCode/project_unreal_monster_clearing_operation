@@ -75,9 +75,9 @@ protected:
 	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) override;
 
 	virtual void SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction) override;
-	virtual void OnActivateAction() const override;
+	virtual void OnActivateAction() override;
 	virtual void SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished) override;
-	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const override;
+	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) override;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const override;
 	
 // --- AI/Action

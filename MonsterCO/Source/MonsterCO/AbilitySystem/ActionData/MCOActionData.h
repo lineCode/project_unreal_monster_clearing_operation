@@ -1,7 +1,6 @@
 #pragma once
 
 #include "MonsterCO.h"
-#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "MCOActionData.generated.h"
 

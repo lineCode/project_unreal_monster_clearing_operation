@@ -61,13 +61,16 @@ protected:
 	EMCOAbilityActivationPolicy ActivationPolicy;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
-	uint8 bActivateAbilityOnGranted:1;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
-	uint8 bAutoStopCharacter:1;
+	uint32 bActivateAbilityOnGranted:1;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
-	uint8 bAutoActivateChargingStaminaAbility:1;
+	uint32 bApplyCooldownOnGranted:1;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
+	uint32 bAutoStopCharacter:1;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MCO|Ability Activation")
+	uint32 bAutoActivateChargingStaminaAbility:1;
 	
 	
 // --- Getter

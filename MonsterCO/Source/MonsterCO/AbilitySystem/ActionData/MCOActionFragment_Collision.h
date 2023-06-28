@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MonsterCO.h"
+#include "CoreMinimal.h"
 #include "MCOActionDefinition.h"
 #include "MCOActionFragment_Collision.generated.h"
 

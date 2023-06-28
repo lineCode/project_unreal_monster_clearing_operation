@@ -21,6 +21,7 @@ UMCOGameplayAbility::UMCOGameplayAbility()
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
+	bApplyCooldownOnGranted = false;
 	bAutoStopCharacter = false;
 	bAutoActivateChargingStaminaAbility = true;
 	
@@ -46,9 +47,13 @@ void UMCOGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 
 	SetDefaultDefinition();
 	
-	if (bActivateAbilityOnGranted == true)
+	if (true == bActivateAbilityOnGranted)
 	{
 		ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
+	}
+	if (true == bApplyCooldownOnGranted)
+	{
+		ApplyCooldown(Spec.Handle, ActorInfo, CurrentActivationInfo);
 	}
 }
 
@@ -178,21 +183,20 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	ISTRUE(nullptr != CurrentDefinition->CooldownFragment);
 	ISTRUE(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
-	//MCOLOG_C(MCOAbility, TEXT("Cooldown Effect : %s [%.1f]sec"), *AbilityTags.First().GetTagName().ToString(), CurrentDefinition->CooldownFragment->CooldownTime);
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
 	
 	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(DurationEffectClass);
 	ISTRUE(true == NewHandle.IsValid());
 
 	CurrentDefinition->CooldownFragment->ApplyCooldownValue(NewHandle);
 	
-	// HandleForCooldown.Data->SetSetByCallerMagnitude(
-	// 	FMCOCharacterTags::Get().GameplayEffect_CooldownTag,
-	// 	CurrentDefinition->CooldownFragment->GetCooldownTime();
-	// );
-	//
-	// HandleForCooldown.Data->DynamicGrantedTags = CurrentDefinition->CooldownFragment->CooldownTags;
-
-	ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, NewHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(
+		*NewHandle.Data.Get(),
+		ASC->GetPredictionKeyForNewAction()
+	);
+	//ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, NewHandle);
+	
 	StartCooldownWidget();
 }
 

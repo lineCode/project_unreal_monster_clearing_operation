@@ -1,9 +1,9 @@
 #pragma once
 
-#include "MonsterCO.h"
+#include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "GameplayEffectTypes.h"
-#include "AbilitySystem/ActionData/MCOActionDefinition.h"
+#include "MCOActionDefinition.h"
 #include "MCOActionFragment_AttributeEffect.generated.h"
 
 class UNiagaraSystem;

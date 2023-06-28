@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MonsterCO.h"
+#include "CoreMinimal.h"
 #include "MCOActionData.h"
 #include "MCOMontageDataDirectional.generated.h"
 

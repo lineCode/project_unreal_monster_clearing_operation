@@ -40,7 +40,7 @@ private:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
-	uint8 bIsInstantAttack : 1;
+	uint32 bIsInstantAttack : 1;
 	
 // --- Attack
 protected:
@@ -86,7 +86,7 @@ private:
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
-	uint8 bUseOverlapEvent : 1;
+	uint32 bUseOverlapEvent : 1;
 	
 private:
 	UPROPERTY()

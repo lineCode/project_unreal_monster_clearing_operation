@@ -243,9 +243,10 @@ void AMCOMonsterCharacter::SetActivateActionDelegate(const FMCOActivateActionDel
 	OnActivateActionDelegate = InOnActivateAction;
 }
 
-void AMCOMonsterCharacter::OnActivateAction() const
+void AMCOMonsterCharacter::OnActivateAction()
 {
 	OnActivateActionDelegate.ExecuteIfBound();
+	OnActivateActionDelegate = FMCOActivateActionDelegate();
 }
 
 void AMCOMonsterCharacter::SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished)
@@ -253,9 +254,10 @@ void AMCOMonsterCharacter::SetActionFinishedDelegate(const FMCOActionFinishedDel
 	OnActionFinishedDelegate = InOnActionFinished;
 }
 
-void AMCOMonsterCharacter::OnActionFinished(const EBTNodeResult::Type& InResult) const
+void AMCOMonsterCharacter::OnActionFinished(const EBTNodeResult::Type& InResult)
 {
 	OnActionFinishedDelegate.ExecuteIfBound(InResult);
+	OnActionFinishedDelegate = FMCOActionFinishedDelegate();
 }
 
 void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const

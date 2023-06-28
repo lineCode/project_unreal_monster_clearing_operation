@@ -18,7 +18,7 @@ protected:
 	
 protected:
 	UPROPERTY()
-	uint8 bIsToEquip:1;
+	uint32 bIsToEquip:1;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = MCO)
 	TObjectPtr<UAnimMontage> MontageOnEquip;

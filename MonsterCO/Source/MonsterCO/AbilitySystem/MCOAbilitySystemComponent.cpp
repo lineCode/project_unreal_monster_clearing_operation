@@ -13,7 +13,7 @@ void UMCOAbilitySystemComponent::NotifyAbilityFailed(const FGameplayAbilitySpecH
 {
 	Super::NotifyAbilityFailed(Handle, Ability, FailureReason);
 
-	const IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(GetAvatarActor());
+	IMCOMonsterAIInterface* MonsterInterface = Cast<IMCOMonsterAIInterface>(GetAvatarActor());
 	if (nullptr != MonsterInterface)
 	{
 		MonsterInterface->OnActionFinished(EBTNodeResult::Failed);

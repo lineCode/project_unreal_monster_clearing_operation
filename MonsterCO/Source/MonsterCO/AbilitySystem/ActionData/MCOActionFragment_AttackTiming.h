@@ -1,6 +1,6 @@
 #pragma once
 
-#include "MonsterCO.h"
+#include "CoreMinimal.h"
 #include "MCOActionDefinition.h"
 #include "Projectile/MCOProjectile.h"
 #include "MCOActionFragment_AttackTiming.generated.h"

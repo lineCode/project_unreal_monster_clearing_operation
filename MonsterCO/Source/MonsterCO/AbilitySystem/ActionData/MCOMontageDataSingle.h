@@ -1,7 +1,6 @@
 #pragma once
 
-#include "MonsterCO.h"
-#include "GameplayTagContainer.h"
+#include "CoreMinimal.h"
 #include "MCOActionData.h"
 #include "MCOMontageDataSingle.generated.h"
 

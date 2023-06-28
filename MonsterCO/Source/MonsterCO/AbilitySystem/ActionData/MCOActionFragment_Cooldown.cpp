@@ -1,4 +1,4 @@
-#include "AbilitySystem/ActionData/MCOActionFragment_Cooldown.h"
+#include "MCOActionFragment_Cooldown.h"
 #include "GameplayEffect.h"
 #include "AbilitySystem/MCOCharacterTags.h"
 
@@ -16,6 +16,8 @@ void UMCOActionFragment_Cooldown::ApplyCooldownValue(const FGameplayEffectSpecHa
 	
 	InHandle.Data->DynamicGrantedTags = CooldownTags;
 	InHandle.Data->DynamicGrantedTags.AddTag(FMCOCharacterTags::Get().EffectRemoveOnDeathTag);
+
+	MCOLOG_C(MCOAbility, TEXT("Cooldown Effect : %s [%.1f]sec"), *CooldownTags.First().GetTagName().ToString(), CooldownTime);
 }
 
 const FGameplayTagContainer* UMCOActionFragment_Cooldown::GetCooldownTags() const
