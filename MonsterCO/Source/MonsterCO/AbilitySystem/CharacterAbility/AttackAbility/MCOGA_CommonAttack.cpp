@@ -33,10 +33,8 @@ UMCOGA_CommonAttack::UMCOGA_CommonAttack()
 // 	CancelAbilitiesWithTag.AddTag(FMCOCharacterTags::Get().ChargingTag);
 // }
 
-void UMCOGA_CommonAttack::StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName, bool InIsInstantAttack)
+void UMCOGA_CommonAttack::StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName)
 {
-	bIsInstantAttack = InIsInstantAttack;
-	
 	DamagedCharacters.Reset();
 
 	if (nullptr != InMontage)

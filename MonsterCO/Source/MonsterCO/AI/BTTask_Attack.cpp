@@ -28,7 +28,7 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 		return EBTNodeResult::Failed;
 	}
 	
-	FMCOAICharacterTaskFinishedDelegate OnAttackFinished;
+	FMCOActionFinishedDelegate OnAttackFinished;
 	OnAttackFinished.BindLambda([&](EBTNodeResult::Type bInResult)
 	{
 		FinishLatentTask(OwnerComp, bInResult);
@@ -36,9 +36,9 @@ EBTNodeResult::Type UBTTask_Attack::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 			//(bInResult == EBTNodeResult::Failed) ? TEXT("FAILED") : TEXT("SUCCEEDED"));
 	});
 
-	AIPawn->SetActionDelegate(OnAttackFinished);
+	AIPawn->SetActionFinishedDelegate(OnAttackFinished);
 	
-	const bool bTryAttack = AIPawn->Attack(AttackTag);
+	const bool bTryAttack = AIPawn->TryActivateAbilityByTag(AttackTag);
 
 	if (false == bTryAttack)
 	{

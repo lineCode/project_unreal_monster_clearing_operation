@@ -33,7 +33,7 @@ EBTNodeResult::Type UBTTask_TurnToTarget::ExecuteTask(UBehaviorTreeComponent& Ow
 		return EBTNodeResult::Failed;
 	}
 	
-	FVector LookVector = TargetPawn->GetActorLocation() - ControllingPawn->GetActorLocation();
+	FVector LookVector = (TargetPawn->GetActorLocation() - ControllingPawn->GetActorLocation()).GetSafeNormal();
 	LookVector.Z = 0.0f;
 
 	TargetRot = FRotationMatrix::MakeFromX(LookVector).Rotator();

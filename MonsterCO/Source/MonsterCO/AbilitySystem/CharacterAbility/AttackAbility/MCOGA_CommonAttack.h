@@ -24,7 +24,7 @@ public:
 	
 // --- Ability
 protected:
-	void StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName, bool InIsInstantAttack = false);
+	void StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName);
 
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
@@ -38,8 +38,9 @@ private:
 	void BeginDamaging_Collision();
 	void EndDamaging_Collision();
 
-private:
-	bool bIsInstantAttack;
+protected:
+	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
+	uint8 bIsInstantAttack : 1;
 	
 // --- Attack
 protected:

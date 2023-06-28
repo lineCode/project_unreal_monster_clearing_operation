@@ -329,8 +329,12 @@ void AMCOCharacter::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float D
 bool AMCOCharacter::CheckCanBeDamaged(FGameplayTag InAttackTag)
 {
 	// except dodge...
-	
-	if (InAttackTag == FMCOCharacterTags::Get().DragonAbility_Falldown)
+
+	if (true == HasTag(FMCOCharacterTags::Get().CharacterAbility_Invincible))
+	{
+		return false;
+	}
+	else if (InAttackTag == FMCOCharacterTags::Get().DragonAbility_Falldown)
 	{
 		return IsCharacterOnGround();
 	}

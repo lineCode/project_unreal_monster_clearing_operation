@@ -201,7 +201,7 @@ void AMCOMonsterCharacter::AddForce(FVector InForce)
 	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	ISTRUE(nullptr != CharacterMC);
 
-	CharacterMC->AddForce(InForce);
+	CharacterMC->AddImpulse(InForce, false);
 }
 
 FVector AMCOMonsterCharacter::GetVelocity()
@@ -238,14 +238,24 @@ void AMCOMonsterCharacter::SetTurnVector(const FVector& InTurnVector)
 	TurnVector = InTurnVector;
 }
 
-void AMCOMonsterCharacter::SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnAttackFinished)
+void AMCOMonsterCharacter::SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction)
 {
-	OnAttackFinishedDelegate = InOnAttackFinished;
+	OnActivateActionDelegate = InOnActivateAction;
+}
+
+void AMCOMonsterCharacter::OnActivateAction() const
+{
+	OnActivateActionDelegate.ExecuteIfBound();
+}
+
+void AMCOMonsterCharacter::SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished)
+{
+	OnActionFinishedDelegate = InOnActionFinished;
 }
 
 void AMCOMonsterCharacter::OnActionFinished(const EBTNodeResult::Type& InResult) const
 {
-	OnAttackFinishedDelegate.ExecuteIfBound(InResult);
+	OnActionFinishedDelegate.ExecuteIfBound(InResult);
 }
 
 void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
@@ -255,12 +265,20 @@ void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
 	AIController->SetDamagedInBlackBoard(IsDamaged);
 }
 
-bool AMCOMonsterCharacter::Attack(const FGameplayTag& InTag) const
+bool AMCOMonsterCharacter::TryActivateAbilityByTag(const FGameplayTag& InTag) const
 {
 	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
 	ISTRUE_F(nullptr != ASC);
 
 	return ASC->TryActivateAbilityByTag(InTag);
+}
+
+void AMCOMonsterCharacter::CancelAbilityByTag(const FGameplayTag& InTag) const
+{
+	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
+
+	return ASC->CancelAbilityByTag(InTag);
 }
 
 void AMCOMonsterCharacter::ContinueAI() const

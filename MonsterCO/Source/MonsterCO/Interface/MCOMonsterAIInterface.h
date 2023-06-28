@@ -6,7 +6,8 @@
 #include "UObject/Interface.h"
 #include "MCOMonsterAIInterface.generated.h"
 
-DECLARE_DELEGATE_OneParam(FMCOAICharacterTaskFinishedDelegate, const EBTNodeResult::Type& /*InResult*/);
+DECLARE_DELEGATE_OneParam(FMCOActionFinishedDelegate, const EBTNodeResult::Type& /*InResult*/);
+DECLARE_DELEGATE(FMCOActivateActionDelegate);
 
 
 UINTERFACE(MinimalAPI)
@@ -44,12 +45,15 @@ public:
 	virtual bool IsTurning() const = 0;
 	virtual FVector GetTurnVector() const = 0;
 	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) = 0;
-	
-	virtual void SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnActionFinished) = 0;
+
+	virtual void SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction) = 0;
+	virtual void OnActivateAction() const = 0;
+	virtual void SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished) = 0;
 	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const = 0;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const = 0;
 
 // --- AI/Action
 public:
-	virtual bool Attack(const FGameplayTag& InTag) const = 0;
+	virtual bool TryActivateAbilityByTag(const FGameplayTag& InTag) const = 0;
+	virtual void CancelAbilityByTag(const FGameplayTag& InTag) const = 0;
 };

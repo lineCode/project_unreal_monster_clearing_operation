@@ -45,8 +45,8 @@ protected:
 	
 // --- AI
 protected:
-	FMCOAICharacterTaskFinishedDelegate OnAttackFinishedDelegate;
-	FMCOAICharacterTaskFinishedDelegate OnTurnFinishedDelegate;
+	FMCOActivateActionDelegate OnActivateActionDelegate;
+	FMCOActionFinishedDelegate OnActionFinishedDelegate;
 	
 protected:
 	virtual UObject* GetTarget() override;
@@ -73,13 +73,17 @@ protected:
 	virtual bool IsTurning() const override;
 	virtual FVector GetTurnVector() const override;
 	virtual void SetTurnVector(const FVector& InTurnVector = FVector()) override;
-	virtual void SetActionDelegate(const FMCOAICharacterTaskFinishedDelegate& InOnAttackFinished) override;
+
+	virtual void SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction) override;
+	virtual void OnActivateAction() const override;
+	virtual void SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished) override;
 	virtual void OnActionFinished(const EBTNodeResult::Type& InResult) const override;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const override;
 	
 // --- AI/Action
 protected:
-	virtual bool Attack(const FGameplayTag& InTag) const override;
+	virtual bool TryActivateAbilityByTag(const FGameplayTag& InTag) const override;
+	virtual void CancelAbilityByTag(const FGameplayTag& InTag) const override;
 
 protected:
 	void ContinueAI() const;

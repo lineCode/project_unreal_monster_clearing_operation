@@ -20,10 +20,11 @@ void UMCOGA_InstantAttack::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	ensure(nullptr != Data);
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
+
+	bIsInstantAttack = true;
 	
 	StartAttackActivation(
 		nullptr,
-		NAME_None,
-		true
+		NAME_None
 	);
 }

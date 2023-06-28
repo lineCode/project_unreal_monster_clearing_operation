@@ -59,6 +59,9 @@ public:
 	FGameplayTag DragonAbility_Breath;
 	FGameplayTag DragonAbility_Falldown;
 
+	// Character
+	FGameplayTag CharacterAbility_Invincible;
+
 private:
 	static FMCOCharacterTags CharacterTags;
 };

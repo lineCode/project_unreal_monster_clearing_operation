@@ -49,5 +49,7 @@ void FMCOCharacterTags::InitializeTags()
 	CharacterTags.DragonAbility_Fireball   = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Fireball"), bErrorIfNotFound);
 	CharacterTags.DragonAbility_Breath     = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Breath"),   bErrorIfNotFound);
 	CharacterTags.DragonAbility_Falldown   = FGameplayTag::RequestGameplayTag(FName("Ability.Dragon.Falldown"),   bErrorIfNotFound);
+	
+	CharacterTags.CharacterAbility_Invincible   = FGameplayTag::RequestGameplayTag(FName("Ability.Character.Invincible"),   bErrorIfNotFound);
 }
 
