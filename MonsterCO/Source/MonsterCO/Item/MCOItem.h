@@ -26,7 +26,11 @@ public:
 	
 protected:
 	virtual void PostInitializeComponents() override;
+	
+public:
 	void InitializeItem(const FVector& InWorldLocation);
+
+protected:
 	virtual void BeginPlay() override;
 	
 // --- Get
