@@ -94,7 +94,7 @@ void UMCOGameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	
 	if (nullptr != MonsterAIFragment)
 	{
-		MonsterAIFragment->OnActionFinished(CurrentActorInfo->AvatarActor.Get(), false == bWasCancelled);
+		MonsterAIFragment->OnActionFinished(GetActor(), false == bWasCancelled);
 	}
 }
 
@@ -152,6 +152,11 @@ bool UMCOGameplayAbility::SetAndCommitAbility(bool bIsCanBeCancelled, const FGam
 	}
 
 	return true;
+}
+
+AActor* UMCOGameplayAbility::GetActor() const
+{
+	return CurrentActorInfo ? CurrentActorInfo->AvatarActor.Get() : nullptr;
 }
 
 ACharacter* UMCOGameplayAbility::GetCharacter() const
@@ -216,7 +221,7 @@ void UMCOGameplayAbility::StartCooldownWidget() const
 	ISTRUE(nullptr != CurrentActorInfo);
 	ISTRUE(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
-	// const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
+	// const IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(GetActor());
 	// ISTRUE(nullptr != HUDInterface);
 	// HUDInterface->StartCooldownWidget(AbilityTag, CooldownFragment->CooldownTime);
 }
@@ -307,8 +312,8 @@ void UMCOGameplayAbility::HandleGameplayEventWithTag(const FGameplayTag& InTag)
 {
 	FGameplayEventData Payload;
 	Payload.EventTag       = InTag; //FMCOCharacterTags::Get().GameplayEvent_StaminaChargeTag;
-	Payload.Instigator     = CurrentActorInfo->AvatarActor.Get();
-	Payload.Target         = CurrentActorInfo->AvatarActor.Get();
+	Payload.Instigator     = GetActor();
+	Payload.Target         = GetActor();
 	// Payload.OptionalObject = EffectSpec.Def;
 	// Payload.ContextHandle  = EffectSpec.GetEffectContext();
 	// Payload.InstigatorTags = *EffectSpec.CapturedSourceTags.GetAggregatedTags();

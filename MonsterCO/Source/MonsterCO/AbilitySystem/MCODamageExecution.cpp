@@ -77,16 +77,17 @@ void UMCODamageExecution::Execute_Implementation(const FGameplayEffectCustomExec
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().AdditiveStiffnessDef, EvaluationParameters, AdditiveStiffness);
 	AdditiveStiffness = Spec.GetSetByCallerMagnitude(FMCOCharacterTags::Get().GameplayEffect_StiffnessTag, false, 0.0f);
 
-	
+
+	// -> move to effect tag in BP
 	// Check Dodge
-	if (AdditiveDamage < 0.0f || AdditiveHealth < 0.0f)
-	{		
-		if (true == TargetASC->HasMatchingGameplayTag(FMCOCharacterTags::Get().DodgeTag))
-		{
-			MCOPRINT(TEXT("Escaped attack by dodging"));
-			return;
-		}
-	}
+	// if (AdditiveDamage < 0.0f || AdditiveHealth < 0.0f)
+	// {		
+	// 	if (true == TargetASC->HasMatchingGameplayTag(FMCOCharacterTags::Get().DodgeTag))
+	// 	{
+	// 		MCOPRINT(TEXT("Escaped attack by dodging"));
+	// 		return;
+	// 	}
+	// }
 
 	
 	// DAMAGE

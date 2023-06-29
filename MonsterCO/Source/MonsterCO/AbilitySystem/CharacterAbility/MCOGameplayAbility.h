@@ -75,6 +75,7 @@ protected:
 	
 // --- Getter
 protected:
+	AActor* GetActor() const;
 	ACharacter* GetCharacter() const;
 	AController* GetController() const;
 	IMCOCharacterInterface* GetMCOCharacterInterface() const;

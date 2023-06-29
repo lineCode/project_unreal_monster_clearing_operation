@@ -70,7 +70,7 @@ void UMCOGameplayAbility_Jump::InputReleased(const FGameplayAbilitySpecHandle Ha
 
 void UMCOGameplayAbility_Jump::EndAbilityAfterDelay()
 {
-	AbilityEndDelayTimer.Invalidate();
+	GetWorld()->GetTimerManager().ClearTimer(AbilityEndDelayTimer);
 	
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 	

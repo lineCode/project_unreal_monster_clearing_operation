@@ -15,8 +15,8 @@
 
 UMCOGA_CommonAttack::UMCOGA_CommonAttack()
 {
-	GETCLASS(InstantEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveDamage.GE_GiveDamage_C"));
-	GETCLASS(DurationEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveDurationDamage.GE_GiveDurationDamage_C"));
+	GETCLASS(InstantEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveMeleeDamage.GE_GiveMeleeDamage_C"));
+	GETCLASS(DurationEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveFireDurationDamage.GE_GiveFireDurationDamage_C"));
 	
 	// Setting 
 	bUseOverlapEvent = false;
@@ -161,7 +161,7 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacte
 	ISTRUE(nullptr != AttackedASC);
 
 	// Show Monster Widgets
-	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(CurrentActorInfo->AvatarActor.Get());
+	IMCOHUDInterface* HUDInterface = Cast<IMCOHUDInterface>(GetActor());
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
 	if (nullptr != HUDInterface && nullptr != CharacterInterface)
 	{
@@ -313,8 +313,8 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 	AMCOProjectile* SpawnedProjectile = GetWorld()->SpawnActorDeferred<AMCOProjectile>(
 		*CurrentDefinition->AttackTimingFragment->GetProjectileClass(CurrentDamageTimingIdx),
 		SocketTransform,
-		CurrentActorInfo->AvatarActor.Get(),
-		Cast<APawn>(CurrentActorInfo->AvatarActor.Get()),
+		GetActor(),
+		Cast<APawn>(GetActor()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
 	);
 

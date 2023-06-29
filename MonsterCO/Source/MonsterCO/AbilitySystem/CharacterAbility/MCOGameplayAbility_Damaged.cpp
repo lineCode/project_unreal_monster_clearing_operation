@@ -34,7 +34,7 @@ void UMCOGameplayAbility_Damaged::ActivateAbility(const FGameplayAbilitySpecHand
 
 	if (nullptr != MonsterAIFragment)
 	{
-		MonsterAIFragment->SetDamagedInBlackBoard(CurrentActorInfo->AvatarActor.Get(), true);
+		MonsterAIFragment->SetDamagedInBlackBoard(GetActor(), true);
 	}
 	
 	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
@@ -59,6 +59,6 @@ void UMCOGameplayAbility_Damaged::EndAbility(const FGameplayAbilitySpecHandle Ha
 	
 	if (nullptr != MonsterAIFragment)
 	{
-		MonsterAIFragment->SetDamagedInBlackBoard(CurrentActorInfo->AvatarActor.Get(), false);
+		MonsterAIFragment->SetDamagedInBlackBoard(GetActor(), false);
 	}
 }

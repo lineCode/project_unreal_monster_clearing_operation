@@ -61,10 +61,10 @@ protected:
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
 protected:
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Effect")
 	TSubclassOf<UGameplayEffect> InstantEffectWithCue;
 	
-	UPROPERTY()
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Effect")
 	TSubclassOf<UGameplayEffect> DurationEffectWithCue;
 	
 // --- Movement

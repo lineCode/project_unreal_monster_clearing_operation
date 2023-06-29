@@ -35,8 +35,8 @@ void UMCOGA_MonsterSignalAttack::ActivateAbility(const FGameplayAbilitySpecHandl
 	});
 
 	// finish "Attack" task node 
-	MonsterAIFragment->OnActionFinished(CurrentActorInfo->AvatarActor.Get(), true);
+	MonsterAIFragment->OnActionFinished(GetActor(), true);
 	
 	// to check hit later... 
-	MonsterAIFragment->SetActivateActionDelegate(CurrentActorInfo->AvatarActor.Get(), ActivateActionDelegate);
+	MonsterAIFragment->SetActivateActionDelegate(GetActor(), ActivateActionDelegate);
 }
