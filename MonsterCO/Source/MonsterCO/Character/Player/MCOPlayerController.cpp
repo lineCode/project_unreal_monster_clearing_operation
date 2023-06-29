@@ -125,6 +125,8 @@ void AMCOPlayerController::ChangeWidgetByState(EMCOWidgetState InState)
 	
 	if (true == Widgets.Contains(CurrentWidgetState))
 	{
+		// If next widget is OPTION -> have to go back anyway. So don't destroy.
+		// If current widget is HUD -> don't destroy HUD
 		if (InState != EMCOWidgetState::OPTION && CurrentWidgetState != EMCOWidgetState::INGAME)
 		{
 			Widgets[CurrentWidgetState]->RemoveFromParent();
@@ -134,8 +136,11 @@ void AMCOPlayerController::ChangeWidgetByState(EMCOWidgetState InState)
 			Widgets[CurrentWidgetState]->OnClosed();
 		}
 	}
-	
-	if (false == Widgets.Contains(InState) || (CurrentWidgetState != EMCOWidgetState::OPTION && InState != EMCOWidgetState::INGAME))
+
+	// If current widget is OPTION -> you just closed prev widget(not destroyed) when opening OPTION. So no need to create.
+	// If next widget is HUD -> HUD is always alive. So no need to create, except for init. 
+	if (false == Widgets.Contains(InState) ||
+		(CurrentWidgetState != EMCOWidgetState::OPTION && InState != EMCOWidgetState::INGAME))
 	{
 		CreateWidgetAndAddToViewport(WidgetData->WidgetClasses[InState], InState);
 	}

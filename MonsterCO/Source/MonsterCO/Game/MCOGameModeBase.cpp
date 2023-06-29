@@ -10,6 +10,7 @@ AMCOGameModeBase::AMCOGameModeBase()
 	// PlayerStateClass      = AMCOPlayerState::StaticClass();
 
 	CurrentStage = 1;
+	CurrentGameState = EMCOGameState::NONE;
 }
 
 void AMCOGameModeBase::StartPlay()

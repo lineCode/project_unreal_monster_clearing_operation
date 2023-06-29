@@ -42,17 +42,18 @@ public:
 
 protected:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
+	virtual bool TryActivateAbilityByTag(const FGameplayTag& InTag) const override;
+	virtual void CancelAbilityByTag(const FGameplayTag& InTag) const override;
 	
 // --- AI
 protected:
-	FMCOActivateActionDelegate OnActivateActionDelegate;
-	FMCOActionFinishedDelegate OnActionFinishedDelegate;
-	
-protected:
-	virtual UObject* GetTarget() override;
+	void RestartAI() const;
+	void StopAI() const;
+		
 	
 // --- AI/Data
 protected:
+	virtual UObject* GetTarget() override;
 	virtual float GetAIPatrolRadius() const override;
 	virtual float GetAIDetectRange() const override;
 	virtual float GetAIAttackRangeMin(const FGameplayTag& InTag) const override;
@@ -61,7 +62,11 @@ protected:
 	virtual float GetAIFlySpeed() const override;
 	virtual float GetHalfHeight() const override;
 	
-// --- AI/State
+protected:
+	UPROPERTY(VisibleAnywhere, Category = MCO)
+	TObjectPtr<UMCOMonsterAIData> MonsterAIData;
+	
+// --- AI/Fly
 protected:
 	virtual void SetMovementMode(EMovementMode InMode) override;
 	virtual void SetFlyMode(EMCOMonsterFlyMode InFlyMode) override;
@@ -71,35 +76,30 @@ protected:
 	virtual FVector GetVelocity() override;
 	virtual void SetVelocity(FVector InVelocity) override;
 	
+	UPROPERTY()
+	EMCOMonsterFlyMode FlyMode;
+	
+// --- AI/Turn
+protected:
 	virtual bool IsTurning() const override;
 	virtual FVector GetTurnVector() const override;
 	virtual void SetTurnVector(FVector InTurnVector) override;
 
+	UPROPERTY()
+	FVector TurnVector;
+	
+// --- AI/Task
+protected:
 	virtual void SetActivateActionDelegate(const FMCOActivateActionDelegate& InOnActivateAction) override;
 	virtual void OnActivateAction() override;
 	virtual void SetActionFinishedDelegate(const FMCOActionFinishedDelegate& InOnActionFinished) override;
 	virtual void OnActionFinished(EBTNodeResult::Type InResult) override;
 	virtual void SetDamagedInBlackBoard(bool IsDamaged) const override;
-	
-// --- AI/Action
-protected:
-	virtual bool TryActivateAbilityByTag(const FGameplayTag& InTag) const override;
-	virtual void CancelAbilityByTag(const FGameplayTag& InTag) const override;
 
 protected:
-	void RestartAI() const;
-	void StopAI() const;
+	FMCOActivateActionDelegate OnActivateActionDelegate;
+	FMCOActionFinishedDelegate OnActionFinishedDelegate;
 	
-protected:
-	UPROPERTY()
-	FVector TurnVector;
-
-	UPROPERTY()
-	EMCOMonsterFlyMode FlyMode;
-	
-protected:
-	UPROPERTY(VisibleAnywhere, Category = MCO)
-	TObjectPtr<UMCOMonsterAIData> MonsterAIData;
 
 // --- Die
 protected:

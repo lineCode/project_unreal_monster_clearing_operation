@@ -19,7 +19,6 @@ class MONSTERCO_API IMCOPlayerInterface
 // --- Action
 public:
 	virtual void SetSpeed(const EMCOCharacterSpeed& CharacterSpeed) const = 0;
-	
 	virtual FVector GetInputWorldDirection() const = 0;
 	virtual bool IsInputForward() const = 0;
 	

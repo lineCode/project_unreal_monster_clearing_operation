@@ -131,6 +131,36 @@ bool AMCOMonsterCharacter::CanActivateAbility(const FGameplayTag& InTag)
 	return true;
 }
 
+bool AMCOMonsterCharacter::TryActivateAbilityByTag(const FGameplayTag& InTag) const
+{
+	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
+	ISTRUE_F(nullptr != ASC);
+
+	return ASC->TryActivateAbilityByTag(InTag);
+}
+
+void AMCOMonsterCharacter::CancelAbilityByTag(const FGameplayTag& InTag) const
+{
+	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
+
+	return ASC->CancelAbilityByTag(InTag);
+}
+
+void AMCOMonsterCharacter::RestartAI() const
+{
+	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
+	ISTRUE(nullptr != AIController);
+	AIController->RestartAI();
+}
+
+void AMCOMonsterCharacter::StopAI() const
+{
+	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
+	ISTRUE(nullptr != AIController);
+	AIController->StopAI();
+}
+
 UObject* AMCOMonsterCharacter::GetTarget()
 {
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
@@ -276,36 +306,6 @@ void AMCOMonsterCharacter::SetDamagedInBlackBoard(bool IsDamaged) const
 	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
 	ISTRUE(nullptr != AIController);
 	AIController->SetDamagedInBlackBoard(IsDamaged);
-}
-
-bool AMCOMonsterCharacter::TryActivateAbilityByTag(const FGameplayTag& InTag) const
-{
-	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
-	ISTRUE_F(nullptr != ASC);
-
-	return ASC->TryActivateAbilityByTag(InTag);
-}
-
-void AMCOMonsterCharacter::CancelAbilityByTag(const FGameplayTag& InTag) const
-{
-	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
-	ISTRUE(nullptr != ASC);
-
-	return ASC->CancelAbilityByTag(InTag);
-}
-
-void AMCOMonsterCharacter::RestartAI() const
-{
-	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
-	ISTRUE(nullptr != AIController);
-	AIController->RestartAI();
-}
-
-void AMCOMonsterCharacter::StopAI() const
-{
-	AMCOMonsterAIController* AIController = Cast<AMCOMonsterAIController>(GetController());
-	ISTRUE(nullptr != AIController);
-	AIController->StopAI();
 }
 
 void AMCOMonsterCharacter::Die()

@@ -158,7 +158,7 @@ protected:
 	TArray<TObjectPtr<UMCODamagedData>> DurationDamagedData;
 	
 	UPROPERTY()
-	float LastDamagedDegree;
+	float DamagedDegree;
 	
 	
 // --- Die

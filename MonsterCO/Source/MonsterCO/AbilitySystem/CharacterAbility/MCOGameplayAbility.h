@@ -90,7 +90,8 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Fragment")
 	UMCOActionDefinition* CurrentDefinition;
-		
+
+	// This is just for stamina & cooltime
 	UPROPERTY()
 	TSubclassOf<UGameplayEffect> InstantEffectClass;
 	

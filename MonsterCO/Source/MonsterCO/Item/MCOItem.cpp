@@ -34,6 +34,11 @@ AMCOItem::AMCOItem()
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
 }
 
+void AMCOItem::SetData(UMCOItemData* InData)
+{
+	Data = InData;
+}
+
 void AMCOItem::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -58,17 +63,6 @@ void AMCOItem::PostInitializeComponents()
 	InitializeItem(GetActorLocation());
 }
 
-void AMCOItem::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-void AMCOItem::SetData(UMCOItemData* InData)
-{
-	Data = InData;
-}
-
 void AMCOItem::InitializeItem(const FVector& InWorldLocation)
 {
 	FVector RelocationByHeight = InWorldLocation;
@@ -77,6 +71,12 @@ void AMCOItem::InitializeItem(const FVector& InWorldLocation)
 	
 	SetActorEnableCollision(true);
 	SetActorHiddenInGame(false);
+}
+
+void AMCOItem::BeginPlay()
+{
+	Super::BeginPlay();
+	
 }
 
 float AMCOItem::GetItemHalfHeight() const

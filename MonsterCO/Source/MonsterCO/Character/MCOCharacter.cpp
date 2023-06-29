@@ -350,12 +350,8 @@ bool AMCOCharacter::CheckCanBeDamaged(FGameplayTag InAttackTag)
 
 float AMCOCharacter::GetDamagedDegreeThenSetZero()
 {
-	float Result = LastDamagedDegree;
-	if (0.0f == LastDamagedDegree)
-	{
-		MCOLOG_C(MCOAbility, TEXT("Damaged Degree was zero.. this could be zero if character died on duration effect"));
-	}
-	LastDamagedDegree = 0.0f;
+	const float Result = DamagedDegree;
+	DamagedDegree = 0.0f;
 	return Result;
 }
 
@@ -374,7 +370,7 @@ void AMCOCharacter::SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InP
 {
 	(InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.Emplace(InData) : DurationDamagedData.Emplace(InData);
 
-	LastDamagedDegree = InData->DamagedDegree;
+	DamagedDegree = InData->DamagedDegree;
 }
 
 void AMCOCharacter::RemoveDamagedData(EMCOEffectPolicy InPolicy)

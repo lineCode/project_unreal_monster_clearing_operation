@@ -16,19 +16,24 @@ UCLASS()
 class MONSTERCO_API AMCOItem : public AActor
 {
 	GENERATED_BODY()
-	
+
+// --- Set
 public:	
 	AMCOItem();
 
-protected:
-	virtual void PostInitializeComponents() override;
-	virtual void BeginPlay() override;
-
 public:
 	void SetData(UMCOItemData* InData);
-	void InitializeItem(const FVector& InWorldLocation);
-	float GetItemHalfHeight() const;
 	
+protected:
+	virtual void PostInitializeComponents() override;
+	void InitializeItem(const FVector& InWorldLocation);
+	virtual void BeginPlay() override;
+	
+// --- Get
+protected:
+	float GetItemHalfHeight() const;
+
+// --- Collision
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepHitResult);
