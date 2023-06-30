@@ -82,7 +82,6 @@ void UBTTask_TurnToTarget::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* No
 	ControllingPawn->SetActorRotation(InterpRot);
 	
 	//MCOLOG_C(MCOMonsterAI, TEXT("Turning Rot : %f -> %f"), InterpRot.Yaw, TargetRot.Yaw);
-
 	
 	if (true == FMath::IsNearlyEqual(ControllingPawn->GetActorRotation().Yaw, TargetRot.Yaw, 5.0f))
 	{

@@ -49,7 +49,7 @@ public:
 	void FindSpawnLocationThenSpawnItem();
 	void PickRandomItem(const FVector& InSpawnLocation);
 	void RespawnItem(const int32& RandomIndex, const FVector& InSpawnLocation);
-	void SpawnNewItem(const int32& RandomIndex, const FVector& InSpawnLocation, const FSoftObjectPtr& AssetPtr);
+	void SpawnNewItem(const int32& RandomIndex, const FPrimaryAssetId& AssetId, const FVector& InSpawnLocation);
 
 	UFUNCTION()
 	void OnItemDestroyed();

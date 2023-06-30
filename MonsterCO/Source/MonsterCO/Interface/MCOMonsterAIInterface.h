@@ -6,8 +6,11 @@
 #include "UObject/Interface.h"
 #include "MCOMonsterAIInterface.generated.h"
 
+
+
 DECLARE_DELEGATE_OneParam(FMCOActionFinishedDelegate, EBTNodeResult::Type /*InResult*/);
 DECLARE_DELEGATE(FMCOActivateActionDelegate);
+
 
 
 UINTERFACE(MinimalAPI)
@@ -20,10 +23,12 @@ class MONSTERCO_API IMCOMonsterAIInterface
 {
 	GENERATED_BODY()
 
+	
 // --- Ability
 public:
 	virtual bool TryActivateAbilityByTag(const FGameplayTag& InTag) const = 0;
 	virtual void CancelAbilityByTag(const FGameplayTag& InTag) const = 0;
+
 	
 // --- AI/Data
 public:
@@ -36,16 +41,14 @@ public:
 	virtual float GetAIFlySpeed() const = 0;
 	virtual float GetHalfHeight() const = 0;
 
+	
 // --- AI/Fly	
 public:
-	virtual void SetMovementMode(EMovementMode InMode) = 0;
-	virtual void SetGravity(float InGravity) = 0;
 	virtual void SetFlyMode(EMCOMonsterFlyMode InFlyMode) = 0;
 	virtual EMCOMonsterFlyMode GetFlyMode() = 0;
 	virtual void AddForce(FVector InForce) = 0;
-	virtual void SetVelocity(FVector InVelocity) = 0;
-	virtual FVector GetVelocity() = 0;
 
+	
 // --- AI/Turn
 public:
 	virtual bool IsTurning() const = 0;

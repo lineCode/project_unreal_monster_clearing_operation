@@ -64,6 +64,7 @@ protected:
 // --- Ability System
 public:
 	virtual void InitializeCharacter() override;
+
 	
 // --- Input
 public:	
@@ -77,6 +78,12 @@ protected:
 
 	UPROPERTY()
 	FVector2D InputVector;
+
+		
+// --- Tag
+protected:
+	virtual void OnTagChanged(FGameplayTag InTag, bool IsSet) override;
+
 	
 // --- Action
 public:
@@ -103,6 +110,7 @@ public:
 	bool bCanTurnByInput;
 
 	bool bIsOptionOpened;
+
 	
 // --- Mode & Weapon 
 public:
@@ -113,6 +121,7 @@ public:
 	virtual void BeginAnimation_Equip() override;
 	virtual void EndAnimation_Equip() override;
 
+	
 // --- Components
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "MCO|Camera")
@@ -149,6 +158,7 @@ public:
 	// virtual void SetHUD(UMCOHUDWidget* InHUDWidget) override;
 	// virtual void StartCooldownWidget(const FGameplayTag& InTag, const float& InCooldownTime) const override;
 
+	
 // --- Widget/Stamina
 public:
 	virtual void SetupStaminaWidget(UMCOStaminaWidget* InStaminaWidget) override;
@@ -172,6 +182,7 @@ protected:
 	
 	FTimerHandle StaminaTimerHandle;
 
+	
 // --- Widget/Monster
 protected:
 	virtual void ShowMonsterInfo(IMCOCharacterInterface* InCharacter) override;

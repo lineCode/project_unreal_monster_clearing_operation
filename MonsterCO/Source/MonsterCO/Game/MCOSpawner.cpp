@@ -122,28 +122,34 @@ void AMCOSpawner::FindSpawnLocationThenSpawnItem()
 
 void AMCOSpawner::PickRandomItem(const FVector& InSpawnLocation)
 {
-	const UAssetManager& Manager = UAssetManager::Get();
+	UAssetManager& Manager = UAssetManager::Get();
 
-	TArray<FPrimaryAssetId> Assets;
-	Manager.GetPrimaryAssetIdList(ITEMDATA_NAME, Assets);
-	ensure(0 < Assets.Num());
+	TArray<FPrimaryAssetId> PrimaryAssetIds;
+	Manager.GetPrimaryAssetIdList(ITEMDATA_NAME, PrimaryAssetIds);
+	ensure(0 < PrimaryAssetIds.Num());
 	
-	const int32 RandomIndex = FMath::RandRange(0, Assets.Num() - 1);
+	const int32 RandomIndex = FMath::RandRange(0, PrimaryAssetIds.Num() - 1);
 
-	const FSoftObjectPtr AssetPtr(Manager.GetPrimaryAssetPath(Assets[RandomIndex]));
-	if (true == AssetPtr.IsPending())
-	{
-		AssetPtr.LoadSynchronous();
-	}
-
+	// Respawn if exists
 	if (true == SpawnedItems.Contains(RandomIndex))
 	{
 		RespawnItem(RandomIndex, InSpawnLocation);
+		return;
 	}
-	else
+
+	// New spawn 
+	const FPrimaryAssetId PrimaryAssetId = PrimaryAssetIds[RandomIndex];
+
+	FStreamableDelegate Delegate = FStreamableDelegate::CreateLambda(
+	[RandomIndex, PrimaryAssetId, InSpawnLocation, this]()
 	{
-		SpawnNewItem(RandomIndex, InSpawnLocation, AssetPtr);
-	}
+		SpawnNewItem(RandomIndex, PrimaryAssetId, InSpawnLocation);
+	});
+    
+	TArray<FName> Bundles;
+	
+	// Async load
+	Manager.LoadPrimaryAsset(PrimaryAssetId, Bundles, Delegate);
 }
 
 void AMCOSpawner::RespawnItem(const int32& RandomIndex, const FVector& InSpawnLocation)
@@ -153,10 +159,12 @@ void AMCOSpawner::RespawnItem(const int32& RandomIndex, const FVector& InSpawnLo
 	SpawnedItems[RandomIndex]->InitializeItem(InSpawnLocation);
 }
 
-void AMCOSpawner::SpawnNewItem(const int32& RandomIndex, const FVector& InSpawnLocation, const FSoftObjectPtr& AssetPtr)
+void AMCOSpawner::SpawnNewItem(const int32& RandomIndex, const FPrimaryAssetId& AssetId, const FVector& InSpawnLocation)
 {
 	MCOPRINT(TEXT("Item: %d -> New spawn !"), RandomIndex);
-		
+
+	UAssetManager& Manager = UAssetManager::Get();
+	
 	FTransform Transform;
 	Transform.SetLocation(InSpawnLocation);
 	
@@ -167,8 +175,8 @@ void AMCOSpawner::SpawnNewItem(const int32& RandomIndex, const FVector& InSpawnL
 	{
 		Item->OnItemDestroyed.AddUObject(this, &ThisClass::OnItemDestroyed);
 		SpawnedItems.Add(RandomIndex, Item);
-		
-		Item->SetData(Cast<UMCOItemData>(AssetPtr.Get()));
+
+		Item->SetData(Cast<UMCOItemData>(Manager.GetPrimaryAssetObject(AssetId)));
 	}
 
 	if (nullptr != ItemActor)

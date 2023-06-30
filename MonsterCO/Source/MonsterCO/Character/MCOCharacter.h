@@ -73,6 +73,13 @@ public:
 	virtual bool IsCharacterOnGround() const override;
 
 	
+	
+// --- Tag
+protected:
+	UFUNCTION()
+	virtual void OnTagChanged(FGameplayTag InTag, bool IsSet) {};
+
+	
 // --- Ability
 public:
 	virtual void OnRep_PlayerState() override;

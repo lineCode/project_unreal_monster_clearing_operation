@@ -179,6 +179,9 @@ void AMCOCharacter::InitializeCharacter()
 		GetStamina(), GetMaxStamina(),
 		GetStiffness(), GetMaxStiffness()
 	);
+
+	// Bind tag event 
+	MCOPlayerState->OnTagChangedDelegate.AddUObject(this, &ThisClass::OnTagChanged);
 }
 
 void AMCOCharacter::UninitializeAbilitySystem()

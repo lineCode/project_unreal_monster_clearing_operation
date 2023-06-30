@@ -262,6 +262,11 @@ void AMCOPlayerCharacter::EndAnimation_Equip()
 	Weapon->EndAnimation_Equip();
 }
 
+void AMCOPlayerCharacter::OnTagChanged(FGameplayTag InTag, bool IsSet)
+{
+	Super::OnTagChanged(InTag, IsSet);
+	
+}
 
 bool AMCOPlayerCharacter::CheckCanMoveWithTags() const
 {

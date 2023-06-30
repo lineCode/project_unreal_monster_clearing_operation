@@ -9,7 +9,12 @@
 class UMCOAbilitySystemComponent;
 class UMCOAttributeSet;
 
+
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FCharacterAttributeDelegate, float /*NewValue*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FCharacterTagDelegate, FGameplayTag /*Tag*/, bool /*Added*/);
+
+
 
 USTRUCT(BlueprintType)
 struct FAttributeDelegateWrapper
@@ -23,6 +28,9 @@ public:
 	FCharacterAttributeDelegate AttributeDelegate;
 	FDelegateHandle DelegateHandle;
 };
+
+
+
 
 UCLASS()
 class MONSTERCO_API AMCOPlayerState : public APlayerState, public IAbilitySystemInterface
@@ -56,21 +64,27 @@ public:
 	UFUNCTION()
 	void HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& EffectSpec, float Magnitude) const;
 	
-protected:
-	UPROPERTY()
-	TObjectPtr<const UMCOAttributeSet> AttributeSet;
-
-// --- On Changed
-public:
-	TMap<FName, FAttributeDelegateWrapper> OnAttributeChangedDelegate;
-	
 	template<class UserClass, typename Func>
 	void BindAttributeChangedDelegate(const FName& InName, UserClass* InUserObject, Func ToDoFunc);
 	
 protected:
 	void RegisterAttributeChangedDelegate(const FGameplayAttribute& Attribute);
 	void OnAttributeChanged(const FOnAttributeChangeData& Data);
+
+public:
+	TMap<FName, FAttributeDelegateWrapper> OnAttributeChangedDelegate;
+	
+protected:
+	UPROPERTY()
+	TObjectPtr<const UMCOAttributeSet> AttributeSet;
+
+
+// --- Tag
+protected:
 	void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+
+public:
+	FCharacterTagDelegate OnTagChangedDelegate;
 };
 
 template<class UserClass, typename Func>

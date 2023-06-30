@@ -68,8 +68,8 @@ void UBTTask_FlyDown::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 	CharacterMC->ComputeFloorDist(ControllingPawn->GetActorLocation(), 4000.0f, 8000.0f, OutResult, 1.0f);
 	if (OutResult.FloorDist < CharacterMC->Velocity.Length() * 0.2f)
 	{
-		AIPawn->SetMovementMode(MOVE_Falling);
-		AIPawn->SetGravity(1.0f);
+		// AIPawn->SetMovementMode(MOVE_Falling);
+		// AIPawn->SetGravity(1.0f);
 		AIPawn->SetFlyMode(EMCOMonsterFlyMode::None);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

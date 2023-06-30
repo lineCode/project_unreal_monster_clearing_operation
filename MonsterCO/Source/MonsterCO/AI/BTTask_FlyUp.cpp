@@ -34,8 +34,7 @@ EBTNodeResult::Type UBTTask_FlyUp::ExecuteTask(UBehaviorTreeComponent& OwnerComp
 	const FVector PawnLocation = ControllingPawn->GetActorLocation();
 	FlyGoal = PawnLocation + FVector(0.0f, 0.0f, FlyDistance);
 
-	// Set flying mode
-	AIPawn->SetMovementMode(MOVE_Flying);
+	// AIPawn->SetMovementMode(MOVE_Flying);
 	AIPawn->SetFlyMode(EMCOMonsterFlyMode::Up);
 	
 	return EBTNodeResult::InProgress;
@@ -63,9 +62,8 @@ void UBTTask_FlyUp::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemor
 
 	if (FlyGoal.Z < ControllingPawn->GetActorLocation().Z) 
 	{
-		// Set gravity 0
-		AIPawn->SetGravity(0.0f);
-		AIPawn->SetVelocity(FVector());
+		// AIPawn->SetGravity(0.0f);
+		// AIPawn->SetVelocity(FVector());
 		AIPawn->SetFlyMode(EMCOMonsterFlyMode::Hold);
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}

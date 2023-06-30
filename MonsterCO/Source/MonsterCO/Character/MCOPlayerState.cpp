@@ -33,7 +33,6 @@ void AMCOPlayerState::InitializeAbilitySystem()
     RegisterAttributeChangedDelegate(AttributeSet->GetStiffnessAttribute());
     RegisterAttributeChangedDelegate(AttributeSet->GetMaxStiffnessAttribute());
 
-    // AbilitySystemComponent->RegisterGameplayTagEvent(FMCOCharacterTags::Get().StunTag).AddUObject(this, &ThisClass::StunTagChanged);
 }
 
 void AMCOPlayerState::BeginPlay()
@@ -92,6 +91,9 @@ void AMCOPlayerState::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCo
 	// AbilityTagsToIgnore.AddTag();
 
 	AbilitySystemComponent->CancelAbilities(&AbilityTagsToCancel, &AbilityTagsToIgnore);
+    
+    ISTRUE(true == OnTagChangedDelegate.IsBound());
+    OnTagChangedDelegate.Broadcast(FMCOCharacterTags::Get().DashTag, (0 < NewCount));
 }
 
 void AMCOPlayerState::HandleEventWithTag(const FGameplayTag& InTag, AActor* DamageInstigator, AActor* DamageCauser, const FGameplayEffectSpec& EffectSpec, float Magnitude) const

@@ -101,11 +101,14 @@ void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
 void AMCOMonsterCharacter::InitializeCharacter()
 {
 	Super::InitializeCharacter();
+
+	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	ISTRUE(nullptr != CharacterMC);
 	
-	SetFlyMode(EMCOMonsterFlyMode::None);
-	SetMovementMode(MOVE_Walking);
-	SetGravity(1.0f);
-	SetVelocity(FVector());
+	FlyMode = EMCOMonsterFlyMode::None;
+	CharacterMC->MovementMode = MOVE_Walking;
+	CharacterMC->GravityScale = 1.0f;
+	CharacterMC->Velocity = FVector(0.0f, 0.0f, 0.0f);
 
 	RestartAI();
 }
@@ -205,32 +208,35 @@ float AMCOMonsterCharacter::GetHalfHeight() const
 	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleHalfHeight() : 0.0f;
 }
 
-void AMCOMonsterCharacter::SetMovementMode(EMovementMode InMode)
+void AMCOMonsterCharacter::SetFlyMode(EMCOMonsterFlyMode InMode)
 {
 	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	ISTRUE(nullptr != CharacterMC);
 
-	CharacterMC->MovementMode = InMode;
-}
-
-void AMCOMonsterCharacter::SetFlyMode(EMCOMonsterFlyMode InFlyMode)
-{
-	//MCOLOG_C(MCOMonsterAI, TEXT("SetFlyMode : %s"), *FHelper::GetEnumDisplayName(TEXT("EMCOMonsterFlyMode"), (int64)InFlyMode));
+	FlyMode = InMode;
 	
-	FlyMode = InFlyMode;
+	if (InMode == EMCOMonsterFlyMode::Up)
+	{
+		CharacterMC->MovementMode = MOVE_Flying;
+	}
+	else if (InMode == EMCOMonsterFlyMode::Hold)
+	{
+		CharacterMC->GravityScale = 0.0f;
+		CharacterMC->Velocity = FVector(0.0f, 0.0f, 0.0f);
+	}
+	else if (InMode == EMCOMonsterFlyMode::Down)
+	{
+	}
+	else if (InMode == EMCOMonsterFlyMode::None)
+	{
+		CharacterMC->MovementMode = MOVE_Falling;
+		CharacterMC->GravityScale = 1.0f;
+	}
 }
 
 EMCOMonsterFlyMode AMCOMonsterCharacter::GetFlyMode()
 {
 	return FlyMode;
-}
-
-void AMCOMonsterCharacter::SetGravity(float InGravity)
-{
-	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
-	ISTRUE(nullptr != CharacterMC);
-
-	CharacterMC->GravityScale = InGravity;
 }
 
 void AMCOMonsterCharacter::AddForce(FVector InForce)
@@ -239,25 +245,6 @@ void AMCOMonsterCharacter::AddForce(FVector InForce)
 	ISTRUE(nullptr != CharacterMC);
 
 	CharacterMC->AddImpulse(InForce, false);
-}
-
-FVector AMCOMonsterCharacter::GetVelocity()
-{
-	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
-	if (nullptr == CharacterMC)
-	{
-		return FVector();
-	}
-
-	return CharacterMC->Velocity;
-}
-
-void AMCOMonsterCharacter::SetVelocity(FVector InVelocity)
-{
-	UCharacterMovementComponent* CharacterMC = Cast<UCharacterMovementComponent>(GetMovementComponent());
-	ISTRUE(nullptr != CharacterMC);
-
-	CharacterMC->Velocity = InVelocity;
 }
 
 bool AMCOMonsterCharacter::IsTurning() const

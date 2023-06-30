@@ -32,11 +32,13 @@ AMCOItem::AMCOItem()
 	Trigger->SetBoxExtent(FVector(45.0f, 45.0f, 45.0f));
 	Trigger->SetHiddenInGame(false);
 	Trigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnOverlapBegin);
+	
 }
 
 void AMCOItem::SetData(UMCOItemData* InData)
 {
 	Data = InData;
+	SetActorHiddenInGame(true);
 }
 
 void AMCOItem::PostInitializeComponents()

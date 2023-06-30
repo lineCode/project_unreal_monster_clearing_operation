@@ -68,13 +68,9 @@ protected:
 	
 // --- AI/Fly
 protected:
-	virtual void SetMovementMode(EMovementMode InMode) override;
 	virtual void SetFlyMode(EMCOMonsterFlyMode InFlyMode) override;
 	virtual EMCOMonsterFlyMode GetFlyMode() override;
-	virtual void SetGravity(float InGravity) override;
 	virtual void AddForce(FVector InForce) override;
-	virtual FVector GetVelocity() override;
-	virtual void SetVelocity(FVector InVelocity) override;
 	
 	UPROPERTY()
 	EMCOMonsterFlyMode FlyMode;
