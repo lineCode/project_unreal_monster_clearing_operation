@@ -7,6 +7,8 @@
 
 
 class UNiagaraSystem;
+class UMCOActionFragment_Collision;
+class UMCOActionFragment_Projectile;
 
 
 USTRUCT(BlueprintType)
@@ -15,7 +17,7 @@ struct FMCOAttackTimingData
 	GENERATED_BODY()
 
 public:
-	FMCOAttackTimingData() : bIsMovable(false), bCanTurn(true), bUseProjectile(false) {};
+	FMCOAttackTimingData() : bIsMovable(false), bCanTurn(true) {};
 	
 	UPROPERTY(EditAnywhere, Category = Control)
 	uint8 bIsMovable : 1;
@@ -30,23 +32,19 @@ public:
 	float End = 0.0f;
 	
 	UPROPERTY(EditAnywhere, Category = Timing)
-	float CheckRate = 0.0f; // Check multiple times in every check rate (from Begin time to End time)
+	int32 AttackCount = 0; // Attack multiple times (from Begin time to End time)
 
+	// Damage 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attribute)
 	TObjectPtr<UMCOActionFragment_AttributeEffect> Attribute;
-	
-	UPROPERTY(EditAnywhere, Category = Projectile)
-	uint8 bUseProjectile : 1;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = Projectile)
-	TSubclassOf<AMCOProjectile> ProjectileClass;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile)
-	float ProjectileLifeSpan = 1.0f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Projectile)
-	float ProjectileSpeed = 600.0f;
-	
+
+	// Collision
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attribute)
+	TObjectPtr<UMCOActionFragment_Collision> Collision;
+
+	// Projectile
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attribute)
+	TObjectPtr<UMCOActionFragment_Projectile> Projectile;
 };
 
 
@@ -75,7 +73,7 @@ public:
 
 // --- Timing
 public:
-	float GetDamageCheckRate(const uint8& InDamageIdx) const;
+	float GetDamageCheckRate(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
 	float GetDamageBeginTimeAfterPrevEndTime(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
 	float GetDamageExistTime(const uint8& InDamageIdx, const float& SpeedRate = 1.0f) const;
 	float GetComboCheckTime(const float& SpeedRate = 1.0f) const;
@@ -86,6 +84,8 @@ protected:
 // --- Damage
 public:
 	UMCOActionFragment_AttributeEffect* GetAttributeFragment(const uint8& InDamageIdx) const;
+	UMCOActionFragment_Collision* GetCollisionFragment(const uint8& InDamageIdx) const;
+	UMCOActionFragment_Projectile* GetProjectileFragment(const uint8& InDamageIdx) const;
 
 // --- Projectile
 public:

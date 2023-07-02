@@ -23,15 +23,15 @@ protected:
 	TMap<EMCOCharacterDirection, TObjectPtr<UMCOActionFragment_Montage>> MontageFragments;
 	
 public:
+	void UpdateDirectionalDefinition(UMCOActionDefinition* OutDefinition, const EMCOCharacterDirection& InDirection = EMCOCharacterDirection::Max) const;
 	EMCOCharacterDirection GetDirectionFromDegree(const float InDegree, const bool bLog = false) const;
 	UAnimMontage* GetMontage(const EMCOCharacterDirection& InDirection);
-	void UpdateDirectionalDefinition(UMCOActionDefinition* OutDefinition, const EMCOCharacterDirection& InDirection = EMCOCharacterDirection::Max) const;
 
 protected:
 	UMCOActionFragment_Cooldown* GetCooldownFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_AttributeEffect* GetAttributeFragment(const EMCOCharacterDirection& InDirection) const;
 	UMCOActionFragment_AttackTiming* GetAttackTimingFragment(const EMCOCharacterDirection& InDirection) const;
-	UMCOActionFragment_Collision* GetCollisionFragment(const EMCOCharacterDirection& InDirection) const;
+	UMCOActionFragment_Collision* GetCollisionFragment(const EMCOCharacterDirection& InDirection, const uint8& InDamageIdx) const;
 	UMCOActionFragment_Montage* GetMontageFragment(const EMCOCharacterDirection& InDirection) const;
 	float GetClosestDirectionFromDegree(float InDegree, EMCOCharacterDirection& OutDirection, const bool bLog) const;
 };

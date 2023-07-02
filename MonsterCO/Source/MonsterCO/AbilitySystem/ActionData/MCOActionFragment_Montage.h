@@ -23,5 +23,5 @@ public:
 	UMCOActionFragment_Cooldown* GetCooldownFragment() const;
 	UMCOActionFragment_AttributeEffect* GetAttributeFragment() const;
 	UMCOActionFragment_AttackTiming* GetAttackTimingFragment() const;
-	UMCOActionFragment_Collision* GetCollisionFragment() const;
+	UMCOActionFragment_Collision* GetCollisionFragment(const uint8& InDamageIdx) const;
 };

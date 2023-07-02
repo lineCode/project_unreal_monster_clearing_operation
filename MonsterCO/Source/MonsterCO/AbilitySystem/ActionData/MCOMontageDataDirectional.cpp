@@ -2,6 +2,16 @@
 #include "MCOActionFragment_Montage.h"
 
 
+void UMCOMontageDataDirectional::UpdateDirectionalDefinition(UMCOActionDefinition* OutDefinition, const EMCOCharacterDirection& InDirection) const
+{
+	ensure(nullptr != OutDefinition);
+
+	OutDefinition->CooldownFragment = GetCooldownFragment(InDirection);
+	OutDefinition->AttributeFragment = GetAttributeFragment(InDirection);
+	OutDefinition->AttackTimingFragment = GetAttackTimingFragment(InDirection);
+	OutDefinition->CollisionFragment = GetCollisionFragment(InDirection, 0);
+}
+
 EMCOCharacterDirection UMCOMontageDataDirectional::GetDirectionFromDegree(const float InDegree, const bool bLog) const
 {
 	const float Gap = 45.0f;
@@ -44,16 +54,6 @@ UAnimMontage* UMCOMontageDataDirectional::GetMontage(const EMCOCharacterDirectio
 {
 	ensure(MontageFragments.Contains(InDirection));
 	return MontageFragments[InDirection]->Montage;
-}
-
-void UMCOMontageDataDirectional::UpdateDirectionalDefinition(UMCOActionDefinition* OutDefinition, const EMCOCharacterDirection& InDirection) const
-{
-	ensure(nullptr != OutDefinition);
-
-	OutDefinition->CooldownFragment = GetCooldownFragment(InDirection);
-	OutDefinition->AttributeFragment = GetAttributeFragment(InDirection);
-	OutDefinition->AttackTimingFragment = GetAttackTimingFragment(InDirection);
-	OutDefinition->CollisionFragment = GetCollisionFragment(InDirection);
 }
 
 UMCOActionFragment_Cooldown* UMCOMontageDataDirectional::GetCooldownFragment(const EMCOCharacterDirection& InDirection) const
@@ -101,12 +101,12 @@ UMCOActionFragment_AttackTiming* UMCOMontageDataDirectional::GetAttackTimingFrag
 	return Super::GetAttackTimingFragment();
 }
 
-UMCOActionFragment_Collision* UMCOMontageDataDirectional::GetCollisionFragment(const EMCOCharacterDirection& InDirection) const
+UMCOActionFragment_Collision* UMCOMontageDataDirectional::GetCollisionFragment(const EMCOCharacterDirection& InDirection, const uint8& InDamageIdx) const
 {
 	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InDirection);
 	if (nullptr != MontageFragment)
 	{
-		UMCOActionFragment_Collision* Fragment = MontageFragment->GetCollisionFragment();
+		UMCOActionFragment_Collision* Fragment = MontageFragment->GetCollisionFragment(InDamageIdx);
 		if (nullptr != Fragment)
 		{
 			return Fragment;
@@ -115,7 +115,6 @@ UMCOActionFragment_Collision* UMCOMontageDataDirectional::GetCollisionFragment(c
 	
 	return Super::GetCollisionFragment();
 }
-
 
 UMCOActionFragment_Montage* UMCOMontageDataDirectional::GetMontageFragment(const EMCOCharacterDirection& InDirection) const
 {
@@ -140,41 +139,28 @@ float UMCOMontageDataDirectional::GetClosestDirectionFromDegree(float InDegree, 
 	
 	float ResultGapDegree = 0.0f;
 	int32 ResultIndex = 0;
+
+	const int32 dir = (InDegree < 0.0f) ? -1 : 1; // Left or Right
 	
-	// Left
-	if (InDegree < 0.0f)
+	for (int32 i = 0; i <= 4; i++)
 	{
-		for (int32 i = 0; i <= 4; i++)
+		const float CurrentDegree = dir * (StartDegree + GapDegree * i);
+		if (dir * InDegree < dir * CurrentDegree) // (22.5f > 67.5 > 112.5 > 157.5 > 202.5)
 		{
-			const float CurrentDegree = -StartDegree - GapDegree * i;
-			if (InDegree > CurrentDegree) // -22.5f > -67.5 > -112.5 > 157.5 > 202.5
-			{
-				ResultIndex = i; // front > fl > l > bl > back
-				ResultGapDegree = InDegree - CurrentDegree;
-				break;
-			}
-		}
-	}
-	// Right
-	else
-	{
-		for (int32 i = 0; i <= 4; i++)
-		{
-			const float CurrentDegree = StartDegree + GapDegree * i;
-			if (InDegree < CurrentDegree)
-			{
-				ResultIndex = i; // front > fr > r > br > back
-				ResultGapDegree = InDegree - CurrentDegree;
-				break;
-			}
-		}
-
-		if (ResultIndex != 0)
-		{
-			ResultIndex = MaxDirectionCount - ResultIndex;
-		}
+			// Left : front > fl > l > bl > back
+			// Right : front > fr > r > br > back
+			ResultIndex = i;
+			
+			ResultGapDegree = InDegree - CurrentDegree;
+			break;
+		}	
 	}
 
+	if (0.0f <= InDegree && ResultIndex != 0)
+	{
+		ResultIndex = MaxDirectionCount - ResultIndex;
+	}
+	
 	OutDirection = static_cast<EMCOCharacterDirection>(ResultIndex);
 
 	if (true == bLog)

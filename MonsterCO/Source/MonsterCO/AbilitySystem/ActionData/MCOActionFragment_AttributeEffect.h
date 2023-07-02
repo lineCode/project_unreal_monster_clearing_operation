@@ -6,7 +6,11 @@
 #include "MCOActionDefinition.h"
 #include "MCOActionFragment_AttributeEffect.generated.h"
 
+
+
 class UNiagaraSystem;
+
+
 
 USTRUCT(BlueprintType)
 struct FMCOAttributeValue

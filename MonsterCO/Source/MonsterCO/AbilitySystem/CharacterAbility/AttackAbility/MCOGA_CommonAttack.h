@@ -10,6 +10,7 @@
 class UGameplayEffect;
 class UMCOActionFragment_AttackTiming;
 class UMCOActionFragment_Collision;
+class UMCOActionFragment_Projectile;
 
 
 
@@ -61,11 +62,19 @@ protected:
 	void DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const;
 	
 protected:
+	UMCOActionFragment_AttributeEffect* GetAttackAttributeFragment(const uint8& InDamageIdx) const;
+	UMCOActionFragment_Collision* GetCollisionFragment(const uint8& InDamageIdx) const;
+	UMCOActionFragment_Projectile* GetProjectileFragment(const uint8& InDamageIdx) const;
+	
+	
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Effect")
 	TSubclassOf<UGameplayEffect> InstantEffectWithCue;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Effect")
 	TSubclassOf<UGameplayEffect> DurationEffectWithCue;
+
+	
 	
 // --- Movement
 protected:
@@ -89,7 +98,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
 	uint32 bUseOverlapEvent : 1;
 	
-private:
+protected:
 	UPROPERTY()
 	TSet<TWeakObjectPtr<ACharacter>> DamagedCharacters;
 	

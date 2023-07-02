@@ -4,6 +4,7 @@
 #include "MCOActionDefinition.h"
 #include "MCOActionFragment_Collision.generated.h"
 
+
 UCLASS()
 class MONSTERCO_API UMCOActionFragment_Collision : public UMCOActionFragment
 {

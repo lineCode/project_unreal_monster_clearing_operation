@@ -40,7 +40,7 @@ void UMCOGameplayAbility_ComboAttack::ActivateAbility(const FGameplayAbilitySpec
 	ComboTimerHandle.Invalidate();
 	
 	ensure(nullptr != Data);
-	Data->UpdateComboDefinition(CurrentDefinition);
+	Data->UpdateComboDefinition(CurrentDefinition, CurrentCombo - 1);
 	
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 	
@@ -113,7 +113,7 @@ void UMCOGameplayAbility_ComboAttack::DoNextCombo()
 	
 	if (false == CheckCanActivateWithStamina())
 	{
-		Data->UpdateComboDefinition(CurrentDefinition);
+		Data->UpdateComboDefinition(CurrentDefinition, 0);
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 		return;
 	}

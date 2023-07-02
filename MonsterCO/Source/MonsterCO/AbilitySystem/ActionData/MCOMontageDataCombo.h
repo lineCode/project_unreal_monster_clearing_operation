@@ -5,6 +5,7 @@
 #include "MCOMontageDataCombo.generated.h"
 
 class UMCOActionFragment_Montage;
+class UMCOMontageDataDirectional;
 
 UCLASS()
 class MONSTERCO_API UMCOMontageDataCombo : public UMCOActionData
@@ -22,13 +23,13 @@ protected:
 public:
 	UAnimMontage* GetMontage(const uint8& InComboIdx);
 	uint8 GetMaxCombo() const;
-	void UpdateComboDefinition(UMCOActionDefinition* OutDefinition, const uint8& InComboIdx = 0) const;
+	void UpdateComboDefinition(UMCOActionDefinition* OutDefinition, const uint8& InComboIdx) const;
 
 protected:
 	UMCOActionFragment_Cooldown* GetCooldownFragment(const uint8& InComboIdx) const;
 	UMCOActionFragment_AttributeEffect* GetAttributeFragment(const uint8& InComboIdx) const;
 	UMCOActionFragment_AttackTiming* GetAttackTimingFragment(const uint8& InComboIdx) const;
-	UMCOActionFragment_Collision* GetCollisionFragment(const uint8& InComboIdx) const;
+	UMCOActionFragment_Collision* GetCollisionFragment(const uint8& InComboIdx, const uint8& InDamageIdx) const;
 	UMCOActionFragment_Montage* GetMontageFragment(const uint8& InComboIdx) const;
 	
 };

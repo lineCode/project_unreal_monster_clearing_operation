@@ -18,7 +18,7 @@ void UMCOMontageDataCombo::UpdateComboDefinition(UMCOActionDefinition* OutDefini
 	OutDefinition->CooldownFragment = GetCooldownFragment(InComboIdx);
 	OutDefinition->AttributeFragment = GetAttributeFragment(InComboIdx);
 	OutDefinition->AttackTimingFragment = GetAttackTimingFragment(InComboIdx);
-	OutDefinition->CollisionFragment = GetCollisionFragment(InComboIdx);
+	OutDefinition->CollisionFragment = GetCollisionFragment(InComboIdx, 0);
 }
 
 UMCOActionFragment_Cooldown* UMCOMontageDataCombo::GetCooldownFragment(const uint8& InComboIdx) const
@@ -66,12 +66,12 @@ UMCOActionFragment_AttackTiming* UMCOMontageDataCombo::GetAttackTimingFragment(c
 	return Super::GetAttackTimingFragment();
 }
 
-UMCOActionFragment_Collision* UMCOMontageDataCombo::GetCollisionFragment(const uint8& InComboIdx) const
+UMCOActionFragment_Collision* UMCOMontageDataCombo::GetCollisionFragment(const uint8& InComboIdx, const uint8& InDamageIdx) const
 {
 	const UMCOActionFragment_Montage* MontageFragment = GetMontageFragment(InComboIdx);
 	if (nullptr != MontageFragment)
 	{
-		UMCOActionFragment_Collision* Fragment = MontageFragment->GetCollisionFragment();
+		UMCOActionFragment_Collision* Fragment = MontageFragment->GetCollisionFragment(InDamageIdx);
 		if (nullptr != Fragment)
 		{
 			return Fragment;

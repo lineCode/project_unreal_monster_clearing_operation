@@ -1,5 +1,7 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_AttackTiming.h"
 #include "MCOActionFragment_AttributeEffect.h"
+#include "MCOActionFragment_Collision.h"
+#include "MCOActionFragment_Projectile.h"
 
 
 bool UMCOActionFragment_AttackTiming::IsValidIdx(const uint8& InDamageIdx) const
@@ -19,10 +21,15 @@ bool UMCOActionFragment_AttackTiming::CanTurn(const uint8& InDamageIdx) const
 	return DamageTimings[InDamageIdx].bCanTurn;
 }
 
-float UMCOActionFragment_AttackTiming::GetDamageCheckRate(const uint8& InDamageIdx) const
+float UMCOActionFragment_AttackTiming::GetDamageCheckRate(const uint8& InDamageIdx, const float& SpeedRate) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
-	return DamageTimings[InDamageIdx].CheckRate;
+
+	const float GapFrameCount = DamageTimings[InDamageIdx].End - DamageTimings[InDamageIdx].Begin;
+	const float SingleAttackFrameCount = GapFrameCount / DamageTimings[InDamageIdx].AttackCount;
+	const float AttackCheckRate = CalculateTime(SingleAttackFrameCount, SpeedRate);
+	
+	return AttackCheckRate;
 }
 
 float UMCOActionFragment_AttackTiming::GetDamageBeginTimeAfterPrevEndTime(const uint8& InDamageIdx, const float& SpeedRate) const
@@ -63,30 +70,43 @@ UMCOActionFragment_AttributeEffect* UMCOActionFragment_AttackTiming::GetAttribut
 	return (DamageTimings.IsValidIndex(InDamageIdx)) ? DamageTimings[InDamageIdx].Attribute : nullptr;
 }
 
+UMCOActionFragment_Collision* UMCOActionFragment_AttackTiming::GetCollisionFragment(const uint8& InDamageIdx) const
+{
+	return (DamageTimings.IsValidIndex(InDamageIdx)) ? DamageTimings[InDamageIdx].Collision : nullptr;
+}
+
+UMCOActionFragment_Projectile* UMCOActionFragment_AttackTiming::GetProjectileFragment(const uint8& InDamageIdx) const
+{
+	return (DamageTimings.IsValidIndex(InDamageIdx)) ? DamageTimings[InDamageIdx].Projectile : nullptr;
+}
+
 bool UMCOActionFragment_AttackTiming::IsUsingProjectile(const uint8& InDamageIdx) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
-	
-	return DamageTimings[InDamageIdx].bUseProjectile;
+
+	return nullptr != DamageTimings[InDamageIdx].Projectile;
 }
 
 const TSubclassOf<AMCOProjectile>* UMCOActionFragment_AttackTiming::GetProjectileClass(const uint8& InDamageIdx) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
+	ISTRUE_N(DamageTimings[InDamageIdx].Projectile);
 	
-	return &DamageTimings[InDamageIdx].ProjectileClass;
+	return &DamageTimings[InDamageIdx].Projectile->ProjectileClass;
 }
 
 float UMCOActionFragment_AttackTiming::GetProjectileSpeed(const uint8& InDamageIdx) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
+	ISTRUE_Z(DamageTimings[InDamageIdx].Projectile);
 	
-	return DamageTimings[InDamageIdx].ProjectileSpeed;
+	return DamageTimings[InDamageIdx].Projectile->ProjectileSpeed;
 }
 
 float UMCOActionFragment_AttackTiming::GetProjectileLifeSpan(const uint8& InDamageIdx) const
 {
 	ensure(DamageTimings.IsValidIndex(InDamageIdx));
+	ISTRUE_Z(DamageTimings[InDamageIdx].Projectile);
 	
-	return DamageTimings[InDamageIdx].ProjectileLifeSpan;
+	return DamageTimings[InDamageIdx].Projectile->ProjectileLifeSpan;
 }

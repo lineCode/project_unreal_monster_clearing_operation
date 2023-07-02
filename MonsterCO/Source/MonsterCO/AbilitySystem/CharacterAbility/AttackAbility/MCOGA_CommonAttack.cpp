@@ -129,31 +129,30 @@ void UMCOGA_CommonAttack::EndDamaging_Channel()
 
 void UMCOGA_CommonAttack::BeginDamaging_Collision()
 {
-	ensure(nullptr != CurrentDefinition->CollisionFragment);
+	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
+	ensure(CollisionFragment);
 		
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(nullptr != CharacterInterface);
 	
 	CharacterInterface->GetCollisionBeginOverlapDelegate().AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlap);
-	CharacterInterface->TurnOnCollision(CurrentDefinition->CollisionFragment->SocketName);
+	CharacterInterface->TurnOnCollision(CollisionFragment->SocketName);
 }
 
 void UMCOGA_CommonAttack::EndDamaging_Collision()
 {
-	ensure(nullptr != CurrentDefinition->CollisionFragment);
-		
+	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
+	ensure(nullptr != CollisionFragment);
+	
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(nullptr != CharacterInterface);
 	
 	CharacterInterface->GetCollisionBeginOverlapDelegate().Clear();
-	CharacterInterface->TurnOffCollision(CurrentDefinition->CollisionFragment->SocketName);
+	CharacterInterface->TurnOffCollision(CollisionFragment->SocketName);
 }
 
 void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FVector& InDamagedLocation)
 {
-	ISTRUE(nullptr != CurrentDefinition);
-	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
-	
 	// Get ASC from AttackedCharacter
 	IAbilitySystemInterface* AttackedCharacter = Cast<IAbilitySystemInterface>(InAttackedCharacter);
 	ISTRUE(nullptr != AttackedCharacter);
@@ -168,7 +167,8 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacte
 		HUDInterface->ShowMonsterInfo(CharacterInterface);
 	}
 
-	const UMCOActionFragment_AttributeEffect* AttributeFragment = CurrentDefinition->AttackTimingFragment->GetAttributeFragment(CurrentDamageTimingIdx);
+	const UMCOActionFragment_AttributeEffect* AttributeFragment = GetAttackAttributeFragment(CurrentDamageTimingIdx);
+	ISTRUE(nullptr != AttributeFragment);
 
 	// Instant effect
 	SendDamagedDataToTarget(InAttackedCharacter, InDamagedDegree, InDamagedLocation, EMCOEffectPolicy::Instant, AttributeFragment);
@@ -223,6 +223,7 @@ float UMCOGA_CommonAttack::CalculateDegree(const FVector& SourceLocation, const 
 void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacter, float InDegree, const FVector& InDamagedLocation,
 	const EMCOEffectPolicy& InPolicy, const UMCOActionFragment_AttributeEffect* InAttributeFragment) const
 {
+	ISTRUE(nullptr != InAttributeFragment);
 	ISTRUE(true == InAttributeFragment->IsEffectExistByPolicy(InPolicy));
 	
 	UMCODamagedData* DamagedData = NewObject<UMCODamagedData>(InAttackedCharacter);
@@ -272,10 +273,10 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor
 	ISTRUE(nullptr != InAttackCauser);
 	ISTRUE(nullptr != InAttackedCharacter);
 	ISTRUE(false == DamagedCharacters.Contains(InAttackedCharacter));
-	ISTRUE(nullptr != CurrentDefinition);
-	ISTRUE(nullptr != CurrentDefinition->CollisionFragment);
-	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
 
+	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
+	ISTRUE(nullptr != CollisionFragment);
+	
 	const IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(InAttackedCharacter);
 	ISTRUE(nullptr != AttackedInterface);
 	
@@ -284,7 +285,7 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor
 	const float DamagedDegree = CalculateDegree(
 		InAttackedCharacter->GetActorLocation(),
 		InAttackedCharacter->GetActorForwardVector(),
-		-CurrentDefinition->CollisionFragment->GetAttackDirection(InAttacker)
+		-CollisionFragment->GetAttackDirection(InAttacker)
 	);
 
 	const FVector DamagedLocation = SweepResult.ImpactPoint;
@@ -297,13 +298,15 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor
 void UMCOGA_CommonAttack::AttackByProjectile()
 {
 	ISTRUE(nullptr != CurrentDefinition);
-	ISTRUE(nullptr != CurrentDefinition->CollisionFragment);
 	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
+	
+	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
+	ISTRUE(nullptr != CollisionFragment);
 	
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
 
-	FTransform SocketTransform = CharacterInterface->GetSocketTransform(CurrentDefinition->CollisionFragment->SocketName);
+	FTransform SocketTransform = CharacterInterface->GetSocketTransform(CollisionFragment->SocketName);
 	SocketTransform.SetRotation(FQuat(FRotator(
 		0.0f,
 		SocketTransform.GetRotation().Rotator().Yaw,
@@ -334,9 +337,8 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 
 void UMCOGA_CommonAttack::AttackByInstantCheck()
 {
-	ISTRUE(nullptr != CurrentDefinition);
-	ISTRUE(nullptr != CurrentDefinition->CollisionFragment);
-	ISTRUE(nullptr != CurrentDefinition->AttackTimingFragment);
+	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
+	ISTRUE(nullptr != CollisionFragment);
 	
 	ACharacter* Attacker = GetCharacter();
 	ISTRUE(nullptr != Attacker);
@@ -351,16 +353,16 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 	IMCOCharacterInterface* AttackerInterface = Cast<IMCOCharacterInterface>(Attacker);
 	ISTRUE(nullptr != AttackerInterface);
 
-	const FName SocketName = CurrentDefinition->CollisionFragment->SocketName;
-	const FVector Start = (SocketName != NAME_None) ? AttackerInterface->GetSocketLocation(CurrentDefinition->CollisionFragment->SocketName) : Attacker->GetActorLocation();
+	const FName SocketName = CollisionFragment->SocketName;
+	const FVector Start = (SocketName != NAME_None) ? AttackerInterface->GetSocketLocation(CollisionFragment->SocketName) : Attacker->GetActorLocation();
 	// const FVector Start = Attacker->GetActorLocation() +
 	// 	(Attacker->GetActorForwardVector() * Radius) +
 	// 	(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);
 	
-	const FVector AttackDirection = CurrentDefinition->CollisionFragment->GetAttackDirection(Attacker);
-	const FVector End = Start + AttackDirection * CurrentDefinition->CollisionFragment->AttackLength;
+	const FVector AttackDirection = CollisionFragment->GetAttackDirection(Attacker);
+	const FVector End = Start + AttackDirection * CollisionFragment->AttackLength;
 	
-	const FCollisionShape Shape = FCollisionShape::MakeSphere(CurrentDefinition->CollisionFragment->AttackRadius);
+	const FCollisionShape Shape = FCollisionShape::MakeSphere(CollisionFragment->AttackRadius);
 	bool HitDetected = GetWorld()->SweepMultiByChannel(
 		OutHitResults,
 		Start,
@@ -455,20 +457,57 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 
 void UMCOGA_CommonAttack::DrawDebug(const FVector& AttackForward, const FVector& Start, const FVector& End, bool bHitDetected) const
 {
+	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
+	ensure(nullptr != CollisionFragment);
+		
 	const FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
-	const float CapsuleHalfHeight = CurrentDefinition->CollisionFragment->AttackLength * 0.5f;
+	const float CapsuleHalfHeight = CollisionFragment->AttackLength * 0.5f;
 	const FColor DrawColor = bHitDetected == true ? FColor::Green : FColor::Red;
 
 	DrawDebugCapsule(
 		GetWorld(), 
 		CapsuleOrigin,
 		CapsuleHalfHeight,
-		CurrentDefinition->CollisionFragment->AttackRadius,
+		CollisionFragment->AttackRadius,
 		FRotationMatrix::MakeFromZ(AttackForward).ToQuat(), 
 		DrawColor,
 		false, 
 		0.5f 
 	);
+}
+
+UMCOActionFragment_AttributeEffect* UMCOGA_CommonAttack::GetAttackAttributeFragment(const uint8& InDamageIdx) const
+{
+	ISTRUE_N(nullptr != CurrentDefinition);
+	ISTRUE_N(nullptr != CurrentDefinition->AttackTimingFragment);
+
+	return CurrentDefinition->AttackTimingFragment->GetAttributeFragment(InDamageIdx);
+}
+
+UMCOActionFragment_Collision* UMCOGA_CommonAttack::GetCollisionFragment(const uint8& InDamageIdx) const
+{
+	ISTRUE_N(nullptr != CurrentDefinition);
+
+	// for using different collision data
+	if (nullptr != CurrentDefinition->AttackTimingFragment)
+	{
+		UMCOActionFragment_Collision* CollisionFragment = CurrentDefinition->AttackTimingFragment->GetCollisionFragment(InDamageIdx);
+		if (nullptr != CollisionFragment)
+		{
+			return CollisionFragment;
+		}
+	}
+
+	// for using same collision data 
+	return CurrentDefinition->CollisionFragment;
+}
+
+UMCOActionFragment_Projectile* UMCOGA_CommonAttack::GetProjectileFragment(const uint8& InDamageIdx) const
+{
+	ISTRUE_N(nullptr != CurrentDefinition);
+	ISTRUE_N(nullptr != CurrentDefinition->AttackTimingFragment);
+
+	return CurrentDefinition->AttackTimingFragment->GetProjectileFragment(InDamageIdx);
 }
 
 void UMCOGA_CommonAttack::SetMovementOnBeginDamaging() const
@@ -520,16 +559,22 @@ void UMCOGA_CommonAttack::ResetDamageTimer()
 
 float UMCOGA_CommonAttack::GetCurrentDamageBeginFrameCount() const
 {
+	ISTRUE_Z(nullptr != CurrentDefinition);
+	ISTRUE_Z(nullptr != CurrentDefinition->AttackTimingFragment);
 	return CurrentDefinition->AttackTimingFragment->GetDamageBeginTimeAfterPrevEndTime(CurrentDamageTimingIdx);
 }
 
 float UMCOGA_CommonAttack::GetCurrentDamageEndFrameCount() const
 {
+	ISTRUE_Z(nullptr != CurrentDefinition);
+	ISTRUE_Z(nullptr != CurrentDefinition->AttackTimingFragment);
 	return CurrentDefinition->AttackTimingFragment->GetDamageExistTime(CurrentDamageTimingIdx);
 }
 
 float UMCOGA_CommonAttack::GetCurrentDamageCheckRate() const
 {
+	ISTRUE_Z(nullptr != CurrentDefinition);
+	ISTRUE_Z(nullptr != CurrentDefinition->AttackTimingFragment);
 	return CurrentDefinition->AttackTimingFragment->GetDamageCheckRate(CurrentDamageTimingIdx);
 }
 

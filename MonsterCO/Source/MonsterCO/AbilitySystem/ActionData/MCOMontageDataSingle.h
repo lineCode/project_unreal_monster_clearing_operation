@@ -4,7 +4,9 @@
 #include "MCOActionData.h"
 #include "MCOMontageDataSingle.generated.h"
 
+
 class UMCOActionDefinition;
+
 
 UCLASS()
 class MONSTERCO_API UMCOMontageDataSingle : public UMCOActionData
