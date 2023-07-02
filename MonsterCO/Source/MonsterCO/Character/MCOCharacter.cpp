@@ -308,26 +308,6 @@ int32 AMCOCharacter::GetTagCount(const FGameplayTag& InTag) const
 	return GetAbilitySystemComponent()->GetTagCount(InTag);
 }
 
-void AMCOCharacter::TurnOnCollision(const FName& InName)
-{
-	ensure(ModeComponent);
-
-	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
-	ensure(Attachment);
-	
-	Attachment->TurnOnCollision(InName);
-}
-
-void AMCOCharacter::TurnOffCollision(const FName& InName)
-{
-	ensure(ModeComponent);
-
-	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
-	ensure(Attachment);
-	
-	Attachment->TurnOffCollision(InName);
-}
-
 void AMCOCharacter::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage)
 {
 	
@@ -394,10 +374,20 @@ float AMCOCharacter::GetCapsuleRadius() const
 	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleRadius() : 0.0f;
 }
 
-FCollisionBeginOverlapDelegate& AMCOCharacter::GetCollisionBeginOverlapDelegate()
+void AMCOCharacter::OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName)
 {
-	ensure(nullptr != ModeComponent);
-	return ModeComponent->GetAttachmentBeginOverlapDelegate();
+	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
+	ensure(Attachment);
+
+	Attachment->OnBeginCollision(InBeginDelegate, InEndDelegate, InSocketName);
+}
+
+void AMCOCharacter::OnEndCollision(const FName& InSocketName)
+{
+	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();
+	ensure(Attachment);
+
+	Attachment->OnEndCollision(InSocketName);
 }
 
 void AMCOCharacter::Die()

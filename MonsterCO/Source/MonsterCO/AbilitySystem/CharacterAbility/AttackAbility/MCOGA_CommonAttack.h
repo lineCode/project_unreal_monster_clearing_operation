@@ -54,7 +54,7 @@ protected:
 	
 // --- Attack/Overlap
 	UFUNCTION()
-	void OnCollisionBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult);
+	void OnCollisionBeginOverlap(ACharacter* InAttacker, ACharacter* InAttackedCharacter, const FHitResult& SweepResult);
 
 // --- Attack/Channel
 	void AttackByProjectile();

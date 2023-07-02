@@ -134,9 +134,13 @@ void UMCOGA_CommonAttack::BeginDamaging_Collision()
 		
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(nullptr != CharacterInterface);
+
+	FCollisionBeginOverlapDelegate OnBeginDelegate;
+	OnBeginDelegate.AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlap);
 	
-	CharacterInterface->GetCollisionBeginOverlapDelegate().AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlap);
-	CharacterInterface->TurnOnCollision(CollisionFragment->SocketName);
+	FCollisionEndOverlapDelegate OnEndDelegate;
+	
+	CharacterInterface->OnBeginCollision(OnBeginDelegate, OnEndDelegate, CollisionFragment->SocketName);
 }
 
 void UMCOGA_CommonAttack::EndDamaging_Collision()
@@ -147,8 +151,7 @@ void UMCOGA_CommonAttack::EndDamaging_Collision()
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ensure(nullptr != CharacterInterface);
 	
-	CharacterInterface->GetCollisionBeginOverlapDelegate().Clear();
-	CharacterInterface->TurnOffCollision(CollisionFragment->SocketName);
+	CharacterInterface->OnEndCollision(CollisionFragment->SocketName);
 }
 
 void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FVector& InDamagedLocation)
@@ -267,10 +270,9 @@ void UMCOGA_CommonAttack::Attack()
 	}
 }
 
-void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AActor* InAttackCauser, ACharacter* InAttackedCharacter, const FHitResult& SweepResult)
+void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, ACharacter* InAttackedCharacter, const FHitResult& SweepResult)
 {
 	ISTRUE(nullptr != InAttacker);
-	ISTRUE(nullptr != InAttackCauser);
 	ISTRUE(nullptr != InAttackedCharacter);
 	ISTRUE(false == DamagedCharacters.Contains(InAttackedCharacter));
 

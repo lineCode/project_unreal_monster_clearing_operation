@@ -14,9 +14,8 @@ class AActor;
 
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FCollisionBeginOverlapDelegate,
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCollisionBeginOverlapDelegate,
 												ACharacter*, InAttacker,
-												AActor*, InAttackCauser,
 												ACharacter*, InOtherCharacter,
 												const FHitResult&, SweepResult);
 
@@ -75,9 +74,8 @@ public:
 
 // --- Collision
 public:
-	virtual FCollisionBeginOverlapDelegate& GetCollisionBeginOverlapDelegate() = 0;
-	virtual void TurnOnCollision(const FName& InName) = 0;
-	virtual void TurnOffCollision(const FName& InName) = 0;
+	virtual void OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName) = 0;
+	virtual void OnEndCollision(const FName& InSocketName) = 0;
 
 	
 // --- Damaged

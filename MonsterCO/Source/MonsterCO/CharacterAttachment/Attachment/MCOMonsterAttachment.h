@@ -19,4 +19,6 @@ protected:
 public:
 	virtual ACharacter* GetAttackedCharacter() override;
 	
+	virtual void TurnOnAttackMode(const FName& InName) override;
+	virtual void TurnOffAttackMode(const FName& InName) override;
 };

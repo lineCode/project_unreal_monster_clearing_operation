@@ -1,5 +1,6 @@
 #include "Projectile/MCOProjectile.h"
 #include "NiagaraComponent.h"
+#include "Chaos/AABBTree.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -66,11 +67,11 @@ void AMCOProjectile::OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComp
 	ISTRUE(OwnerCharacter != OtherActor);
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
 	
-	//MCOLOG_C(MCOCollision, TEXT("+++Projectile OnCollisionBeginOverlap"));
+	MCOLOG_C(MCOCollision, TEXT("+++Projectile OnCollisionBeginOverlap : %s"), *SweepResult.ImpactPoint.ToString());
 	
 	ISTRUE(true == CollisionBeginOverlapDelegate.IsBound());
 	
-	CollisionBeginOverlapDelegate.Broadcast(Cast<ACharacter>(GetOwner()), this, OtherCharacter, SweepResult);
+	CollisionBeginOverlapDelegate.Broadcast(Cast<ACharacter>(GetOwner()), OtherCharacter, SweepResult);
 
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetLifeSpan(0.1f);

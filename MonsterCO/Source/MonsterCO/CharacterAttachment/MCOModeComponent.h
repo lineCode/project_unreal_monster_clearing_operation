@@ -23,7 +23,6 @@ protected:
 // --- Getter
 public:
 	AMCOAttachment* GetCurrentAttachment() const;
-	FCollisionBeginOverlapDelegate& GetAttachmentBeginOverlapDelegate() const;
 
 // --- Mode (1) 
 public:

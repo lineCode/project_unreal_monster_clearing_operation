@@ -134,8 +134,6 @@ public:
 // --- Mode
 public:
 	FORCEINLINE UMCOModeComponent* GetModeComponent() { return ModeComponent; }
-	virtual void TurnOnCollision(const FName& InName) override;
-	virtual void TurnOffCollision(const FName& InName) override;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "MCO|Mode")
@@ -155,7 +153,9 @@ public:
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;
-	virtual FCollisionBeginOverlapDelegate& GetCollisionBeginOverlapDelegate() override;
+	virtual void OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName) override;
+	virtual void OnEndCollision(const FName& InSocketName) override;
+
 	
 protected:
 	UPROPERTY()

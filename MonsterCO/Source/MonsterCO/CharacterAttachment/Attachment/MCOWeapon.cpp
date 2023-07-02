@@ -10,7 +10,6 @@ AMCOWeapon::AMCOWeapon()
 	WeaponMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("WeaponMesh"));
 	WeaponMesh->SetupAttachment(Scene);
 	
-	bControlCollision = true;
 }
 
 void AMCOWeapon::BeginPlay()

@@ -11,7 +11,6 @@ AMCOAttachment::AMCOAttachment()
 	Scene = CreateDefaultSubobject<USceneComponent>(TEXT("NAME_Scene"));
 	SetRootComponent(Scene);
 
-	bControlCollision = false;
 	bAttachToSocket = false;
 }
 
@@ -27,8 +26,8 @@ void AMCOAttachment::BeginPlay()
 	
 	for (UShapeComponent* Shape : ShapeComponents)
 	{
-		// Shape->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
-		// Shape->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttachmentEndOverlap);
+		Shape->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttachmentBeginOverlap);
+		Shape->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttachmentEndOverlap);
 
 		// Set this in BP
 		// Shape->SetCollisionProfileName(TEXT("OverlapAllDynamic"));
@@ -40,11 +39,9 @@ void AMCOAttachment::BeginPlay()
 		{
 			AttachCollisionToSocket(Shape, *Shape->GetName());
 		}
-		if (true == bControlCollision)
-		{
-			Shape->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		}
 	}
+
+	bIsAttacking = false;
 }
 
 void AMCOAttachment::TurnOnAllCollision() const
@@ -63,31 +60,52 @@ void AMCOAttachment::TurnOffAllCollision() const
 	}
 }
 
-void AMCOAttachment::TurnOnCollision(const FName& InName)
+void AMCOAttachment::TurnOnAttackMode(const FName& InName)
 {
-	ISTRUE(true == bControlCollision);
 	ISTRUE(true == ShapeComponentsMap.Contains(InName));
 	
 	ShapeComponentsMap[InName]->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
-void AMCOAttachment::TurnOffCollision(const FName& InName)
+void AMCOAttachment::TurnOffAttackMode(const FName& InName)
 {
-	ISTRUE(true == bControlCollision);
 	ISTRUE(true == ShapeComponentsMap.Contains(InName));
 	
 	ShapeComponentsMap[InName]->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void AMCOAttachment::OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate,
+	const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName)
+{
+	bIsAttacking = true;
+	
+	OnCollisionBeginOverlapDelegate = InBeginDelegate;
+	OnCollisionEndOverlapDelegate = InEndDelegate;
+
+	TurnOnAttackMode(InSocketName);
+}
+
+void AMCOAttachment::OnEndCollision(const FName& InSocketName)
+{
+	bIsAttacking = false;
+	
+	TurnOffAttackMode(InSocketName);
+	
+	OnCollisionBeginOverlapDelegate.Clear();
+	OnCollisionEndOverlapDelegate.Clear();
+}
+
 void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	MCOLOG_C(MCOCollision, TEXT("++++ OnAttachmentBeginOverlap"));
+	ISTRUE(true == bIsAttacking);
+	
+	MCOLOG_C(MCOCollision, TEXT("++++ OnAttachmentBeginOverlap : %s -> %s (%s)"),
+		*OverlappedComponent->GetName(), *OtherComp->GetName(), *SweepResult.ImpactPoint.ToString());
 	
 	ISTRUE(true == OnCollisionBeginOverlapDelegate.IsBound());
 	ISTRUE(OwnerCharacter != OtherActor);
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
-
-		
+	
 	const FCollisionQueryParams Params(
 		SCENE_QUERY_STAT(Attack),
 		false,
@@ -144,16 +162,18 @@ void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedCom
 	
 #endif			
 	
-		OnCollisionBeginOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(Result.GetActor()), Result);
+		OnCollisionBeginOverlapDelegate.Broadcast(OwnerCharacter, AttackedCharacter, Result);
 	}
 }
 
 void AMCOAttachment::OnAttachmentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	ISTRUE(true == bIsAttacking);
+	
 	ISTRUE(OwnerCharacter != OtherActor);
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
 	ISTRUE(true == OnCollisionEndOverlapDelegate.IsBound());
-
+	
 	OnCollisionEndOverlapDelegate.Broadcast(OwnerCharacter, this, Cast<ACharacter>(OtherActor));
 }
 

@@ -46,16 +46,21 @@ public:
 	void TurnOffAllCollision() const;
 	
 	UFUNCTION()
-	void TurnOnCollision(const FName& InName);
+	virtual void TurnOnAttackMode(const FName& InName);
 
 	UFUNCTION()
-	void TurnOffCollision(const FName& InName);
+	virtual void TurnOffAttackMode(const FName& InName);
+
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	TMap<FName, TObjectPtr<UShapeComponent>> ShapeComponentsMap;
 
 // --- Overlap
+public:
+	void OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName);
+	void OnEndCollision(const FName& InSocketName);
+	
 protected:
 	UFUNCTION()
 	virtual void OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -69,7 +74,7 @@ protected:
 	UFUNCTION()
 	virtual void AttachCollisionToSocket(UShapeComponent* InComponent, const FName& InSocketName);
 
-public:
+protected:
 	UPROPERTY()
 	FCollisionBeginOverlapDelegate OnCollisionBeginOverlapDelegate;
 	
@@ -78,8 +83,7 @@ public:
 
 protected:
 	UPROPERTY()
-	uint8 bControlCollision:1;
-	
-	UPROPERTY()
 	uint8 bAttachToSocket:1;
+
+	bool bIsAttacking;
 };

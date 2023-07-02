@@ -10,9 +10,6 @@
 
 // ---- Profile
 #define PROFILE_PROJECTILE TEXT("MCOProjectileCollision")
-#define PROFILE_WEAPON     TEXT("MCOWeaponCollision")
-#define PROFILE_CAPSULE    TEXT("MCOCapsuleCollision")
-#define PROFILE_PARTS      TEXT("MCOPartsCollision")
 #define PROFILE_TRIGGER    TEXT("MCOTrigger")
 
 
