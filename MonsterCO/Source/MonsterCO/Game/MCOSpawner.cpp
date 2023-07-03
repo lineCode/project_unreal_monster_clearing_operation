@@ -51,9 +51,9 @@ void AMCOSpawner::SpawnMonster()
 {
 	const IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
     ensure(nullptr != GameModeInterface);
-	const int32 State = 0; // GameModeInterface->GetStage(); // only one monster is available now...
+	const int32 StateIdx = GameModeInterface->GetStage() - 1; // set 0 if only one monster is available...
 	
-	ensure(State < MonstersData->Monsters.Num());
+	ensure(StateIdx < MonstersData->Monsters.Num());
 
 	if (nullptr != SpawnedMonster)
 	{
@@ -62,7 +62,7 @@ void AMCOSpawner::SpawnMonster()
 	}
 	else
 	{
-		SpawnedMonster = GetWorld()->SpawnActorDeferred<AMCOMonsterCharacter>(MonstersData->Monsters[State], GetTransform());
+		SpawnedMonster = GetWorld()->SpawnActorDeferred<AMCOMonsterCharacter>(MonstersData->Monsters[StateIdx], GetTransform());
 		ISTRUE(nullptr != SpawnedMonster);
 		SpawnedMonster->FinishSpawning(GetTransform());
 		SpawnedMonster->OnCharacterDeathFinished.AddUniqueDynamic(this, &ThisClass::OnMonsterDied);
