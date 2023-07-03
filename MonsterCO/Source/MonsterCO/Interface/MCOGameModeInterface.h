@@ -8,6 +8,7 @@
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnGameStateChangedDelegate, const EMCOGameState&, InState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStageChangedDelegate, const int32&, InCurrent);
 
 
 
@@ -27,6 +28,9 @@ public:
 
 	UFUNCTION()
 	virtual FOnGameStateChangedDelegate& GetOnGameStateChangedDelegate() = 0;
+
+	UFUNCTION()
+	virtual FOnStageChangedDelegate& GetOnStageChangedDelegate() = 0;
 	
 	virtual void OnChangeGameState(EMCOGameState InState) = 0;
 };

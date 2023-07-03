@@ -30,8 +30,10 @@ void AMCOGameModeBase::OnChangeGameState(EMCOGameState InState)
 	{
 		CurrentStage++;
 
-		ISTRUE(true == OnGameStateChangedDelegate.IsBound());
-		OnGameStateChangedDelegate.Broadcast(InState);
+		if (true == OnGameStateChangedDelegate.IsBound())
+		{
+			OnGameStateChangedDelegate.Broadcast(InState);
+		}
 		
 		OnChangeGameState(EMCOGameState::FIGHT);
 
@@ -57,12 +59,21 @@ void AMCOGameModeBase::OnChangeGameState(EMCOGameState InState)
 			}
 		}
 
-		ISTRUE(true == OnGameStateChangedDelegate.IsBound());
-		OnGameStateChangedDelegate.Broadcast(InState);
+		if (true == OnGameStateChangedDelegate.IsBound())
+		{
+			OnGameStateChangedDelegate.Broadcast(InState);
+		}
 		
 		OnChangeGameState(EMCOGameState::FIGHT);
 
 		return;
+	}
+	else if (InState == EMCOGameState::FIGHT)
+	{
+		if (true == OnStageChangedDelegate.IsBound())
+		{
+			OnStageChangedDelegate.Broadcast(CurrentStage);
+		}
 	}
 	else if (InState == EMCOGameState::MONSTER_DIED)
 	{
@@ -81,6 +92,8 @@ void AMCOGameModeBase::OnChangeGameState(EMCOGameState InState)
 		
 	}
 
-	ISTRUE(true == OnGameStateChangedDelegate.IsBound());
-	OnGameStateChangedDelegate.Broadcast(InState);
+	if (true == OnGameStateChangedDelegate.IsBound())
+	{
+		OnGameStateChangedDelegate.Broadcast(InState);
+	}
 }

@@ -24,10 +24,12 @@ public:
 	virtual int32 GetStage() const override { return CurrentStage; }
 	virtual EMCOGameState GetGameState() const override { return CurrentGameState; }
 	virtual FOnGameStateChangedDelegate& GetOnGameStateChangedDelegate() override { return OnGameStateChangedDelegate; }
+	virtual FOnStageChangedDelegate& GetOnStageChangedDelegate() override { return OnStageChangedDelegate; }
 	virtual void OnChangeGameState(EMCOGameState InState) override;
 	
 protected:
 	FOnGameStateChangedDelegate OnGameStateChangedDelegate;
+	FOnStageChangedDelegate OnStageChangedDelegate;
 
 	UPROPERTY()
 	EMCOGameState CurrentGameState;

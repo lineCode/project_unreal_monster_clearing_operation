@@ -9,6 +9,7 @@
 class UMCOHpWidget;
 class UMCOAttributeWidget;
 class UMCOOptionWidget;
+class UMCOStageWidget;
 
 
 
@@ -35,6 +36,10 @@ protected:
 	void SetInGameWidget(const FName& InName);
 
 protected:
+	UFUNCTION()
+	void OnStageChanged(const int32& InCurrent);
+	
+protected:
 	UPROPERTY()
 	FName PlayerName;
 	
@@ -59,6 +64,10 @@ protected:
 	TMap<FName, TObjectPtr<UMCOAttributeWidget>> AttributeWidgets;
 
 	
+// --- Stage Widget
+protected:
+	UPROPERTY()
+	TObjectPtr<UMCOStageWidget> StageWidget;
 
 	
 // --- Skill Widget

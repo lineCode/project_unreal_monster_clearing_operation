@@ -67,7 +67,7 @@ void AMCOProjectile::OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComp
 	ISTRUE(OwnerCharacter != OtherActor);
 	ISTRUE(OwnerCharacter->GetClass() != OtherActor->GetClass());
 	
-	MCOLOG_C(MCOCollision, TEXT("+++Projectile OnCollisionBeginOverlap : %s"), *SweepResult.ImpactPoint.ToString());
+	//MCOLOG_C(MCOCollision, TEXT("+++Projectile OnCollisionBeginOverlap : %s"), *SweepResult.ImpactPoint.ToString());
 	
 	ISTRUE(true == CollisionBeginOverlapDelegate.IsBound());
 	

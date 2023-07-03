@@ -36,8 +36,8 @@ protected:
 //--- Socket
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName HolsterSocketName;
-
+	FName UnequipSocketName;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FName HandSocketName;
+	FName EquipSocketName;
 };

@@ -7,6 +7,7 @@
 #include "Interface/MCOHUDInterface.h"
 #include "Interface/MCOGameModeInterface.h"
 #include "GameFramework/GameModeBase.h"
+#include "UI/SubWidgets/MCOStageWidget.h"
 
 
 UMCOHUDWidget::UMCOHUDWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -23,6 +24,9 @@ void UMCOHUDWidget::NativeConstruct()
 
 	SetInGameWidget(PlayerName);
 	SetInGameWidget(MonsterName);
+	
+	StageWidget = Cast<UMCOStageWidget>(GetWidgetFromName(TEXT("WBP_StageInfo")));
+	ensure(nullptr != StageWidget);
 
 	// for (int32 i = 0; i < SLOT_MAX; i++)
 	// {
@@ -36,6 +40,7 @@ void UMCOHUDWidget::NativeConstruct()
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
 	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
+	GameModeInterface->GetOnStageChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnStageChanged);
 	
 	IMCOHUDInterface* HUDPawn = Cast<IMCOHUDInterface>(GetOwningPlayerPawn());
 	ensure(nullptr != HUDPawn);
@@ -71,6 +76,11 @@ void UMCOHUDWidget::SetInGameWidget(const FName& InName)
 	UWidget* AttributeWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sAttribute"), *InName.ToString()));
 	ensure(nullptr != AttributeWidget);
 	AttributeWidgets.Emplace(InName, Cast<UMCOAttributeWidget>(AttributeWidget));
+}
+
+void UMCOHUDWidget::OnStageChanged(const int32& InCurrent)
+{
+	StageWidget->OnStageChanged(InCurrent);
 }
 
 void UMCOHUDWidget::ShowInGameWidget(const FName& InName, bool bShow)
