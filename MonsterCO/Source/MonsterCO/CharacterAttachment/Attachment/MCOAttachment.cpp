@@ -83,6 +83,8 @@ void AMCOAttachment::OnBeginCollision(const FCollisionBeginOverlapDelegate& InBe
 	OnCollisionEndOverlapDelegate = InEndDelegate;
 
 	TurnOnAttackMode(InSocketName);
+
+	MCOLOG_C(MCOCollision, TEXT("++++ TurnOnAttackMode : %s"), *InSocketName.ToString());
 }
 
 void AMCOAttachment::OnEndCollision(const FName& InSocketName)
@@ -93,6 +95,8 @@ void AMCOAttachment::OnEndCollision(const FName& InSocketName)
 	
 	OnCollisionBeginOverlapDelegate.Clear();
 	OnCollisionEndOverlapDelegate.Clear();
+	
+	MCOLOG_C(MCOCollision, TEXT("++++ TurnOffAttackMode : %s"), *InSocketName.ToString());
 }
 
 void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -116,7 +120,7 @@ void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedCom
 	const bool HitDetected = GetWorld()->LineTraceMultiByChannel(
 		OutHitResults,
 		OverlappedComponent->GetComponentLocation(),
-		OtherActor->GetActorLocation(),
+		OtherComp->GetComponentLocation(),
 		CHANNEL_ACTION_TRACE,
 		Params
 	);
@@ -154,13 +158,14 @@ void AMCOAttachment::OnAttachmentBeginOverlap(UPrimitiveComponent* OverlappedCom
 		DrawDebugLine(
 			GetWorld(),
 			OverlappedComponent->GetComponentLocation(),
-			OtherActor->GetActorLocation(),
+			OtherComp->GetComponentLocation(),
 			FColor::Blue,
 			false,
 			3.0f
 		);
 	
-#endif			
+#endif
+		
 	
 		OnCollisionBeginOverlapDelegate.Broadcast(OwnerCharacter, AttackedCharacter, Result);
 	}
