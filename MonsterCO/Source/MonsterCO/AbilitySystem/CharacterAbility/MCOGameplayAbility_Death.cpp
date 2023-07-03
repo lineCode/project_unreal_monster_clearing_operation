@@ -8,6 +8,9 @@
 UMCOGameplayAbility_Death::UMCOGameplayAbility_Death()
 {	
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+	
+	DilationTime = 0.4f;
+	DilationDuration = 1.0f;
 }
 
 // void UMCOGameplayAbility_Death::DoneAddingNativeTags()
@@ -31,6 +34,12 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(nullptr != CharacterInterface);
+
+	if (false == IsPlayer())
+	{
+		SetDilation();
+	}
+
 	CharacterInterface->Die();
 	
 	CancelAllAbility();
@@ -54,4 +63,27 @@ void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Hand
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(nullptr != CharacterInterface);
 	CharacterInterface->FinishDying();
+}
+
+void UMCOGameplayAbility_Death::SetDilation()
+{
+	ISTRUE(0.0f < DilationTime);
+	ISTRUE(0.0f < DilationDuration);
+	
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), DilationTime);
+
+	TimeDilationHandle.Invalidate();
+	GetWorld()->GetTimerManager().SetTimer(
+		TimeDilationHandle,
+		this,
+		&ThisClass::RestoreTimeDilation,
+		DilationDuration,
+		false
+	);
+}
+
+void UMCOGameplayAbility_Death::RestoreTimeDilation()
+{
+	TimeDilationHandle.Invalidate();
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.0f);
 }

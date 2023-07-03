@@ -19,7 +19,7 @@ void AMCOAttachment::BeginPlay()
 	Super::BeginPlay();
 	
 	OwnerCharacter = Cast<ACharacter>(GetOwner());
-	AttachToActor(OwnerCharacter, FAttachmentTransformRules(EAttachmentRule::KeepRelative, true));
+	//AttachToActor(OwnerCharacter, FAttachmentTransformRules(EAttachmentRule::KeepRelative, true));
 	
 	TArray<UShapeComponent*> ShapeComponents;
 	GetComponents<UShapeComponent>(ShapeComponents);

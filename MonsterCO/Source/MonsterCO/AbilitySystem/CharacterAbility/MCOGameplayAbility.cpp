@@ -9,6 +9,7 @@
 #include "AbilitySystem/ActionData/MCOActionFragment_MonsterAI.h"
 #include "GameFramework/Character.h"
 #include "Interface/MCOCharacterInterface.h"
+#include "Interface/MCOPlayerInterface.h"
 
 
 UMCOGameplayAbility::UMCOGameplayAbility()
@@ -182,6 +183,11 @@ UAbilitySystemComponent* UMCOGameplayAbility::GetAbilitySystemComponent() const
 UMCOAbilitySystemComponent* UMCOGameplayAbility::GetMCOAbilitySystemComponent() const
 {
 	return CurrentActorInfo ? Cast<UMCOAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent.Get()) : nullptr;
+}
+
+bool UMCOGameplayAbility::IsPlayer() const
+{
+	return CurrentActorInfo ? nullptr != Cast<IMCOPlayerInterface>(CurrentActorInfo->AvatarActor.Get()) : false;
 }
 
 void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const

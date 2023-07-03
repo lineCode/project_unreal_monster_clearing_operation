@@ -81,6 +81,7 @@ protected:
 	IMCOCharacterInterface* GetMCOCharacterInterface() const;
 	UAbilitySystemComponent* GetAbilitySystemComponent() const;
 	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;
+	bool IsPlayer() const;
 
 // // --- Effect
 // protected:

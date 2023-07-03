@@ -36,9 +36,9 @@ void UMCOModeComponent::SpawnAttachmentByClass(ACharacter* InOwner, const TSubcl
 	AMCOAttachment* Attachment = InOwner->GetWorld()->SpawnActorDeferred<AMCOAttachment>(InAttachmentClass, transform, InOwner);
 	ensure(nullptr != Attachment);
 
-	UGameplayStatics::FinishSpawningActor(Attachment, transform);
-
 	Attachments.Emplace(Attachment);
+	
+	Attachment->FinishSpawning(transform);
 }
 
 bool UMCOModeComponent::IsEquipped() const
