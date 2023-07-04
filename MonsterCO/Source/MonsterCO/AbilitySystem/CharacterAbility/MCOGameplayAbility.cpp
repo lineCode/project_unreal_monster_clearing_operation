@@ -290,6 +290,14 @@ void UMCOGameplayAbility::CancelAbilityEffectsSelf() const
 	//MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
 }
 
+void UMCOGameplayAbility::ApplyCueSelf(FGameplayTag InTag) const
+{
+	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+	ISTRUE(nullptr != ASC);
+	
+	ASC->ExecuteGameplayCue(InTag);
+}
+
 bool UMCOGameplayAbility::ApplyEffect(
 	UAbilitySystemComponent* ASC,
 	const UMCOActionFragment_AttributeEffect* AttributeFragment,
@@ -382,7 +390,9 @@ void UMCOGameplayAbility::StartActivationWithMontage(UAnimMontage* InMontage, co
 	
 	Task->OnBlendOut.AddDynamic(this, &ThisClass::OnTaskCompleted);
 	Task->OnCompleted.AddDynamic(this, &ThisClass::OnTaskCompleted);
+	
 	Task->OnCancelled.AddDynamic(this, &ThisClass::OnTaskCancelled);
+	
 	Task->OnInterrupted.AddDynamic(this, &ThisClass::OnTaskInterrupted);
 	
 	Task->ReadyForActivation();
@@ -405,8 +415,11 @@ void UMCOGameplayAbility::StartActivationWithMontageAndEventTag(UAnimMontage* In
 	
 	Task->OnBlendOut.AddDynamic(this, &ThisClass::OnTaskCompletedWithEventTag);
 	Task->OnCompleted.AddDynamic(this, &ThisClass::OnTaskCompletedWithEventTag);
+	
 	Task->OnCancelled.AddDynamic(this, &ThisClass::OnTaskCancelledWithEventTag);
-	Task->OnInterrupted.AddDynamic(this, &ThisClass::OnTaskCancelledWithEventTag);
+	
+	Task->OnInterrupted.AddDynamic(this, &ThisClass::OnTaskInterruptedWithEventTag);
+	
 	Task->EventReceived.AddDynamic(this, &ThisClass::OnGrantedEventTag);
 	
 	Task->ReadyForActivation();
@@ -441,19 +454,22 @@ void UMCOGameplayAbility::OnTaskInterrupted()
 
 void UMCOGameplayAbility::OnTaskCompletedWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	OnTaskCompleted();
 }
 
 void UMCOGameplayAbility::OnTaskCancelledWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+	OnTaskCancelled();
+}
+
+void UMCOGameplayAbility::OnTaskInterruptedWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData)
+{
+	OnTaskInterrupted();
 }
 
 void UMCOGameplayAbility::OnGrantedEventTag(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	// if (EventTag == FMCOCharacterTags::Get().AttackHitCheckTag)
-	// {
-	// 	GetMCOAbilitySystemComponent()->RemoveLooseGameplayTag(FMCOCharacterTags::Get().AttackHitCheckTag);
-	// 	//...
-	// }
+	// use event tag only for sound cue...
+	
+	ApplyCueSelf(EventTag);
 }

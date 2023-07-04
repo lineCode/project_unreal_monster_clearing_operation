@@ -114,6 +114,8 @@ protected:
 	void ApplyAbilityEffectSelf(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
 	void CancelAbilityEffectsSelf() const;
 
+	void ApplyCueSelf(FGameplayTag InTag) const;
+
 private:
 	bool ApplyEffect(
 		UAbilitySystemComponent* ASC,
@@ -147,6 +149,9 @@ protected:
 
 	UFUNCTION()
 	virtual void OnTaskCancelledWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData);
+	
+	UFUNCTION()
+	virtual void OnTaskInterruptedWithEventTag(FGameplayTag EventTag, FGameplayEventData EventData);
 	
 	UFUNCTION()
 	virtual void OnGrantedEventTag(FGameplayTag EventTag, FGameplayEventData EventData);
