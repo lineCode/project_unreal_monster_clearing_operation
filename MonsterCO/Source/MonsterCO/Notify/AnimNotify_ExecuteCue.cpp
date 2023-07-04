@@ -4,7 +4,7 @@
 
 FString UAnimNotify_ExecuteCue::GetNotifyName_Implementation() const
 {
-	return Tag.ToString();
+	return TEXT("Cue");
 }
 
 void UAnimNotify_ExecuteCue::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
