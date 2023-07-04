@@ -13,6 +13,7 @@ AMCOGameplayCue_Damaged::AMCOGameplayCue_Damaged()
 	NiagaraComponent->SetupAttachment(RootComponent);
 
 	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("NAME_Audio"));
+	AudioComponent->bAutoActivate = false;
 	AudioComponent->SetupAttachment(RootComponent);
 }
 
@@ -38,4 +39,10 @@ void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEv
 	}
 	
 	NiagaraComponent->ActivateSystem();
+
+	ISTRUE(nullptr != AudioComponent);
+	ISTRUE(nullptr != AudioComponent->GetSound());
+	
+	AudioComponent->Stop();
+	AudioComponent->Activate();
 }
