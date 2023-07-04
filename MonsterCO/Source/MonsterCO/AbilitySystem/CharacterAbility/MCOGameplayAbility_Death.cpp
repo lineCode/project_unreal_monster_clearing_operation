@@ -53,7 +53,7 @@ void UMCOGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	const EMCOCharacterDirection Direction = Data->GetDirectionFromDegree(CharacterInterface->GetDamagedDegreeThenSetZero());
 	
-	StartActivationWithMontageAndEventTag(Data->GetMontage(Direction));
+	StartActivationWithMontage(Data->GetMontage(Direction));
 }
 
 void UMCOGameplayAbility_Death::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)

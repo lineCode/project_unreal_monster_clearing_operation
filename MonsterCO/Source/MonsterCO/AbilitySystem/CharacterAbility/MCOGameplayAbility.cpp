@@ -469,7 +469,5 @@ void UMCOGameplayAbility::OnTaskInterruptedWithEventTag(FGameplayTag EventTag, F
 
 void UMCOGameplayAbility::OnGrantedEventTag(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	// use event tag only for sound cue...
 	
-	ApplyCueSelf(EventTag);
 }
