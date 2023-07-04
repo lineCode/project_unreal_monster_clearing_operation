@@ -153,6 +153,9 @@ public:
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;
+
+	void SetIgnoreActors();
+	virtual void GetIgnoreActors(TArray<AActor*>& OutIgnoreActors) const override;
 	virtual void OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName) override;
 	virtual void OnEndCollision(const FName& InSocketName) override;
 
@@ -167,6 +170,8 @@ protected:
 	UPROPERTY()
 	float DamagedDegree;
 	
+	UPROPERTY()
+	TArray<AActor*> IgnoreActors;
 	
 // --- Die
 public:

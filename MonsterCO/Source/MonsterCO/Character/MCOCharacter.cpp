@@ -374,6 +374,18 @@ float AMCOCharacter::GetCapsuleRadius() const
 	return (nullptr != Capsule) ? Capsule->GetScaledCapsuleRadius() : 0.0f;
 }
 
+void AMCOCharacter::SetIgnoreActors()
+{
+	IgnoreActors.Empty();
+	IgnoreActors.Emplace(this);
+	IgnoreActors.Append(ModeComponent->GetAttachments());
+}
+
+void AMCOCharacter::GetIgnoreActors(TArray<AActor*>& OutIgnoreActors) const
+{
+	OutIgnoreActors = IgnoreActors;
+}
+
 void AMCOCharacter::OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName)
 {
 	AMCOAttachment* Attachment = ModeComponent->GetCurrentAttachment();

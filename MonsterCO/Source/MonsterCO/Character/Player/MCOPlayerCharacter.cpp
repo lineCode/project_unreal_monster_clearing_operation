@@ -114,6 +114,8 @@ void AMCOPlayerCharacter::BeginPlay()
 	
 	ModeComponent->SetCurrentMode(static_cast<int32>(EMCOPlayerMode::TwoHand));
 	ModeComponent->SpawnAttachment(this);
+
+	SetIgnoreActors();
 }
 
 void AMCOPlayerCharacter::OnGameStateChanged(const EMCOGameState& InState)

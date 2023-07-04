@@ -23,6 +23,7 @@ protected:
 // --- Getter
 public:
 	AMCOAttachment* GetCurrentAttachment() const;
+	const TArray<AMCOAttachment*>& GetAttachments() const;
 
 // --- Mode (1) 
 public:

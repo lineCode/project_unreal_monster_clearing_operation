@@ -39,16 +39,10 @@ void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEv
 	
 	//MCOLOG_C(MCOAbility, TEXT("[%s] Cue Executed : [%s]"), *GetName(), *DamageNiagara->GetName());
 
+	SetActorLocationAndRotation(DamagedData->DamagedLocation, MyTarget->GetActorRotation());
+	
 	NiagaraComponent->SetAsset(DamageNiagara);
-
-	const IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(MyTarget);
-	if (nullptr == PlayerInterface)
-	{
-		NiagaraComponent->SetWorldLocation(DamagedData->DamagedLocation);
-	}
-
-	NiagaraComponent->SetWorldRotation(MyTarget->GetActorRotation());
 	NiagaraComponent->ActivateSystem();
-
+	
 	CharacterInterface->RemoveDamagedData(EMCOEffectPolicy::Instant);
 }

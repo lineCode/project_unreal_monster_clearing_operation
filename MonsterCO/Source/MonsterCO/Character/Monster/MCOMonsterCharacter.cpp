@@ -56,6 +56,8 @@ void AMCOMonsterCharacter::BeginPlay()
 	ModeComponent->SetCurrentMode(static_cast<int32>(EMCOMonsterMode::Normal));
 	ModeComponent->SpawnAttachment(this);
 
+	SetIgnoreActors();
+	
 	// OnDamagedBegin.BindUObject(this, &ThisClass::StopAI);
 	// OnDamagedEnd.BindUObject(this, &ThisClass::ContinueAI);
 	
@@ -70,6 +72,7 @@ void AMCOMonsterCharacter::BeginPlay()
 	IMCOGameModeInterface* GameModeInterface = Cast<IMCOGameModeInterface>(GetWorld()->GetAuthGameMode());
 	ISTRUE(nullptr != GameModeInterface);
 	GameModeInterface->GetOnGameStateChangedDelegate().AddUniqueDynamic(this, &ThisClass::OnGameStateChanged);
+	
 }
 
 void AMCOMonsterCharacter::StopCharacterFromMoving(bool bToStop)

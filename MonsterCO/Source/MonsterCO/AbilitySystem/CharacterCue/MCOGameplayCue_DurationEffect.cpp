@@ -39,9 +39,10 @@ void AMCOGameplayCue_DurationEffect::HandleGameplayCue(AActor* MyTarget, EGamepl
 		ISTRUE(nullptr != DamageNiagara);
 
 		//MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Executed : [%s]"), *GetName(), *DamageNiagara->GetName());
-	
+
+		SetActorRotation(MyTarget->GetActorRotation());
+		
 		NiagaraComponent->SetAsset(DamageNiagara);
-		NiagaraComponent->SetWorldRotation(MyTarget->GetActorRotation());
 		
 		CharacterInterface->RemoveDamagedData(EMCOEffectPolicy::Duration);
 	}

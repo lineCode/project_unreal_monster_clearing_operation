@@ -74,6 +74,7 @@ public:
 
 // --- Collision
 public:
+	virtual void GetIgnoreActors(TArray<AActor*>& OutIgnoreActors) const = 0;
 	virtual void OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName) = 0;
 	virtual void OnEndCollision(const FName& InSocketName) = 0;
 

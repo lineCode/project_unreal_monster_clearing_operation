@@ -342,27 +342,27 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 	const UMCOActionFragment_Collision* CollisionFragment = GetCollisionFragment(CurrentDamageTimingIdx);
 	ISTRUE(nullptr != CollisionFragment);
 	
-	ACharacter* Attacker = GetCharacter();
+	AActor* Attacker = GetActor();
 	ISTRUE(nullptr != Attacker);
-
-	TArray<FHitResult> OutHitResults;
-	const FCollisionQueryParams Params(
-		SCENE_QUERY_STAT(Attack),
-		false,
-		Attacker
-	);
-	
 	IMCOCharacterInterface* AttackerInterface = Cast<IMCOCharacterInterface>(Attacker);
 	ISTRUE(nullptr != AttackerInterface);
 
-	const FName SocketName = CollisionFragment->SocketName;
-	const FVector Start = (SocketName != NAME_None) ? AttackerInterface->GetSocketLocation(CollisionFragment->SocketName) : Attacker->GetActorLocation();
-	// const FVector Start = Attacker->GetActorLocation() +
-	// 	(Attacker->GetActorForwardVector() * Radius) +
-	// 	(Attacker->GetActorForwardVector() * CollisionFragment->AdditiveLocationFromFront);
 	
+	TArray<AActor*> IgnoreActors;
+	AttackerInterface->GetIgnoreActors(IgnoreActors);
+	FCollisionQueryParams Params(
+		SCENE_QUERY_STAT(Attack),
+		false
+	);
+	Params.AddIgnoredActors(IgnoreActors);
+	
+	
+	const FName SocketName = CollisionFragment->SocketName;
+	const FVector Start = (SocketName != NAME_None) ? AttackerInterface->GetSocketLocation(SocketName) : Attacker->GetActorLocation();
 	const FVector AttackDirection = CollisionFragment->GetAttackDirection(Attacker);
 	const FVector End = Start + AttackDirection * CollisionFragment->AttackLength;
+	
+	TArray<FHitResult> OutHitResults;
 	
 	const FCollisionShape Shape = FCollisionShape::MakeSphere(CollisionFragment->AttackRadius);
 	bool HitDetected = GetWorld()->SweepMultiByChannel(
@@ -375,11 +375,29 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 		Params
 	);
 	
+#if ENABLE_DRAW_DEBUG
+
+	UKismetSystemLibrary::SphereTraceMulti(
+		GetWorld(),
+		Start,
+		End,
+		CollisionFragment->AttackRadius,
+		UEngineTypes::ConvertToTraceType(CHANNEL_ACTION_TRACE),
+		true,
+		IgnoreActors,
+		EDrawDebugTrace::Type::ForDuration,
+		OutHitResults,
+		true, 
+		FColor::Red,
+		FColor::Green,
+		1.0f
+	);
+	
+#endif
 	
 	ISTRUE(true == HitDetected);
-	HitDetected = false;
 	
-	for (const FHitResult & Result : OutHitResults)
+	for (const FHitResult& Result : OutHitResults)
 	{
 		IMCOAttackedInterface* AttackedInterface = Cast<IMCOAttackedInterface>(Result.GetActor());
 		if (nullptr == AttackedInterface)
@@ -391,11 +409,11 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 		{
 			continue;
 		}
-		if (true == DamagedCharacters.Contains(AttackedCharacter))
+		if (Attacker == AttackedCharacter)
 		{
 			continue;
 		}
-		if (Attacker == AttackedCharacter)
+		if (true == DamagedCharacters.Contains(AttackedCharacter))
 		{
 			continue;
 		}
@@ -408,8 +426,6 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 		{
 			continue;
 		}
-
-		HitDetected = true;
 		
 		DamagedCharacters.Emplace(AttackedCharacter);
 			
@@ -421,19 +437,10 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 
 		const FVector DamagedLocation = Result.ImpactPoint;
 		
-#if ENABLE_DRAW_DEBUG
-		//DrawDebugPoint(GetWorld(), DamagedLocation, 10.0f, FColor::Blue, false, 2.0f);
-#endif
-		
 		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, DamagedLocation);
 	}
 	
 	DamagedCharacters.Reset();
-
-#if ENABLE_DRAW_DEBUG
-	DrawDebug(AttackDirection, Start, End, HitDetected);
-#endif
-
 	
 	// FGameplayAbilityTargetDataHandle TargetDataHandle;
 	// FGameplayAbilityTargetData_SingleTargetHit* HitData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);

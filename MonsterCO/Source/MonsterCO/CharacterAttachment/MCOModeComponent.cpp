@@ -17,6 +17,11 @@ AMCOAttachment* UMCOModeComponent::GetCurrentAttachment() const
 	return Attachments[CurrentAttachmentIdx];
 }
 
+const TArray<AMCOAttachment*>& UMCOModeComponent::GetAttachments() const
+{
+	return Attachments;
+}
+
 int32 UMCOModeComponent::GetCurrentMode() const
 {
 	return CurrentAttachmentIdx;
@@ -43,7 +48,7 @@ void UMCOModeComponent::SpawnAttachmentByClass(ACharacter* InOwner, const TSubcl
 
 bool UMCOModeComponent::IsEquipped() const
 {
-	AMCOAttachment* Attachment = GetCurrentAttachment();
+	const AMCOAttachment* Attachment = GetCurrentAttachment();
 	ISTRUE_F(nullptr != Attachment);
 	return Attachment->GetIsEquipped();
 }

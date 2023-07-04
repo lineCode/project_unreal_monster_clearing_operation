@@ -5,6 +5,8 @@
 // --- Header
 #include "CoreMinimal.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Engine/Private/KismetTraceUtils.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
