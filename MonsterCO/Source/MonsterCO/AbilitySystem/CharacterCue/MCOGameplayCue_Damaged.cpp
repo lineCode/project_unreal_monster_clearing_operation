@@ -1,9 +1,5 @@
 #include "AbilitySystem/CharacterCue/MCOGameplayCue_Damaged.h"
 #include "NiagaraComponent.h"
-#include "Game/MCOGameSingleton.h"
-#include "Interface/MCOCharacterInterface.h"
-#include "Interface/MCOPlayerInterface.h"
-#include "NiagaraEffect/MCONiagaraEffectData.h"
 
 
 AMCOGameplayCue_Damaged::AMCOGameplayCue_Damaged()
@@ -16,33 +12,23 @@ AMCOGameplayCue_Damaged::AMCOGameplayCue_Damaged()
 
 void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters)
 {
-	// Only "Executed" is called because this is for an instant effect
 	// if (EventType == EGameplayCueEvent::OnActive) MCOLOG_C(MCOAbility, TEXT("Instant Cue : OnActive"))
 	// else if (EventType == EGameplayCueEvent::WhileActive) MCOLOG_C(MCOAbility, TEXT("Instant Cue : WhileActive"))
 	// else if (EventType == EGameplayCueEvent::Executed) MCOLOG_C(MCOAbility, TEXT("Instant Cue : Executed"))
 	// else if (EventType == EGameplayCueEvent::Removed) MCOLOG_C(MCOAbility, TEXT("Instant Cue : Removed"))
-	//
+	
 	Super::HandleGameplayCue(MyTarget, EventType, Parameters);
 	
 	ISTRUE(nullptr != NiagaraComponent);
-	
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(MyTarget);
-	ensure(CharacterInterface);
+	ISTRUE(nullptr != NiagaraComponent->GetAsset());
 
-	const UMCODamagedData* DamagedData = CharacterInterface->GetDamagedData(EMCOEffectPolicy::Instant);
-	ISTRUE(nullptr != DamagedData);
-	
-	UNiagaraSystem* DamageNiagara = UMCOGameSingleton::Get().NiagaraEffectData->GetDamagedNiagaraEffect(
-		DamagedData->DamagedEffectType, DamagedData->DamagedEffectPolicy, DamagedData->DamagedAmount
-	);
-	ISTRUE(nullptr != DamageNiagara);
-	
-	//MCOLOG_C(MCOAbility, TEXT("[%s] Cue Executed : [%s]"), *GetName(), *DamageNiagara->GetName());
+	const FHitResult* InHitResult = Parameters.EffectContext.GetHitResult();
+	if (nullptr != InHitResult)
+	{
+		SetActorLocationAndRotation(InHitResult->ImpactPoint, MyTarget->GetActorRotation());
 
-	SetActorLocationAndRotation(DamagedData->DamagedLocation, MyTarget->GetActorRotation());
+		MCOLOG_C(MCOAbility, TEXT("[%s] Cue Executed : [%s]"), *GetName(), *InHitResult->ImpactPoint.ToString());
+	}
 	
-	NiagaraComponent->SetAsset(DamageNiagara);
 	NiagaraComponent->ActivateSystem();
-	
-	CharacterInterface->RemoveDamagedData(EMCOEffectPolicy::Instant);
 }

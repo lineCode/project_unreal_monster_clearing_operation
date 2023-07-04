@@ -15,9 +15,6 @@
 
 UMCOGA_CommonAttack::UMCOGA_CommonAttack()
 {
-	GETCLASS(InstantEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveMeleeDamage.GE_GiveMeleeDamage_C"));
-	GETCLASS(DurationEffectWithCue, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveFireDurationDamage.GE_GiveFireDurationDamage_C"));
-	
 	// Setting 
 	bUseOverlapEvent = false;
 	bAutoStopCharacter = true;
@@ -154,7 +151,11 @@ void UMCOGA_CommonAttack::EndDamaging_Collision()
 	CharacterInterface->OnEndCollision(CollisionFragment->SocketName);
 }
 
-void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FVector& InDamagedLocation)
+void UMCOGA_CommonAttack::ApplyDamageAndStiffness(
+	ACharacter* InAttackedCharacter,
+	float InDamagedDegree,
+	const FVector& InDamagedLocation,
+	const FHitResult& InHitResult)
 {
 	// Get ASC from AttackedCharacter
 	IAbilitySystemInterface* AttackedCharacter = Cast<IAbilitySystemInterface>(InAttackedCharacter);
@@ -173,13 +174,60 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacte
 	const UMCOActionFragment_AttributeEffect* AttributeFragment = GetAttackAttributeFragment(CurrentDamageTimingIdx);
 	ISTRUE(nullptr != AttributeFragment);
 
-	// Instant effect
-	SendDamagedDataToTarget(InAttackedCharacter, InDamagedDegree, InDamagedLocation, EMCOEffectPolicy::Instant, AttributeFragment);
-	ApplyEffect(AttackedASC, AttributeFragment, EMCOEffectPolicy::Instant, InstantEffectWithCue);
+	for (const EMCOEffectPolicy& Policy : TEnumRange<EMCOEffectPolicy>())
+	{
+		SendDamagedDataToTarget(
+			InAttackedCharacter,
+			InDamagedDegree,
+			InDamagedLocation,
+			Policy,
+			AttributeFragment
+		);
 
-	// Duration effect
-	SendDamagedDataToTarget(InAttackedCharacter, InDamagedDegree, InDamagedLocation, EMCOEffectPolicy::Duration, AttributeFragment);
-	ApplyEffect(AttackedASC, AttributeFragment, EMCOEffectPolicy::Duration, DurationEffectWithCue);
+		if (false == EffectClassesForAttack.Contains(Policy))
+		{
+			continue;
+		}
+		
+		ApplyEffectWithHitResult(
+			AttackedASC,
+			AttributeFragment,
+			Policy,
+			EffectClassesForAttack[Policy],
+			InHitResult
+		);
+	}
+}
+
+bool UMCOGA_CommonAttack::ApplyEffectWithHitResult(	
+		UAbilitySystemComponent* ASC,
+		const UMCOActionFragment_AttributeEffect* AttributeFragment,
+		const EMCOEffectPolicy& InPolicy,
+		const TSubclassOf<UGameplayEffect>& EffectClass,
+		const FHitResult& InHitResult) const
+{
+	ISTRUE_F(nullptr != ASC);
+	ISTRUE_F(nullptr != EffectClass);
+	ISTRUE_F(nullptr != AttributeFragment);
+	ISTRUE_F(true == AttributeFragment->IsEffectExistByPolicy(InPolicy));
+	
+	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(EffectClass);
+	ISTRUE_F(true == NewHandle.IsValid());
+
+	AttributeFragment->ApplyAttributeAdditiveValue(InPolicy, NewHandle);
+
+	// Set hit result for cue location 
+	if (false == InHitResult.ImpactPoint.IsNearlyZero())
+	{
+		NewHandle.Data->GetContext().AddHitResult(InHitResult);
+	}
+	
+	ASC->ApplyGameplayEffectSpecToSelf(
+		*NewHandle.Data.Get(),
+		ASC->GetPredictionKeyForNewAction()
+	);
+
+	return true;
 }
 
 float UMCOGA_CommonAttack::CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog) const
@@ -292,7 +340,7 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AChara
 
 	const FVector DamagedLocation = SweepResult.ImpactPoint;
 		
-	ApplyDamageAndStiffness(InAttackedCharacter, DamagedDegree, DamagedLocation);
+	ApplyDamageAndStiffness(InAttackedCharacter, DamagedDegree, DamagedLocation, SweepResult);
 	
 	DamagedCharacters.Reset();
 }
@@ -437,7 +485,7 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 
 		const FVector DamagedLocation = Result.ImpactPoint;
 		
-		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, DamagedLocation);
+		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, DamagedLocation, Result);
 	}
 	
 	DamagedCharacters.Reset();

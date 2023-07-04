@@ -15,10 +15,21 @@
 UMCOGameplayAbility::UMCOGameplayAbility()
 {
 	// Effect 
-	// GETCLASS(TagEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_GiveAbilityTags.GE_GiveAbilityTags_C"));
-	GETCLASS(DurationEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Duration.GE_Attribute_Duration_C"));
-	GETCLASS(InstantEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Instant.GE_Attribute_Instant_C"));
-	GETCLASS(InfiniteEffectClass, UGameplayEffect, TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
+	ConstructorHelpers::FClassFinder<UGameplayEffect> InstantRef(TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Instant.GE_Attribute_Instant_C"));
+	if (true == InstantRef.Succeeded())
+	{
+		EffectClasses.Emplace(EMCOEffectPolicy::Instant, InstantRef.Class);
+	}
+	ConstructorHelpers::FClassFinder<UGameplayEffect> DurationRef( TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Duration.GE_Attribute_Duration_C"));
+	if (true == DurationRef.Succeeded())
+	{
+		EffectClasses.Emplace(EMCOEffectPolicy::Duration, DurationRef.Class);
+	}
+	ConstructorHelpers::FClassFinder<UGameplayEffect> InfiniteRef(TEXT("/Game/AbilitySystem/Effects/GE_Attribute_Infinite.GE_Attribute_Infinite_C"));
+	if (true == InfiniteRef.Succeeded())
+	{
+		EffectClasses.Emplace(EMCOEffectPolicy::Infinite, InfiniteRef.Class);
+	}
 	
 	// Setting
 	bActivateAbilityOnGranted = false;
@@ -192,14 +203,13 @@ bool UMCOGameplayAbility::IsPlayer() const
 
 void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
-	ISTRUE(nullptr != DurationEffectClass);
 	ISTRUE(nullptr != CurrentDefinition->CooldownFragment);
 	ISTRUE(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
 	
-	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(DurationEffectClass);
+	const FGameplayEffectSpecHandle NewHandle = MakeOutgoingGameplayEffectSpec(EffectClasses[EMCOEffectPolicy::Duration]);
 	ISTRUE(true == NewHandle.IsValid());
 
 	CurrentDefinition->CooldownFragment->ApplyCooldownValue(NewHandle);
@@ -215,7 +225,6 @@ void UMCOGameplayAbility::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 
 const FGameplayTagContainer* UMCOGameplayAbility::GetCooldownTags() const
 {
-	ISTRUE_N(nullptr != DurationEffectClass);
 	ISTRUE_N(nullptr != CurrentDefinition->CooldownFragment);
 	ISTRUE_N(true == CurrentDefinition->CooldownFragment->CanApplyCooldown());
 	
@@ -247,16 +256,26 @@ bool UMCOGameplayAbility::CheckCanActivateWithStamina() const
 
 void UMCOGameplayAbility::ApplyAbilityEffectSelf(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	ISTRUE(nullptr != InstantEffectClass);
-	ISTRUE(nullptr != InfiniteEffectClass);
+	ISTRUE(nullptr != CurrentDefinition);
 	ISTRUE(nullptr != CurrentDefinition->AttributeFragment);
 
 	UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
 	ISTRUE(nullptr != ASC);
-	
-	ApplyEffect(ASC, CurrentDefinition->AttributeFragment, EMCOEffectPolicy::Instant, InstantEffectClass, true);
-	ApplyEffect(ASC, CurrentDefinition->AttributeFragment, EMCOEffectPolicy::Duration, DurationEffectClass, true);
-	ApplyEffect(ASC, CurrentDefinition->AttributeFragment, EMCOEffectPolicy::Infinite, InfiniteEffectClass, true);
+
+	for (const EMCOEffectPolicy& Policy : TEnumRange<EMCOEffectPolicy>())
+	{
+		if (false == EffectClasses.Contains(Policy))
+		{
+			continue;
+		}
+		
+		ApplyEffect(
+			ASC,
+			CurrentDefinition->AttributeFragment,
+			Policy,
+			EffectClasses[Policy]
+		);
+	}
 }
 
 void UMCOGameplayAbility::CancelAbilityEffectsSelf() const
@@ -271,7 +290,11 @@ void UMCOGameplayAbility::CancelAbilityEffectsSelf() const
 	//MCOLOG_C(MCOAbility, TEXT("Attribute Effect : Removed"));
 }
 
-bool UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect) const
+bool UMCOGameplayAbility::ApplyEffect(
+	UAbilitySystemComponent* ASC,
+	const UMCOActionFragment_AttributeEffect* AttributeFragment,
+	const EMCOEffectPolicy& InPolicy,
+	const TSubclassOf<UGameplayEffect>& EffectClass) const
 {
 	ISTRUE_F(nullptr != ASC);
 	ISTRUE_F(nullptr != EffectClass);
@@ -283,11 +306,9 @@ bool UMCOGameplayAbility::ApplyEffect(UAbilitySystemComponent* ASC, const UMCOAc
 
 	AttributeFragment->ApplyAttributeAdditiveValue(InPolicy, NewHandle);
 
-	if (true == IsAbilityEffect)
-	{
-		NewHandle.Data->DynamicGrantedTags.AddTag(EffectTag);
-	}
-
+	// to cancel on end ability 
+	NewHandle.Data->DynamicGrantedTags.AddTag(EffectTag);
+	
 	ASC->ApplyGameplayEffectSpecToSelf(
 		*NewHandle.Data.Get(),
 		ASC->GetPredictionKeyForNewAction()

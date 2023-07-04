@@ -174,10 +174,14 @@ enum class EMCOItemType : uint8
 UENUM(BlueprintType)
 enum class EMCOEffectPolicy : uint8
 {
+	None,
 	Instant        UMETA(DisplayName = "Instant"),
 	Duration       UMETA(DisplayName = "Duration"),
-	Infinite       UMETA(DisplayName = "Infinite")
+	Infinite       UMETA(DisplayName = "Infinite"),
+	Max            UMETA(Hidden)
 };
+ENUM_RANGE_BY_FIRST_AND_LAST(EMCOEffectPolicy, EMCOEffectPolicy::Instant, EMCOEffectPolicy::Infinite)
+
 
 UENUM(BlueprintType)
 enum class EMCONiagaraEffectType : uint8

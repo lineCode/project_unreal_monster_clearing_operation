@@ -89,18 +89,14 @@ protected:
 // 	TSubclassOf<UGameplayEffect> TagEffectClass;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Fragment")
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Fragment")
+	UPROPERTY()
 	UMCOActionDefinition* CurrentDefinition;
 
 	// This is just for stamina & cooltime
 	UPROPERTY()
-	TSubclassOf<UGameplayEffect> InstantEffectClass;
+	TMap<EMCOEffectPolicy, TSubclassOf<UGameplayEffect>> EffectClasses;
 	
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> DurationEffectClass;
-	
-	UPROPERTY()
-	TSubclassOf<UGameplayEffect> InfiniteEffectClass;
 	
 // --- Cooldown
 protected:
@@ -118,8 +114,12 @@ protected:
 	void ApplyAbilityEffectSelf(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo);
 	void CancelAbilityEffectsSelf() const;
 
-protected:
-	bool ApplyEffect(UAbilitySystemComponent* ASC, const UMCOActionFragment_AttributeEffect* AttributeFragment, const EMCOEffectPolicy& InPolicy, const TSubclassOf<UGameplayEffect>& EffectClass, const bool& IsAbilityEffect = false) const;
+private:
+	bool ApplyEffect(
+		UAbilitySystemComponent* ASC,
+		const UMCOActionFragment_AttributeEffect* AttributeFragment,
+		const EMCOEffectPolicy& InPolicy,
+		const TSubclassOf<UGameplayEffect>& EffectClass) const;
 
 	
 // --- Stamina charge

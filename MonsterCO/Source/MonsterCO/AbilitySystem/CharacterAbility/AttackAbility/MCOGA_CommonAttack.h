@@ -45,7 +45,17 @@ protected:
 	
 // --- Attack
 protected:
-	void ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FVector& InDamagedLocation);
+	void ApplyDamageAndStiffness(
+		ACharacter* InAttackedCharacter,
+		float InDamagedDegree,
+		const FVector& InDamagedLocation,
+		const FHitResult& InHitResult);
+	bool ApplyEffectWithHitResult(	
+		UAbilitySystemComponent* ASC,
+		const UMCOActionFragment_AttributeEffect* AttributeFragment,
+		const EMCOEffectPolicy& InPolicy,
+		const TSubclassOf<UGameplayEffect>& EffectClass,
+		const FHitResult& InHitResult) const;
 	float CalculateDegree(const FVector& SourceLocation, const FVector& SourceForward, const FVector& TargetDirection, bool bLog = false) const;
 	void SendDamagedDataToTarget(ACharacter* InAttackedCharacter, float InDegree, const FVector& InDamagedLocation,
 		const EMCOEffectPolicy& InPolicy, const UMCOActionFragment_AttributeEffect* InAttributeFragment) const;
@@ -65,15 +75,10 @@ protected:
 	UMCOActionFragment_AttributeEffect* GetAttackAttributeFragment(const uint8& InDamageIdx) const;
 	UMCOActionFragment_Collision* GetCollisionFragment(const uint8& InDamageIdx) const;
 	UMCOActionFragment_Projectile* GetProjectileFragment(const uint8& InDamageIdx) const;
-	
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Effect")
-	TSubclassOf<UGameplayEffect> InstantEffectWithCue;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "MCO|Effect")
-	TSubclassOf<UGameplayEffect> DurationEffectWithCue;
-
+	TMap<EMCOEffectPolicy, TSubclassOf<UGameplayEffect>> EffectClassesForAttack;
 	
 	
 // --- Movement
