@@ -6,6 +6,7 @@
 
 
 class UNiagaraComponent;
+class UAudioComponent;
 
 
 
@@ -21,6 +22,9 @@ protected:
 	virtual void HandleGameplayCue(AActor* MyTarget, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters) override;
 
 protected:
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	TObjectPtr<USceneComponent> Scene;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UNiagaraComponent> NiagaraComponent;
 	
