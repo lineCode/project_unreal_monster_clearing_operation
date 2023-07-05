@@ -64,6 +64,7 @@ protected:
 public:
 	virtual void StopCharacterFromMoving(bool bToStop) override;
 	virtual void StopCharacterFromTurning(bool bStopTuring) override;
+	virtual void ChangedMovementMode(const EMovementMode& InMode) override;
 
 	void DisableMovement() const;
 	void DisableAllCollision();

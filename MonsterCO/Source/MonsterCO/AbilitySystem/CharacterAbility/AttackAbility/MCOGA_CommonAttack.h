@@ -26,6 +26,8 @@ public:
 // --- Ability
 protected:
 	void StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName);
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	
 
 	virtual void OnTaskCompleted() override;
 	virtual void OnTaskCancelled() override;
@@ -42,6 +44,9 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
 	uint32 bIsInstantAttack : 1;
+	
+	UPROPERTY(EditAnywhere, Category = "MCO|AttackStyle")
+	uint32 bHasJumpRootMotion : 1;
 	
 // --- Attack
 protected:

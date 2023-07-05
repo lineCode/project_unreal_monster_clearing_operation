@@ -67,6 +67,13 @@ void AMCOCharacter::StopCharacterFromTurning(bool bStopTuring)
 	
 }
 
+void AMCOCharacter::ChangedMovementMode(const EMovementMode& InMode)
+{
+	UCharacterMovementComponent* Movement = GetCharacterMovement();
+	ISTRUE(nullptr != Movement);
+	Movement->MovementMode = InMode;
+}
+
 void AMCOCharacter::DisableMovement() const
 {
 	// ignore input

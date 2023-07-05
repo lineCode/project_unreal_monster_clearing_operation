@@ -64,6 +64,7 @@ public:
 
 	virtual void StopCharacterFromMoving(bool bStopMoving) = 0;
 	virtual void StopCharacterFromTurning(bool bStopTuring) = 0;
+	virtual void ChangedMovementMode(const EMovementMode& InMode) = 0;
 
 // --- Information
 public:

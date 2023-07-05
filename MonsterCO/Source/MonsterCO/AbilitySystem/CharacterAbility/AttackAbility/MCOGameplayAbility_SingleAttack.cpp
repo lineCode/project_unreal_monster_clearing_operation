@@ -1,5 +1,7 @@
 #include "MCOGameplayAbility_SingleAttack.h"
 #include "AbilitySystem/ActionData/MCOMontageDataSingle.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 UMCOGameplayAbility_SingleAttack::UMCOGameplayAbility_SingleAttack()

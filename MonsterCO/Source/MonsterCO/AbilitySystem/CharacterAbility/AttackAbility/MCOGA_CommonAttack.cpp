@@ -34,7 +34,16 @@ UMCOGA_CommonAttack::UMCOGA_CommonAttack()
 void UMCOGA_CommonAttack::StartAttackActivation(UAnimMontage* InMontage, const FName& InSectionName)
 {
 	DamagedCharacters.Reset();
-
+	
+	if (true == bHasJumpRootMotion)
+	{
+		IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
+		if (nullptr != CharacterInterface)
+		{
+			CharacterInterface->ChangedMovementMode(MOVE_Flying);
+		}
+	}
+	
 	if (nullptr != InMontage)
 	{
 		// Play Montage
@@ -43,6 +52,20 @@ void UMCOGA_CommonAttack::StartAttackActivation(UAnimMontage* InMontage, const F
 
 	// Damage Timer
 	SetDamageTimer();
+}
+
+void UMCOGA_CommonAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+	if (true == bHasJumpRootMotion)
+	{
+		IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
+		if (nullptr != CharacterInterface)
+		{
+			CharacterInterface->ChangedMovementMode(MOVE_Walking);
+		}
+	}
 }
 
 void UMCOGA_CommonAttack::OnTaskCompleted()
