@@ -7,7 +7,6 @@
 #include "AbilitySystem/MCOAbilitySet.h"
 #include "Interface/MCOAttackedInterface.h"
 #include "Interface/MCOCharacterInterface.h"
-#include "Interface/MCOCharacterItemInterface.h"
 #include "MCOCharacter.generated.h"
 
 
@@ -20,6 +19,7 @@ class UMCOAttributeWidget;
 class UMCOItemData;
 class UMCOModeComponent;
 class UMCOProjectileSpawnComponent;
+class UMCOPawnExtensionComponent;
 
 
 DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, const UMCOItemData* /*InItemData*/);
@@ -53,8 +53,12 @@ protected:
 	void SetCharacterData();
 	
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
 	virtual void BeginPlay() override;
 
+	virtual void OnRep_Controller() override;
+	virtual void OnRep_PlayerState() override;
+	
 protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MCO|Character")
 	TObjectPtr<UMCOCharacterData> CharacterData;
@@ -84,9 +88,7 @@ protected:
 	
 // --- Ability
 public:
-	virtual void OnRep_PlayerState() override;
 	virtual void InitializeCharacter();
-	void UninitializeAbilitySystem();
 	
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UMCOAbilitySystemComponent* GetMCOAbilitySystemComponent() const;
@@ -94,8 +96,8 @@ public:
 	virtual bool CanActivateAbility(const FGameplayTag& InTag) override;
 
 protected:
-	UPROPERTY()
-	TWeakObjectPtr<UMCOAbilitySystemComponent> AbilitySystemComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MCO|Character|Ability", Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UMCOPawnExtensionComponent> PawnExtComponent;
 
 	UPROPERTY()
 	TWeakObjectPtr<const UMCOAttributeSet> AttributeSet;
@@ -105,7 +107,7 @@ protected:
 	
 	
 // --- Attribute
-public:
+protected:
 	UFUNCTION(BlueprintCallable, Category = "MCO|Character|Attributes")
 	virtual bool IsAlive() const;
 
@@ -143,9 +145,6 @@ protected:
 	
 // --- Attack
 public:
-	UFUNCTION()
-	void ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage);
-
 	virtual bool CheckCanBeDamaged(FGameplayTag InAttackTag) override;
 	virtual float GetDamagedDegreeThenSetZero() override;
 	virtual void SetDamagedDegree(const float& InDegree) override;

@@ -8,6 +8,10 @@
 class AMCOProjectile;
 
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDestroyProjectiles);
+
+
+
 USTRUCT()
 struct FMCOProjectileArray
 {
@@ -17,8 +21,6 @@ public:
 	UPROPERTY()
 	TArray<TObjectPtr<AMCOProjectile>> Projectiles = TArray<TObjectPtr<AMCOProjectile>>();
 };
-
-
 
 
 UCLASS()
@@ -31,7 +33,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void BeginDestroy() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
 	AMCOProjectile* SpawnProjectile(const TSubclassOf<AMCOProjectile>& InClass, ACharacter* InOwner, const FTransform& InTransform, const float& InSpeed, const float& InLifeSpan);
@@ -44,6 +46,8 @@ protected:
 	void BackToPool(AMCOProjectile* InProjectile);
 	
 protected:
+	FOnDestroyProjectiles OnDestroyProjectiles;
+	
 	UPROPERTY()
 	TMap<TSubclassOf<AMCOProjectile>, FMCOProjectileArray> Pool;
 

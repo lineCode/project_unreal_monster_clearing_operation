@@ -21,11 +21,12 @@ void AMCOPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	const AMCOPlayerState* MCOPlayerState = GetPlayerState<AMCOPlayerState>();
-	if (nullptr != MCOPlayerState)
-	{
-		MCOPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(PlayerState, InPawn);
-	}
+	// move to pawn extension component
+	// const AMCOPlayerState* MCOPlayerState = GetPlayerState<AMCOPlayerState>();
+	// if (nullptr != MCOPlayerState)
+	// {
+	// 	MCOPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(PlayerState, InPawn);
+	// }
 }
 
 void AMCOPlayerController::BeginPlay()

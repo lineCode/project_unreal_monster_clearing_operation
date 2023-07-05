@@ -20,6 +20,12 @@ void UMCOAbilitySystemComponent::NotifyAbilityFailed(const FGameplayAbilitySpecH
 	}
 }
 
+void UMCOAbilitySystemComponent::InitAbilityActorInfo(AActor* InOwnerActor, AActor* InAvatarActor)
+{
+	Super::InitAbilityActorInfo(InOwnerActor, InAvatarActor);
+	
+}
+
 bool UMCOAbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag& InTag)
 {
 	ISTRUE_F(true == InTag.IsValid());

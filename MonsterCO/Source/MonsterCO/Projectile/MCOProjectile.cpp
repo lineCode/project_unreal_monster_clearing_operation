@@ -12,6 +12,7 @@ AMCOProjectile::AMCOProjectile()
 {
 	bReplicates = true;
 	bIsActive = false;
+	bDestroyOnDeactive = false;
 	LifeSpan = 0.0f;
 	
 	Sphere = CreateDefaultSubobject<USphereComponent>(FName("NAME_Sphere"));
@@ -73,9 +74,27 @@ void AMCOProjectile::OnRespawned()
 	StartLifeSpanTimer();
 }
 
+void AMCOProjectile::DestroyActor()
+{
+	if (false == bIsActive)
+	{
+		Destroy();
+	}
+	else
+	{
+		bDestroyOnDeactive = true;
+	}
+}
+
 void AMCOProjectile::OnBackToPool()
 {
 	ISTRUE(true == bIsActive);
+
+	if (true == bDestroyOnDeactive)
+	{
+		Destroy();
+		return;
+	}
 	
 	bIsActive = false;
 	LifeSpanTimer.Invalidate();

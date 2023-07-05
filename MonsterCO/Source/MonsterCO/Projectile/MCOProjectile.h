@@ -33,6 +33,9 @@ public:
 	void Initialize(const float& InSpeed, const float& InLifeSpan);
 	void OnRespawned();
 
+	UFUNCTION()
+	void DestroyActor();
+
 protected:
 	void OnBackToPool();
 	void StartLifeSpanTimer();
@@ -57,6 +60,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
+	bool bDestroyOnDeactive;
 	bool bIsActive;
 	bool bIsHit;
 	float LifeSpan;

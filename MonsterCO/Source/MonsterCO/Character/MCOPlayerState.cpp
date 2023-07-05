@@ -40,6 +40,14 @@ void AMCOPlayerState::BeginPlay()
     Super::BeginPlay();
 }
 
+void AMCOPlayerState::PostInitializeComponents()
+{
+    Super::PostInitializeComponents();
+
+    check(nullptr != AbilitySystemComponent);
+    AbilitySystemComponent->InitAbilityActorInfo(this, GetPawn());
+}
+
 UMCOAbilitySystemComponent* AMCOPlayerState::GetMCOAbilitySystemComponent() const
 {
     return AbilitySystemComponent;

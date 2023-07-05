@@ -5,6 +5,7 @@
 #include "InputActionValue.h"
 #include "Interface/MCOHUDInterface.h"
 #include "Interface/MCOPlayerInterface.h"
+#include "Interface/MCOCharacterItemInterface.h"
 #include "MCOPlayerCharacter.generated.h"
 
 class UMCOPlayerModeComponent;

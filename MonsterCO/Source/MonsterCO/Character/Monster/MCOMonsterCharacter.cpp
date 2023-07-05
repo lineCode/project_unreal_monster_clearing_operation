@@ -96,8 +96,12 @@ void AMCOMonsterCharacter::OnGameStateChanged(const EMCOGameState& InState)
 {
 	if (InState == EMCOGameState::RESULT_LOSE)
 	{
-		//GetMCOAbilitySystemComponent()->RemoveEffectsOnResult();
-		AbilitySetHandles.TakeFromAbilitySystem(AbilitySystemComponent.Get());
+		UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
+		if (nullptr != ASC)
+		{
+			//GetMCOAbilitySystemComponent()->RemoveEffectsOnResult();
+			AbilitySetHandles.TakeFromAbilitySystem(ASC);
+		}
 	}
 }
 

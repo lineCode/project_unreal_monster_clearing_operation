@@ -1,5 +1,6 @@
 #include "MCOCharacter.h"
 #include "MCOCharacterData.h"
+#include "MCOPawnExtensionComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystem/MCOAbilitySystemComponent.h"
@@ -10,7 +11,6 @@
 #include "MCOPlayerState.h"
 #include "CharacterAttachment/MCOModeComponent.h"
 #include "CharacterAttachment/Attachment/MCOAttachment.h"
-#include "Containers/Queue.h"
 #include "Projectile/MCOProjectileSpawnComponent.h"
 
 
@@ -19,6 +19,7 @@ AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Supe
 	// PrimaryActorTick.bCanEverTick = true;
 	
 	ProjectileSpawner = CreateDefaultSubobject<UMCOProjectileSpawnComponent>(TEXT("NAME_ProjectileComponent"));
+	PawnExtComponent = CreateDefaultSubobject<UMCOPawnExtensionComponent>(TEXT("NAME_PawnExtensionComponent"));
 }
 
 void AMCOCharacter::SetCharacterData()
@@ -46,14 +47,29 @@ void AMCOCharacter::SetCharacterData()
 void AMCOCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
+	
+	PawnExtComponent->HandleControllerChanged();
 	InitializeCharacter();
+}
+
+void AMCOCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+	
+	PawnExtComponent->HandleControllerChanged();
 }
 
 void AMCOCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+}
+
+void AMCOCharacter::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+
+	PawnExtComponent->HandleControllerChanged();
 }
 
 void AMCOCharacter::StopCharacterFromMoving(bool bToStop)
@@ -154,33 +170,22 @@ void AMCOCharacter::InitializeCharacter()
 	// get ASC
 	AMCOPlayerState* MCOPlayerState = GetPlayerState<AMCOPlayerState>();
 	ensure(nullptr != MCOPlayerState);
-	AbilitySystemComponent = MCOPlayerState->GetMCOAbilitySystemComponent();
-	ensure(nullptr != AbilitySystemComponent);
+	UMCOAbilitySystemComponent* ASC = MCOPlayerState->GetMCOAbilitySystemComponent();
+	ensure(nullptr != ASC);
 
 	// init ASC
-	AbilitySystemComponent->InitAbilityActorInfo(MCOPlayerState, this);
-	AbilitySystemComponent->SetTagMapCount(FMCOCharacterTags::Get().DeadTag, 0);
-	AbilitySystemComponent->OnDamagedReceived.AddUniqueDynamic(this, &AMCOCharacter::ReceiveDamage);
+	PawnExtComponent->InitializeAbilitySystem(ASC, MCOPlayerState);
 	
 	// give ability
 	ISTRUE(GetLocalRole() == ROLE_Authority);
 	ISTRUE(nullptr != CharacterData);
 	ISTRUE(nullptr != CharacterData->AbilitySet);
 
-	CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-	
-	// if (false == AbilitySystemComponent->bCharacterAbilitySetGiven)
-	// {	
-	// 	CharacterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-	// }
-	// else
-	// {
-	// 	CharacterData->AbilitySet->AddStartupEffects(AbilitySystemComponent.Get(), &AbilitySetHandles, nullptr);
-	// }
+	CharacterData->AbilitySet->GiveToAbilitySystem(ASC, &AbilitySetHandles, nullptr);
 	
 	// set delegates "after giving abilities" 
 	MCOPlayerState->InitializeAbilitySystem();
-	AttributeSet = AbilitySystemComponent->GetSet<UMCOAttributeSet>();
+	AttributeSet = ASC->GetSet<UMCOAttributeSet>();
 	
 	MCOPRINT(TEXT("[Init: %s] Health (%.1f/%.1f), Stemina (%.1f/%.1f), Stiffness (%.1f/%.1f)"),
 		*CharacterName.ToString(),
@@ -193,41 +198,14 @@ void AMCOCharacter::InitializeCharacter()
 	MCOPlayerState->OnTagChangedDelegate.AddUObject(this, &ThisClass::OnTagChanged);
 }
 
-void AMCOCharacter::UninitializeAbilitySystem()
-{
-	ISTRUE(nullptr != AbilitySystemComponent.Get());
-	
-	// Uninitialize the ASC if we're still the avatar actor
-	// (otherwise another pawn already did it when they became the avatar actor)
-	if (AbilitySystemComponent->GetAvatarActor() == GetOwner())
-	{
-		AbilitySystemComponent->CancelAbilities(nullptr, nullptr);
-		AbilitySystemComponent->ClearAbilityInput();
-		AbilitySystemComponent->RemoveAllGameplayCues();
-
-		if (nullptr != AbilitySystemComponent->GetOwnerActor())
-		{
-			AbilitySystemComponent->SetAvatarActor(nullptr);
-		}
-		else
-		{
-			// If the ASC doesn't have a valid owner,
-			// we need to clear *all* actor info, not just the avatar pairing
-			AbilitySystemComponent->ClearActorInfo();
-		}
-	}
-	
-	AbilitySystemComponent = nullptr;
-}
-
 UAbilitySystemComponent* AMCOCharacter::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent.Get();
+	return PawnExtComponent ? PawnExtComponent->GetMCOAbilitySystemComponent() : nullptr;
 }
 
 UMCOAbilitySystemComponent* AMCOCharacter::GetMCOAbilitySystemComponent() const
 {
-	return AbilitySystemComponent.Get();
+	return PawnExtComponent ? PawnExtComponent->GetMCOAbilitySystemComponent() : nullptr;
 }
 
 bool AMCOCharacter::CanActivateAbility(const FGameplayTag& InTag)
@@ -315,11 +293,6 @@ int32 AMCOCharacter::GetTagCount(const FGameplayTag& InTag) const
 	ISTRUE_Z(nullptr != GetAbilitySystemComponent());
 	
 	return GetAbilitySystemComponent()->GetTagCount(InTag);
-}
-
-void AMCOCharacter::ReceiveDamage(UMCOAbilitySystemComponent* SourceASC, float Damage)
-{
-	
 }
 
 bool AMCOCharacter::CheckCanBeDamaged(FGameplayTag InAttackTag)
@@ -419,7 +392,12 @@ void AMCOCharacter::Die()
 
 void AMCOCharacter::FinishDying()
 {
-	AbilitySetHandles.TakeFromAbilitySystem(AbilitySystemComponent.Get());
+	UMCOAbilitySystemComponent* ASC = GetMCOAbilitySystemComponent();
+
+	if (nullptr != ASC)
+	{
+		AbilitySetHandles.TakeFromAbilitySystem(ASC);
+	}
 	
 	if (GetLocalRole() == ROLE_Authority)
 	{
@@ -429,7 +407,7 @@ void AMCOCharacter::FinishDying()
 	}
 
 	SetActorHiddenInGame(true);
-	UninitializeAbilitySystem();
+	PawnExtComponent->UninitializeAbilitySystem();
 	
 	OnCharacterDeathFinished.Broadcast(this);
 }

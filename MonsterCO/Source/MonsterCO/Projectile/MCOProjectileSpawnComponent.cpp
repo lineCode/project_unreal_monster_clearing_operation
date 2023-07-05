@@ -12,17 +12,11 @@ void UMCOProjectileSpawnComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UMCOProjectileSpawnComponent::BeginDestroy()
+void UMCOProjectileSpawnComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	for (auto Tuple : Pool)
-	{
-		for (AMCOProjectile* Projectile : Tuple.Value.Projectiles)
-		{
-			Projectile->Destroy();
-		}
-	}
+	OnDestroyProjectiles.Broadcast();
 	
-	Super::BeginDestroy();
+	Super::EndPlay(EndPlayReason);
 }
 
 AMCOProjectile* UMCOProjectileSpawnComponent::SpawnProjectile(const TSubclassOf<AMCOProjectile>& InClass, ACharacter* InOwner, const FTransform& InTransform, const float& InSpeed, const float& InLifeSpan)
@@ -60,6 +54,8 @@ AMCOProjectile* UMCOProjectileSpawnComponent::SpawnNewProjectile(const TSubclass
 	SpawnedProjectile->Initialize(InSpeed, InLifeSpan);
 	
 	SpawnedProjectile->FinishSpawning(InTransform);
+	
+	OnDestroyProjectiles.AddUniqueDynamic(SpawnedProjectile, &AMCOProjectile::DestroyActor);
 	
 	return SpawnedProjectile;
 }
