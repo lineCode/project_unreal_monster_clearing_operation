@@ -84,9 +84,10 @@ public:
 public:
 	virtual bool CheckCanBeDamaged(FGameplayTag InTag) = 0;
 	virtual float GetDamagedDegreeThenSetZero() = 0;
-	virtual const UMCODamagedData* GetDamagedData(EMCOEffectPolicy InPolicy) = 0;
-	virtual void SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy) = 0;
-	virtual void RemoveDamagedData(EMCOEffectPolicy InPolicy) = 0;
+	virtual void SetDamagedDegree(const float& InDegree) = 0;
+	//virtual const UMCODamagedData* GetDamagedData(EMCOEffectPolicy InPolicy) = 0;
+	//virtual void SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy) = 0;
+	//virtual void RemoveDamagedData(EMCOEffectPolicy InPolicy) = 0;
 
 	
 // --- Die

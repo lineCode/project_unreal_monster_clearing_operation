@@ -147,10 +147,7 @@ public:
 
 	virtual bool CheckCanBeDamaged(FGameplayTag InAttackTag) override;
 	virtual float GetDamagedDegreeThenSetZero() override;
-	
-	virtual const UMCODamagedData* GetDamagedData(EMCOEffectPolicy InPolicy) override;
-	virtual void SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy) override;
-	virtual void RemoveDamagedData(EMCOEffectPolicy InPolicy) override;
+	virtual void SetDamagedDegree(const float& InDegree) override;
 
 	virtual ACharacter* GetAttackedCharacter() override { return this; }
 	virtual float GetCapsuleRadius() const override;
@@ -162,12 +159,6 @@ public:
 
 	
 protected:
-	UPROPERTY()
-	TArray<TObjectPtr<UMCODamagedData>> InstantDamagedData;
-	
-	UPROPERTY()
-	TArray<TObjectPtr<UMCODamagedData>> DurationDamagedData;
-	
 	UPROPERTY()
 	float DamagedDegree;
 	

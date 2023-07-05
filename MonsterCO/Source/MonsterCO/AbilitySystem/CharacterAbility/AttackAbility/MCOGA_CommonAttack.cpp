@@ -174,11 +174,7 @@ void UMCOGA_CommonAttack::EndDamaging_Collision()
 	CharacterInterface->OnEndCollision(CollisionFragment->SocketName);
 }
 
-void UMCOGA_CommonAttack::ApplyDamageAndStiffness(
-	ACharacter* InAttackedCharacter,
-	float InDamagedDegree,
-	const FVector& InDamagedLocation,
-	const FHitResult& InHitResult)
+void UMCOGA_CommonAttack::ApplyDamageAndStiffness(ACharacter* InAttackedCharacter, float InDamagedDegree, const FHitResult& InHitResult)
 {
 	// Get ASC from AttackedCharacter
 	IAbilitySystemInterface* AttackedCharacter = Cast<IAbilitySystemInterface>(InAttackedCharacter);
@@ -199,13 +195,7 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(
 
 	for (const EMCOEffectPolicy& Policy : TEnumRange<EMCOEffectPolicy>())
 	{
-		SendDamagedDataToTarget(
-			InAttackedCharacter,
-			InDamagedDegree,
-			InDamagedLocation,
-			Policy,
-			AttributeFragment
-		);
+		SendDamagedDataToTarget(InAttackedCharacter, InDamagedDegree);
 
 		if (false == EffectClassesForAttack.Contains(Policy))
 		{
@@ -223,11 +213,11 @@ void UMCOGA_CommonAttack::ApplyDamageAndStiffness(
 }
 
 bool UMCOGA_CommonAttack::ApplyEffectWithHitResult(	
-		UAbilitySystemComponent* ASC,
-		const UMCOActionFragment_AttributeEffect* AttributeFragment,
-		const EMCOEffectPolicy& InPolicy,
-		const TSubclassOf<UGameplayEffect>& EffectClass,
-		const FHitResult& InHitResult) const
+	UAbilitySystemComponent* ASC,
+	const UMCOActionFragment_AttributeEffect* AttributeFragment,
+	const EMCOEffectPolicy& InPolicy,
+	const TSubclassOf<UGameplayEffect>& EffectClass,
+	const FHitResult& InHitResult) const
 {
 	ISTRUE_F(nullptr != ASC);
 	ISTRUE_F(nullptr != EffectClass);
@@ -294,29 +284,11 @@ float UMCOGA_CommonAttack::CalculateDegree(const FVector& SourceLocation, const 
 	return Degree;
 }
 
-void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacter, float InDegree, const FVector& InDamagedLocation,
-	const EMCOEffectPolicy& InPolicy, const UMCOActionFragment_AttributeEffect* InAttributeFragment) const
-{
-	ISTRUE(nullptr != InAttributeFragment);
-	ISTRUE(true == InAttributeFragment->IsEffectExistByPolicy(InPolicy));
-	
-	UMCODamagedData* DamagedData = NewObject<UMCODamagedData>(InAttackedCharacter);
-	DamagedData->DamagedDegree = InDegree;
-	DamagedData->DamagedLocation = InDamagedLocation;
-	DamagedData->DamagedEffectType = InAttributeFragment->GetEffectType(InPolicy);
-	DamagedData->DamagedEffectPolicy = InPolicy;
-	DamagedData->DamagedAmount = InAttributeFragment->GetDamage(InPolicy);
-	
-	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
-	ISTRUE(CharacterInterface);
-	CharacterInterface->SetDamagedData(DamagedData, InPolicy);
-}
-
-void UMCOGA_CommonAttack::RemoveDamagedDataFromTarget(ACharacter* InAttackedCharacter, const EMCOEffectPolicy& InPolicy) const
+void UMCOGA_CommonAttack::SendDamagedDataToTarget(ACharacter* InAttackedCharacter, float InDegree) const
 {
 	IMCOCharacterInterface* CharacterInterface = Cast<IMCOCharacterInterface>(InAttackedCharacter);
 	ISTRUE(CharacterInterface);
-	CharacterInterface->RemoveDamagedData(InPolicy);
+	CharacterInterface->SetDamagedDegree(InDegree);
 }
 
 void UMCOGA_CommonAttack::Attack()
@@ -360,10 +332,8 @@ void UMCOGA_CommonAttack::OnCollisionBeginOverlap(ACharacter* InAttacker, AChara
 		InAttackedCharacter->GetActorForwardVector(),
 		-CollisionFragment->GetAttackDirection(InAttacker)
 	);
-
-	const FVector DamagedLocation = SweepResult.ImpactPoint;
 		
-	ApplyDamageAndStiffness(InAttackedCharacter, DamagedDegree, DamagedLocation, SweepResult);
+	ApplyDamageAndStiffness(InAttackedCharacter, DamagedDegree, SweepResult);
 	
 	DamagedCharacters.Reset();
 }
@@ -505,10 +475,8 @@ void UMCOGA_CommonAttack::AttackByInstantCheck()
 			AttackedCharacter->GetActorForwardVector(),
 			-AttackDirection
 		);
-
-		const FVector DamagedLocation = Result.ImpactPoint;
 		
-		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, DamagedLocation, Result);
+		ApplyDamageAndStiffness(AttackedCharacter, DamagedDegree, Result);
 	}
 	
 	DamagedCharacters.Reset();

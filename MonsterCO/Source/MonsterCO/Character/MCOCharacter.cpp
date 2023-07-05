@@ -345,33 +345,9 @@ float AMCOCharacter::GetDamagedDegreeThenSetZero()
 	return Result;
 }
 
-const UMCODamagedData* AMCOCharacter::GetDamagedData(EMCOEffectPolicy InPolicy)
+void AMCOCharacter::SetDamagedDegree(const float& InDegree)
 {
-	if ((InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.IsEmpty() : DurationDamagedData.IsEmpty())
-	{
-		MCOLOG_C(MCOAbility, TEXT("Damaged Data was empty"));
-		return nullptr;
-	}
-	
-	return (InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData[0] : DurationDamagedData[0];
-}
-
-void AMCOCharacter::SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy)
-{
-	(InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.Emplace(InData) : DurationDamagedData.Emplace(InData);
-
-	DamagedDegree = InData->DamagedDegree;
-}
-
-void AMCOCharacter::RemoveDamagedData(EMCOEffectPolicy InPolicy)
-{
-	if ((InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.IsEmpty() : DurationDamagedData.IsEmpty())
-	{
-		MCOLOG_C(MCOAbility, TEXT("Damaged Data was empty, so nothing to remove"));
-		return;
-	}
-	
-	(InPolicy == EMCOEffectPolicy::Instant) ? InstantDamagedData.RemoveAt(0) : DurationDamagedData.RemoveAt(0);
+	DamagedDegree = InDegree;
 }
 
 float AMCOCharacter::GetCapsuleRadius() const
