@@ -1,4 +1,6 @@
 #include "MCOGameplayAbility_Equip.h"
+
+#include "AbilitySystem/MCOCharacterTags.h"
 #include "Interface/MCOPlayerInterface.h"
 
 
@@ -32,10 +34,26 @@ void UMCOGameplayAbility_Equip::ActivateAbility(const FGameplayAbilitySpecHandle
 {
 	ISTRUE(SetAndCommitAbility(true, Handle, ActorInfo, ActivationInfo, TriggerEventData));
 
-	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(ActorInfo->AvatarActor.Get());
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(GetActor());
 	ensure(PlayerInterface);
 
-	StartActivationWithMontage(PlayerInterface->IsEquipped() ? MontageOnUnequip : MontageOnEquip);
+	bIsToEquip = false == PlayerInterface->IsEquipped();
+	StartActivationWithMontageAndEventTag(bIsToEquip ? MontageOnEquip : MontageOnUnequip);
 	
 	PlayerInterface->SwitchEquipUnequip();
+}
+
+void UMCOGameplayAbility_Equip::OnGrantedEventTag(FGameplayTag EventTag, FGameplayEventData EventData)
+{
+	IMCOPlayerInterface* PlayerInterface = Cast<IMCOPlayerInterface>(GetActor());
+	ensure(PlayerInterface);
+
+	if (EventTag == FMCOCharacterTags::Get().AnimNotify_Player_BeginEquip)
+	{
+		PlayerInterface->BeginAnimation_Equip();	
+	}
+	else if (EventTag == FMCOCharacterTags::Get().AnimNotify_Player_EndEquip)
+	{
+		PlayerInterface->EndAnimation_Equip();	
+	}
 }

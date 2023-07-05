@@ -53,6 +53,10 @@ public:
 	// Ability 
 	FGameplayTag EffectRemoveOnDeathTag;
 	FGameplayTag CancelOnStaminaEmptyTag;
+
+	// Player Animation
+	FGameplayTag AnimNotify_Player_BeginEquip;
+	FGameplayTag AnimNotify_Player_EndEquip;
 	
 	// Dragon
 	FGameplayTag DragonAbility_Claw;
