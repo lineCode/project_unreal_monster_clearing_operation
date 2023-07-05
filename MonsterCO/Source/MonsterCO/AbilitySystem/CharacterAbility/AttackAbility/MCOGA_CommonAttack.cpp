@@ -349,19 +349,11 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 	IMCOCharacterInterface* CharacterInterface = GetMCOCharacterInterface();
 	ISTRUE(CharacterInterface);
 
-	FTransform SocketTransform = CharacterInterface->GetSocketTransform(CollisionFragment->SocketName);
-	SocketTransform.SetRotation(FQuat(FRotator(
-		0.0f,
-		SocketTransform.GetRotation().Rotator().Yaw,
-		SocketTransform.GetRotation().Rotator().Roll
-	)));
-
-	AMCOProjectile* SpawnedProjectile = GetWorld()->SpawnActorDeferred<AMCOProjectile>(
+	AMCOProjectile* SpawnedProjectile = CharacterInterface->SpawnProjectile(
 		*CurrentDefinition->AttackTimingFragment->GetProjectileClass(CurrentDamageTimingIdx),
-		SocketTransform,
-		GetActor(),
-		Cast<APawn>(GetActor()),
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+		CollisionFragment->SocketName,
+		CurrentDefinition->AttackTimingFragment->GetProjectileSpeed(CurrentDamageTimingIdx),
+		CurrentDefinition->AttackTimingFragment->GetProjectileLifeSpan(CurrentDamageTimingIdx)
 	);
 
 	ISTRUE(nullptr != SpawnedProjectile);
@@ -369,13 +361,6 @@ void UMCOGA_CommonAttack::AttackByProjectile()
 	// bind overlap event 
 	SpawnedProjectile->CollisionBeginOverlapDelegate.AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlap);
 
-	// initialize 
-	SpawnedProjectile->Initialize(
-		CurrentDefinition->AttackTimingFragment->GetProjectileSpeed(CurrentDamageTimingIdx),
-		CurrentDefinition->AttackTimingFragment->GetProjectileLifeSpan(CurrentDamageTimingIdx)
-	);
-	
-	SpawnedProjectile->FinishSpawning(SocketTransform);
 }
 
 void UMCOGA_CommonAttack::AttackByInstantCheck()

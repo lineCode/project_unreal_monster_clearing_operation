@@ -5,6 +5,8 @@
 #include "MCONiagaraEffectData.generated.h"
 
 
+// Not used
+
 
 class UNiagaraSystem;
 

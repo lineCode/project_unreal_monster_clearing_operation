@@ -1,10 +1,7 @@
 #include "MCOGameSingleton.h"
-#include "NiagaraEffect/MCONiagaraEffectData.h"
-
 
 UMCOGameSingleton::UMCOGameSingleton()
 {
-	GETASSET(NiagaraEffectData, UMCONiagaraEffectData, TEXT("/Game/Data/Effect/DA_NiagaraEffectData.DA_NiagaraEffectData"));
 }
 
 UMCOGameSingleton& UMCOGameSingleton::Get()

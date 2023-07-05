@@ -38,10 +38,10 @@ void UMCOStaminaWidget::OnGameStateChanged(const EMCOGameState& InState)
 			HUDInterface->SetupStaminaWidget(this);
 		}
 	}
-	else if (InState == EMCOGameState::FIGHT)
-	{
-		SetVisibility(ESlateVisibility::Visible);
-	}
+	// else if (InState == EMCOGameState::FIGHT)
+	// {
+	// 	SetVisibility(ESlateVisibility::Visible);
+	// }
 	else if (InState == EMCOGameState::RESULT_WIN || InState == EMCOGameState::RESULT_LOSE)
 	{
 		SetVisibility(ESlateVisibility::Hidden);
@@ -55,7 +55,8 @@ void UMCOStaminaWidget::SetPercent(const float& InPercent)
 	if (InPercent >= 1.0f)
 	{
 		bIsTimerTicking = true;
-		
+
+		StaminaTimerHandle.Invalidate();
 		GetWorld()->GetTimerManager().SetTimer(
 			StaminaTimerHandle,
 			this,
@@ -82,5 +83,4 @@ void UMCOStaminaWidget::OnStaminaFull()
 	bIsTimerTicking = false;
 	SetVisibility(ESlateVisibility::Hidden);
 	GetWorld()->GetTimerManager().ClearTimer(StaminaTimerHandle);
-	StaminaTimerHandle.Invalidate();
 }

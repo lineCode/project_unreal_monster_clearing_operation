@@ -13,10 +13,8 @@ class UNiagaraComponent;
 class UProjectileMovementComponent;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FProjectileBeginOverlapDelegate,
-												AActor*, OtherActor, 
-												const FHitResult&, SweepResult);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FProjectileBeginOverlapDelegate, AActor*, OtherActor, const FHitResult&, SweepResult);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FProjectileBackToPoolDelegate, AMCOProjectile*, InProjectile);
 
 
 UCLASS()
@@ -33,15 +31,18 @@ protected:
 
 public:
 	void Initialize(const float& InSpeed, const float& InLifeSpan);
+	void OnRespawned();
+
+protected:
+	void OnBackToPool();
+	void StartLifeSpanTimer();
 	
 	UFUNCTION()
 	void OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-	void OnCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
 public:
 	FCollisionBeginOverlapDelegate CollisionBeginOverlapDelegate;
+	FProjectileBackToPoolDelegate ProjectileBackToPoolDelegate;
 	
 protected:
 	UPROPERTY(VisibleAnywhere)
@@ -56,5 +57,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
 
+	bool bIsActive;
 	bool bIsHit;
+	float LifeSpan;
+	FTimerHandle LifeSpanTimer;
 };

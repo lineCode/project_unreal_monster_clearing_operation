@@ -11,6 +11,7 @@ class UMCOAttributeWidget;
 class UNiagaraSystem;
 class ACharacter;
 class AActor;
+class AMCOProjectile;
 
 
 
@@ -23,29 +24,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FCollisionEndOverlapDelegate,
 												ACharacter*, InAttacker,
 												AActor*, InAttackCauser,
 												ACharacter*, InOtherCharacter);
-
-
-UCLASS()
-class MONSTERCO_API UMCODamagedData : public UObject
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	float DamagedDegree = 0.0f;
-
-	UPROPERTY()
-	FVector DamagedLocation = FVector(0.0f, 0.0f, 0.0f);
-
-	UPROPERTY()
-	EMCONiagaraEffectType DamagedEffectType = EMCONiagaraEffectType::Melee;
-	
-	UPROPERTY()
-	EMCOEffectPolicy DamagedEffectPolicy = EMCOEffectPolicy::Instant;
-	
-	UPROPERTY()
-	float DamagedAmount = 0.0f;	
-};
 
 
 UINTERFACE(MinimalAPI)
@@ -79,15 +57,16 @@ public:
 	virtual void OnBeginCollision(const FCollisionBeginOverlapDelegate& InBeginDelegate, const FCollisionEndOverlapDelegate& InEndDelegate, const FName& InSocketName) = 0;
 	virtual void OnEndCollision(const FName& InSocketName) = 0;
 
+// --- Projectile
+public:
+	virtual AMCOProjectile* SpawnProjectile(const TSubclassOf<AMCOProjectile>& InClass,const FName& InSocketName, const float& InSpeed, const float& InLifeSpan) = 0;
+	
 	
 // --- Damaged
 public:
 	virtual bool CheckCanBeDamaged(FGameplayTag InTag) = 0;
 	virtual float GetDamagedDegreeThenSetZero() = 0;
 	virtual void SetDamagedDegree(const float& InDegree) = 0;
-	//virtual const UMCODamagedData* GetDamagedData(EMCOEffectPolicy InPolicy) = 0;
-	//virtual void SetDamagedData(UMCODamagedData* InData, EMCOEffectPolicy InPolicy) = 0;
-	//virtual void RemoveDamagedData(EMCOEffectPolicy InPolicy) = 0;
 
 	
 // --- Die

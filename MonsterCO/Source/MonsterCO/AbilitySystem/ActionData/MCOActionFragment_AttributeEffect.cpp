@@ -110,8 +110,3 @@ float UMCOActionFragment_AttributeEffect::GetDamage(const EMCOEffectPolicy& InPo
 	
 	return Data[InPolicy].Damage;
 }
-
-EMCONiagaraEffectType UMCOActionFragment_AttributeEffect::GetEffectType(const EMCOEffectPolicy& InPolicy) const
-{
-	return (true == Data.Contains(InPolicy)) ? Data[InPolicy].EffectType : EMCONiagaraEffectType::Melee;
-}

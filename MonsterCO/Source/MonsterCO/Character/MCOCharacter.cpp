@@ -11,12 +11,14 @@
 #include "CharacterAttachment/MCOModeComponent.h"
 #include "CharacterAttachment/Attachment/MCOAttachment.h"
 #include "Containers/Queue.h"
+#include "Projectile/MCOProjectileSpawnComponent.h"
 
 
 AMCOCharacter::AMCOCharacter(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer.SetDefaultSubobjectClass<UCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// PrimaryActorTick.bCanEverTick = true;
-
+	
+	ProjectileSpawner = CreateDefaultSubobject<UMCOProjectileSpawnComponent>(TEXT("NAME_ProjectileComponent"));
 }
 
 void AMCOCharacter::SetCharacterData()
@@ -383,6 +385,18 @@ void AMCOCharacter::OnEndCollision(const FName& InSocketName)
 	ensure(Attachment);
 
 	Attachment->OnEndCollision(InSocketName);
+}
+
+AMCOProjectile* AMCOCharacter::SpawnProjectile(const TSubclassOf<AMCOProjectile>& InClass, const FName& InSocketName, const float& InSpeed, const float& InLifeSpan)
+{
+	FTransform SocketTransform = GetSocketTransform(InSocketName);
+	SocketTransform.SetRotation(FQuat(FRotator(
+		0.0f,
+		SocketTransform.GetRotation().Rotator().Yaw,
+		SocketTransform.GetRotation().Rotator().Roll
+	)));
+	
+	return ProjectileSpawner->SpawnProjectile(InClass, this, SocketTransform, InSpeed, InLifeSpan);
 }
 
 void AMCOCharacter::Die()

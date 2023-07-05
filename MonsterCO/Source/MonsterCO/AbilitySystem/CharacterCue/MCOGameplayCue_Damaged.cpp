@@ -35,7 +35,7 @@ void AMCOGameplayCue_Damaged::HandleGameplayCue(AActor* MyTarget, EGameplayCueEv
 		// Set 'Location Position' of Niagara effect 'ON' !!!
 		SetActorLocationAndRotation(InHitResult->ImpactPoint, MyTarget->GetActorRotation());
 
-		MCOLOG_C(MCOAbility, TEXT("[%s] Instant Cue Executed : [%s]"), *GetName(), *InHitResult->ImpactPoint.ToString());
+		//MCOLOG_C(MCOAbility, TEXT("[%s] Instant Cue Executed : [%s]"), *GetName(), *InHitResult->ImpactPoint.ToString());
 	}
 	
 	NiagaraComponent->ActivateSystem();

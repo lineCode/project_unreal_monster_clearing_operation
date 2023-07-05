@@ -11,6 +11,8 @@
 AMCOProjectile::AMCOProjectile()
 {
 	bReplicates = true;
+	bIsActive = false;
+	LifeSpan = 0.0f;
 	
 	Sphere = CreateDefaultSubobject<USphereComponent>(FName("NAME_Sphere"));
 	SetRootComponent(Sphere);
@@ -29,10 +31,12 @@ void AMCOProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bIsActive = true;
 	bIsHit = false;
 	
 	Sphere->OnComponentBeginOverlap.AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlap);
-	Sphere->OnComponentEndOverlap.AddUniqueDynamic(this, &ThisClass::OnCollisionEndOverlap);
+
+	StartLifeSpanTimer();
 }
 
 void AMCOProjectile::Destroyed()
@@ -49,13 +53,63 @@ void AMCOProjectile::Initialize(const float& InSpeed, const float& InLifeSpan)
 {
 	ProjectileMovement->InitialSpeed = InSpeed;
 	ProjectileMovement->MaxSpeed = InSpeed;
-	SetLifeSpan(InLifeSpan);
+	LifeSpan = InLifeSpan;
 }
 
-// void AMCOProjectile::SetDamageEffectSpecHandle(const FGameplayEffectSpecHandle& InDamageEffectSpecHandle)
-// {
-// 	DamageEffectSpecHandle = InDamageEffectSpecHandle;
-// }
+void AMCOProjectile::OnRespawned()
+{
+	ISTRUE(false == bIsActive);
+	
+	bIsActive = true;
+	
+	NiagaraComponent->Activate();
+	
+	SetActorHiddenInGame(false);
+	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	ProjectileMovement->Velocity = GetActorForwardVector() * ProjectileMovement->InitialSpeed;
+	ProjectileMovement->Activate();
+
+	StartLifeSpanTimer();
+}
+
+void AMCOProjectile::OnBackToPool()
+{
+	ISTRUE(true == bIsActive);
+	
+	bIsActive = false;
+	LifeSpanTimer.Invalidate();
+	
+	NiagaraComponent->Deactivate();
+	
+	SetActorHiddenInGame(true);
+	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	ProjectileMovement->Deactivate();
+	
+	ProjectileBackToPoolDelegate.Broadcast(this);
+}
+
+void AMCOProjectile::StartLifeSpanTimer()
+{
+	ISTRUE(true == bIsActive);
+	
+	LifeSpanTimer.Invalidate();
+	
+	if (0.0f >= LifeSpan)
+	{
+		OnBackToPool();
+		return;
+	}
+	
+	GetWorld()->GetTimerManager().SetTimer(
+		LifeSpanTimer,
+		this,
+		&ThisClass::OnBackToPool,
+		LifeSpan,
+		false
+	);
+}
 
 void AMCOProjectile::OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -69,12 +123,12 @@ void AMCOProjectile::OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComp
 	
 	//MCOLOG_C(MCOCollision, TEXT("+++Projectile OnCollisionBeginOverlap : %s"), *SweepResult.ImpactPoint.ToString());
 	
-	ISTRUE(true == CollisionBeginOverlapDelegate.IsBound());
-	
-	CollisionBeginOverlapDelegate.Broadcast(Cast<ACharacter>(GetOwner()), OtherCharacter, SweepResult);
+	if (true == CollisionBeginOverlapDelegate.IsBound())
+	{
+		CollisionBeginOverlapDelegate.Broadcast(OwnerCharacter, OtherCharacter, SweepResult);
+	}
 
-	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(0.1f);
+	OnBackToPool();
 	
 	// if (true == HasAuthority())
 	// {
@@ -86,10 +140,4 @@ void AMCOProjectile::OnCollisionBeginOverlap(UPrimitiveComponent* OverlappedComp
 	// 	bIsHit = true;
 	// }
 }
-
-void AMCOProjectile::OnCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	
-}
-
 

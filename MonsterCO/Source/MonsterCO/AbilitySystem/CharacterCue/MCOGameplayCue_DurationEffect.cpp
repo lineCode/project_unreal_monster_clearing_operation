@@ -34,7 +34,7 @@ void AMCOGameplayCue_DurationEffect::HandleGameplayCue(AActor* MyTarget, EGamepl
 			// Set 'Location Position' of Niagara effect 'ON' !!!
 			SetActorLocationAndRotation(InHitResult->ImpactPoint, MyTarget->GetActorRotation());
 
-			MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Executed : [%s]"), *GetName(), *InHitResult->ImpactPoint.ToString());
+			//MCOLOG_C(MCOAbility, TEXT("[%s] Duration Cue Executed : [%s]"), *GetName(), *InHitResult->ImpactPoint.ToString());
 		}
 	}
 	else if (EventType == EGameplayCueEvent::Executed)

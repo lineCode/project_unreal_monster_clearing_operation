@@ -24,9 +24,6 @@ public:
 	uint8 bIsStartupEffectOfAbility : 1; 
 	
 	UPROPERTY(EditAnywhere)
-	EMCONiagaraEffectType EffectType = EMCONiagaraEffectType::Melee;
-	
-	UPROPERTY(EditAnywhere)
 	float Stamina = 0.0f;
 	
 	UPROPERTY(EditAnywhere)
@@ -54,7 +51,6 @@ public:
 	void ApplyAttributeAdditiveValue(const EMCOEffectPolicy& InPolicy, const FGameplayEffectSpecHandle& InHandle) const;
 	FGameplayTagContainer GetAllTags() const;
 	float GetDamage(const EMCOEffectPolicy& InPolicy) const;
-	EMCONiagaraEffectType GetEffectType(const EMCOEffectPolicy& InPolicy) const;
 
 protected:
 	UPROPERTY(EditAnywhere)

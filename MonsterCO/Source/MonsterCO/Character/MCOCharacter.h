@@ -19,6 +19,7 @@ class UMCOHpWidget;
 class UMCOAttributeWidget;
 class UMCOItemData;
 class UMCOModeComponent;
+class UMCOProjectileSpawnComponent;
 
 
 DECLARE_DELEGATE_OneParam(FOnTakeItemDelegate, const UMCOItemData* /*InItemData*/);
@@ -164,6 +165,16 @@ protected:
 	
 	UPROPERTY()
 	TArray<AActor*> IgnoreActors;
+
+	
+// --- Projectile
+public:
+	virtual AMCOProjectile* SpawnProjectile(const TSubclassOf<AMCOProjectile>& InClass, const FName& InSocketName, const float& InSpeed, const float& InLifeSpan) override;
+	
+protected:
+	UPROPERTY()
+	TObjectPtr<UMCOProjectileSpawnComponent> ProjectileSpawner;
+
 	
 // --- Die
 public:
