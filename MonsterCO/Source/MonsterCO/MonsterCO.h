@@ -116,6 +116,7 @@ UENUM(BlueprintType)
 enum class EMCOPlayerMode : uint8
 {
 	TwoHand        UMETA(DisplayName = "TwoHand"),
+	Bow            UMETA(DisplayName = "Bow"),
 	Max            UMETA(DisplayName = "Max")
 };
 
