@@ -415,28 +415,31 @@ void AMCOCharacter::FinishDying()
 void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidget* InAttributeWidget)
 {
 	ISTRUE(InHpWidget != nullptr);
-	ISTRUE(InAttributeWidget != nullptr);
+	AMCOPlayerState* MCOPlayerState = Cast<AMCOPlayerState>(GetPlayerState());
+	ISTRUE(MCOPlayerState);
 	
 	InHpWidget->SetName(CharacterName.ToString());
 	InHpWidget->SetMaxHp(GetMaxHealth());
 	InHpWidget->UpdateHpBar(GetHealth());
-
-	InAttributeWidget->UpdateHealth(GetHealth());
-	InAttributeWidget->UpdateMaxHealth(GetMaxHealth());
-	InAttributeWidget->UpdateStamina(GetStamina());
-	InAttributeWidget->UpdateMaxStamina(GetMaxStamina());
-	InAttributeWidget->UpdateStiffness(GetStiffness());
-	InAttributeWidget->UpdateMaxStiffness(GetMaxStiffness());
-
-	AMCOPlayerState* MCOPlayerState = Cast<AMCOPlayerState>(GetPlayerState());
-	ISTRUE(MCOPlayerState);
-
+	
 	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetHealthAttribute().GetName(), InHpWidget, &UMCOHpWidget::UpdateHpBar
 	);
 	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetMaxHealthAttribute().GetName(), InHpWidget, &UMCOHpWidget::SetMaxHp
 	);
+
+#if WITH_EDITOR
+
+	if (InAttributeWidget != nullptr)
+	{
+		InAttributeWidget->UpdateHealth(GetHealth());
+		InAttributeWidget->UpdateMaxHealth(GetMaxHealth());
+		InAttributeWidget->UpdateStamina(GetStamina());
+		InAttributeWidget->UpdateMaxStamina(GetMaxStamina());
+		InAttributeWidget->UpdateStiffness(GetStiffness());
+		InAttributeWidget->UpdateMaxStiffness(GetMaxStiffness());
+	}
 
 	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetHealthAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateHealth
@@ -456,6 +459,8 @@ void AMCOCharacter::InitializeWidget(UMCOHpWidget* InHpWidget, UMCOAttributeWidg
 	MCOPlayerState->BindAttributeChangedDelegate(
 		*AttributeSet->GetMaxStiffnessAttribute().GetName(), InAttributeWidget, &UMCOAttributeWidget::UpdateMaxStiffness
 	);
+	
+#endif 
 }
 
 

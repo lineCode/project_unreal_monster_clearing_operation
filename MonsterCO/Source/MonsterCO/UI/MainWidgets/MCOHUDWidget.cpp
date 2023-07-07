@@ -72,10 +72,12 @@ void UMCOHUDWidget::SetInGameWidget(const FName& InName)
 	UWidget* HpWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sHpBar"), *InName.ToString()));
 	ensure(nullptr != HpWidget);
 	HpWidgets.Emplace(InName, Cast<UMCOHpWidget>(HpWidget));
-	
+
+#if WITH_EDITOR
 	UWidget* AttributeWidget = GetWidgetFromName(*FString::Printf(TEXT("WBP_%sAttribute"), *InName.ToString()));
 	ensure(nullptr != AttributeWidget);
 	AttributeWidgets.Emplace(InName, Cast<UMCOAttributeWidget>(AttributeWidget));
+#endif
 }
 
 void UMCOHUDWidget::OnStageChanged(const int32& InCurrent)
@@ -87,11 +89,14 @@ void UMCOHUDWidget::ShowInGameWidget(const FName& InName, bool bShow)
 {
 	ISTRUE(true == HpWidgets.Contains(InName));
 	ISTRUE(nullptr != HpWidgets[InName]);
+	HpWidgets[InName]->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+
+#if WITH_EDITOR
 	ISTRUE(true == AttributeWidgets.Contains(InName));
 	ISTRUE(nullptr != AttributeWidgets[InName]);
 	
-	HpWidgets[InName]->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 	AttributeWidgets[InName]->SetVisibility((true == bShow) ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+#endif
 }
 
 UMCOHpWidget* UMCOHUDWidget::GetHpWidget(const bool bIsPlayer)
